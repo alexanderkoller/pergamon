@@ -1,5 +1,5 @@
 
-#import "bibtricks.typ": add-bibliography, refsection, print-bibliography
+#import "bibtypst.typ": add-bibliography, refsection, print-bibliography
 #import "bibtypst-acl.typ": format-citation-acl, format-reference-acl
 
 #set heading(numbering: "1.1")
@@ -25,7 +25,8 @@
 
   @bender20:_climb_nlu
 
-  #include "test3.typ"
+  @irtg-sgraph-15
+
 
   #print-bibliography(format-reference: format-reference-acl, sorting: it => (it.lastname-first-authors, -int(it.fields.year)),)
 ]
