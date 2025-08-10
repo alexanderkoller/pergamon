@@ -7,7 +7,8 @@
 #show ref: set text(fill: blue)
 #show link: set text(fill: blue)
 
-#add-bibliography("bibliography.bib")
+#let bibtex-string = read("bibliography.bib")
+#add-bibliography(bibtex-string)
 
 #refsection(format-citation: format-citation-acl)[
   = Introduction <sec:intro>

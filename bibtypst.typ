@@ -74,8 +74,9 @@
 #let bib-count = state("citation-counter", (:))
 #let bibliography = state("bibliography", none)
 
-#let add-bibliography(bibfilename) = {
-  let bibtex_string = read(bibfilename)
+// Unfortunately, we have to `read` the bib file from the Typst document,
+// because code in packages can't read files in the working directory.
+#let add-bibliography(bibtex_string) = {
   bibliography.update(load-bibliography(bibtex_string))
 }
 
