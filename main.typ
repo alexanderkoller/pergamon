@@ -29,7 +29,7 @@
   @irtg-sgraph-15
 
 
-  #print-bibliography(format-reference: format-reference-acl, sorting: it => (it.lastname-first-authors, -int(it.fields.year)),)
+  #print-bibliography(bibliography-title: none, format-reference: format-reference-acl, sorting: it => (it.lastname-first-authors, -int(it.fields.year)),)
 ]
 
 

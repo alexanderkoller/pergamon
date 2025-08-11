@@ -142,7 +142,9 @@
   }
 
   // "References" heading
-  [#heading(bibliography-title, numbering: none)]
+  if bibliography-title != none [
+    #heading(bibliography-title, numbering: none)
+  ]
 
   // print formatted references
   let sorted = bibl-unsorted.sorted(key: sorting)
