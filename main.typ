@@ -17,20 +17,19 @@
 #refsection(format-citation: format-citation-acl)[
   // This show rule has to come inside the refsection, otherwise it is
   // overwritten by the show rule that is defined in refsection's source code.
-  #show ref: it => [
-    #if-reference(str(it.target), 
-      reference => reference.fields.author.contains("Koller"),
-      ref => [
-        #show link: set text(fill: darkgreen)
-        #it
-      ], 
-      ref => [
-        #show link: set text(fill: darkblue)
-        #set text(fill: darkblue)
-        #it
-      ]
-    )
-  ]
+  #show ref: it => if-reference(str(it.target), 
+    reference => reference.fields.author.contains("Koller"),
+    ref => {
+      show link: set text(fill: darkgreen)
+      it
+    }, 
+    ref => {
+      show link: set text(fill: darkblue)
+      set text(fill: darkblue)
+      it
+    }
+  )
+  
 
 
   = Introduction <sec:intro>
@@ -38,13 +37,15 @@
 
   = Another section
 
-  citet: #citet(<modelizer-24>)
+  citet: !#citet(<modelizer-24>)!
 
   citep: #citep(<bender20:_climb_nlu>)
 
   citeg: #citeg(<kandra-bsc-25>)
 
   citen: #citen(<yang2025goescrosslinguisticstudyimpossible>)
+
+  #citen(<yang2025goescrosslinguisticstudyimpossible>)\; #citen(<yang2025goescrosslinguisticstudyimpossible>)
 
   @sec:intro
 

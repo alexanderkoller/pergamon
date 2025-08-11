@@ -1,5 +1,5 @@
 
-// #import "@local/bibtypst:0.1.1": url-title, paper-authors, paper-type, paper-year, highlight, parse-author-names
+// #import "@local/bibtypst:0.1.2": url-title, paper-authors, paper-type, paper-year, highlight, parse-author-names
 #import "bibtypst.typ": url-title, paper-authors, paper-type, paper-year, highlight, parse-author-names
 #import "@preview/oxifmt:0.2.1": strfmt
 
