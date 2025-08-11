@@ -120,12 +120,19 @@
 
 
 #let bib-count = state("citation-counter", (:))
-#let bibliography = state("bibliography", none)
+// #let bibliography = state("bibliography", none)
+#let bibliography = state("bibliography", (:))
 
 // Unfortunately, we have to `read` the bib file from the Typst document,
 // because code in packages can't read files in the working directory.
-#let add-bibliography(bibtex_string) = {
-  bibliography.update(load-bibliography(bibtex_string))
+#let add-bib-resource(bibtex_string) = {
+  bibliography.update(old-bib => {
+    for (key, value) in load-bibliography(bibtex_string).pairs() {
+      old-bib.insert(key, value)
+    }
+
+    old-bib
+  })
 }
 
 // Defines a section of the document that shares a bibliography.

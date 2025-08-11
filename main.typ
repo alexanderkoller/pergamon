@@ -1,5 +1,5 @@
 
-#import "bibtypst.typ": add-bibliography, refsection, print-bibliography, if-reference
+#import "bibtypst.typ": add-bib-resource, refsection, print-bibliography, if-reference
 #import "bibtypst-acl.typ": format-citation-acl, format-reference-acl, citep, citet, citeg
 
 #let darkgreen = green.darken(20%)
@@ -11,9 +11,8 @@
 #set heading(numbering: "1.1")
 
 
-
-#let bibtex-string = read("bibliography.bib")
-#add-bibliography(bibtex-string)
+#add-bib-resource(read("bibliography.bib"))
+#add-bib-resource(read("other.bib"))
 
 #refsection(format-citation: format-citation-acl)[
   // This show rule has to come inside the refsection, otherwise it is
@@ -56,6 +55,8 @@
   @bender20:_climb_nlu
 
   @irtg-sgraph-15
+
+  @wu-etal-2024-reasoning
 
   #set par(justify: true)
   #print-bibliography(format-reference: format-reference-acl, sorting: it => (it.lastname-first-authors, -int(it.fields.year)),)
