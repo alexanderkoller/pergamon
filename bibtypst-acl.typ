@@ -1,30 +1,9 @@
+
+// #import "@local/bibtypst:0.1.1": url-title, paper-authors, paper-type, paper-year, highlight, parse-author-names
+#import "bibtypst.typ": url-title, paper-authors, paper-type, paper-year, highlight, parse-author-names
 #import "@preview/oxifmt:0.2.1": strfmt
 
 
-// make title a hyperlink if DOI or URL are defined
-#let url-title(reference) = {
-  if "doi" in reference.fields {
-    link("https://doi.org/" + reference.fields.doi)[#reference.fields.title.trim()]
-  } else if "url" in reference.fields {
-    link(reference.fields.url)[#reference.fields.title.trim()]
-  } else {
-    reference.fields.title.trim()
-  }
-}
-
-
-#let paper-type(reference) = reference.entry_type
-
-#let paper-authors(reference) = if "authors" in reference { 
-  reference.authors 
-} else if "author" in reference.fields {
-  let parsed-authors = fix-authors(reference)
-  parsed-authors.authors
-} else {
-  "NO AUTHORS"
-}
-
-#let paper-year(reference) = int(reference.fields.year)
 
 // under the assumption that this is an @article reference, format the journal name + volume + number
 #let journal-suffix(reference) = {
@@ -53,13 +32,6 @@
   suffix.join("")
 }
 
-#let highlight(reference, formatted, highlighting) = {
-  if "keywords" in reference.fields and reference.fields.keywords.contains("highlight") {
-    highlighting(formatted)
-  } else {
-    formatted
-  }
-}
 
 #let format-reference-acl(reference, highlighting) = {
   let bib-type = paper-type(reference)
@@ -84,28 +56,6 @@
   highlight(reference, labeled, highlighting)
 }
 
-
-// returns a list of author names, in the form ((first, last), (first, last), ...)
-#let parse-author-names(reference) = {
-  let ret = ()
-
-  for raw_author in reference.fields.author.split(regex("\s+and\s+")) {
-    let match = raw_author.match(regex("(.*)\s*,\s*(.*)"))
-    let first = ""
-    let last = ""
-
-    if match != none {
-      (first, last) = (match.captures.at(1), match.captures.at(0))
-    } else {
-      match = raw_author.match(regex("(.+)\s+(\S+)"))
-      (first, last) = (match.captures.at(0), match.captures.at(1))
-    }
-
-    ret.push((first, last))
-  }
-
-  return ret
-}
 
 
 #let format-citation-acl(reference) = {

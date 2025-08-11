@@ -7,6 +7,44 @@
 #import "@preview/oxifmt:0.2.1": strfmt
 #import "@preview/citegeist:0.1.0": load-bibliography
 
+///////// 
+///////// Helper methods for developing Bibtypst styles
+///////// 
+
+
+// make title a hyperlink if DOI or URL are defined
+#let url-title(reference) = {
+  if "doi" in reference.fields {
+    link("https://doi.org/" + reference.fields.doi)[#reference.fields.title.trim()]
+  } else if "url" in reference.fields {
+    link(reference.fields.url)[#reference.fields.title.trim()]
+  } else {
+    reference.fields.title.trim()
+  }
+}
+
+
+#let paper-type(reference) = reference.entry_type
+
+#let paper-authors(reference) = if "authors" in reference { 
+  reference.authors 
+} else if "author" in reference.fields {
+  let parsed-authors = fix-authors(reference)
+  parsed-authors.authors
+} else {
+  "NO AUTHORS"
+}
+
+#let paper-year(reference) = int(reference.fields.year)
+
+
+#let highlight(reference, formatted, highlighting) = {
+  if "keywords" in reference.fields and reference.fields.keywords.contains("highlight") {
+    highlighting(formatted)
+  } else {
+    formatted
+  }
+}
 
 
 // returns a list of author names, in the form ((first, last), (first, last), ...)
@@ -30,6 +68,11 @@
 
   return ret
 }
+
+
+///////// 
+///////// Internal helper methods
+///////// 
 
 
 // concatenate an array of authors into "A, B, and C"
@@ -69,6 +112,11 @@
   reference
 }
 
+
+
+///////// 
+///////// Public functions
+///////// 
 
 
 #let bib-count = state("citation-counter", (:))
