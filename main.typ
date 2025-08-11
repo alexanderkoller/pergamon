@@ -1,6 +1,6 @@
 
 #import "bibtypst.typ": add-bib-resource, refsection, print-bibliography, if-reference
-#import "bibtypst-acl.typ": format-citation-acl, format-reference-acl, citep, citet, citeg
+#import "bibtypst-acl.typ": format-citation-acl, format-reference-acl, citep, citet, citeg, citen
 
 #let darkgreen = green.darken(20%)
 #let darkblue = blue.darken(20%)
@@ -44,11 +44,10 @@
 
   citeg: #citeg(<kandra-bsc-25>)
 
+  citen: #citen(<yang2025goescrosslinguisticstudyimpossible>)
+
   @sec:intro
 
-  @modelizer-24
-
-  @yang2025goescrosslinguisticstudyimpossible
 
   @kandra-bsc-25
 

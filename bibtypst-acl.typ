@@ -73,13 +73,15 @@
     parsed-authors.at(0).at(1) + " et al."
   }
 
-  if form == auto or form(none) == "p" {
-    strfmt("({} {})", authors-str, year)
-  } else if form(none) == "t" {
+  let fform = if form == auto { auto } else { form(none) } // str or auto
+
+  if fform == "t" {
     strfmt("{} ({})", authors-str, year)
-  } else if form(none) == "g" {
+  } else if fform == "g" {
     strfmt("{}'s ({})", authors-str, year)
-  } else {
+  } else if fform == "n" {
+    strfmt("{} {}", authors-str, year)
+  } else { // auto or "p"
     strfmt("({} {})", authors-str, year)    
   }
 }
@@ -88,3 +90,4 @@
 #let citep(lbl) = ref(lbl, supplement: it => "p")
 #let citet(lbl) = ref(lbl, supplement: it => "t")
 #let citeg(lbl) = ref(lbl, supplement: it => "g")
+#let citen(lbl) = ref(lbl, supplement: it => "n")
