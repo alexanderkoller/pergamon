@@ -1,6 +1,6 @@
 
 #import "bibtypst.typ": add-bibliography, refsection, print-bibliography, if-reference
-#import "bibtypst-acl.typ": format-citation-acl, format-reference-acl, citep, citet
+#import "bibtypst-acl.typ": format-citation-acl, format-reference-acl, citep, citet, citeg
 
 #let darkgreen = green.darken(20%)
 #let darkblue = blue.darken(20%)
@@ -42,6 +42,8 @@
   citet: #citet(<modelizer-24>)
 
   citep: #citep(<bender20:_climb_nlu>)
+
+  citeg: #citeg(<kandra-bsc-25>)
 
   @sec:intro
 

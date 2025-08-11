@@ -77,6 +77,8 @@
     strfmt("({} {})", authors-str, year)
   } else if form(none) == "t" {
     strfmt("{} ({})", authors-str, year)
+  } else if form(none) == "g" {
+    strfmt("{}'s ({})", authors-str, year)
   } else {
     strfmt("({} {})", authors-str, year)    
   }
@@ -85,4 +87,4 @@
 
 #let citep(lbl) = ref(lbl, supplement: it => "p")
 #let citet(lbl) = ref(lbl, supplement: it => "t")
-
+#let citeg(lbl) = ref(lbl, supplement: it => "g")
