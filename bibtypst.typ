@@ -178,6 +178,31 @@
   doc
 }
 
+// Generates content depending on whether the reference for a given key
+// matches the condition. "condition" is a function (reference => boolean);
+// "if-content" and "else-content" are functions (reference => content).
+// if-reference looks up the reference for the given key. If one exists
+// and the condition returns true for it, it returns the content that
+// "if-content" generates for the reference. Otherwise, it returns the
+// content that "else-content" generates.
+#let if-reference(key, condition, if-content, else-content) = context {
+  let bib = bibliography.get()
+
+  if key in bib {
+    let ref = bib.at(key)
+    // [#ref.fields.author]
+
+    if condition(ref) {
+      if-content(ref)
+    } else {
+      else-content(ref)
+    }
+  } else {
+    return else-content(ref)
+  }
+}
+
+
 #let print-bibliography( 
   format-reference: (bib-entry, highlighting) => [REFERENCE],
   sorting: reference => 0, 
