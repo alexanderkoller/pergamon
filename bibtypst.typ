@@ -158,7 +158,7 @@
 
     if el != none and  el.func() == figure and el.kind == "reference" {
       let bib = bibliography.get()
-      let citation = format-citation(bib.at(cite-key))
+      let citation = format-citation(bib.at(cite-key), it.supplement)
       link(it.target)[#citation]
     } else {
       it

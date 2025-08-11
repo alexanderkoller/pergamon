@@ -57,20 +57,32 @@
 }
 
 
-
-#let format-citation-acl(reference) = {
+// Regrettably, the form has to be specified as either "auto"
+// (a default value) or as a constant function that returns a string.
+// This is because we get the form from a "ref" supplement, which can't
+// have type "string" (it has to be "content"). 
+#let format-citation-acl(reference, form) = {
   let parsed-authors = parse-author-names(reference)
   let year = paper-year(reference)
 
-  if parsed-authors.len() == 1 {
-    return strfmt("{} ({})", parsed-authors.at(0).at(1), year)
+  let authors-str = if parsed-authors.len() == 1 {
+    parsed-authors.at(0).at(1)
   } else if parsed-authors.len() == 2 {
-    return strfmt("{} and {} ({})", parsed-authors.at(0).at(1), parsed-authors.at(1).at(1), year)
+    strfmt("{} and {}", parsed-authors.at(0).at(1), parsed-authors.at(1).at(1))
   } else {
-    return strfmt("{} et al. ({})", parsed-authors.at(0).at(1), year)
+    parsed-authors.at(0).at(1) + " et al."
+  }
+
+  if form == auto or form(none) == "p" {
+    strfmt("({} {})", authors-str, year)
+  } else if form(none) == "t" {
+    strfmt("{} ({})", authors-str, year)
+  } else {
+    strfmt("({} {})", authors-str, year)    
   }
 }
 
 
-
+#let citep(lbl) = ref(lbl, supplement: it => "p")
+#let citet(lbl) = ref(lbl, supplement: it => "t")
 
