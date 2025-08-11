@@ -165,7 +165,15 @@
     }
   }
 
-  show figure: set align(left)
+  show figure: it => {
+    // left-align figures that we abuse for the individual references
+    if it.kind == "reference" {
+      set align(left)
+      it
+    } else {
+      it
+    } 
+  }
 
   doc
 }

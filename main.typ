@@ -5,6 +5,9 @@
 #set heading(numbering: "1.1")
 
 #show ref: set text(fill: blue)
+
+
+
 #show link: set text(fill: blue)
 
 #let bibtex-string = read("bibliography.bib")
