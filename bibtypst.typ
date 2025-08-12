@@ -1,9 +1,4 @@
 
-// Limitations:
-// - Can't use the same label for a bib entry and as a standalone label (e.g. section reference),
-//   but I guess that doesn't make sense anyway.
-// - "add-bibliography" can only load a single bibliography for now.
-
 #import "@preview/oxifmt:0.2.1": strfmt
 #import "@preview/citegeist:0.1.0": load-bibliography
 
@@ -122,10 +117,8 @@
 ///////// 
 
 
-#let bib-count = state("citation-counter", (:))
-// #let bibliography = state("bibliography", none)
+#let reference-collection = state("reference-collection", (:))
 #let bibliography = state("bibliography", (:))
-#let bib-counter = counter("bib-entry-id")
 
 
 // Unfortunately, we have to `read` the bib file from the Typst document,
@@ -147,7 +140,7 @@
 // "print-bibliography" function.
 #let refsection(format-citation: reference => [CITATION], doc) = {
   // reset the keys that are cited in this section
-  bib-count.update((:))
+  reference-collection.update((:))
 
   // check that we have a bibliography loaded
   context {
@@ -162,15 +155,18 @@
 
     // this has to be executed unconditionally, because the ref target
     // only changes into a reference once it is cited
-    bib-count.update( dict => {
+    reference-collection.update( dict => {
      dict.insert(cite-key, "1")
      return dict
     })
 
+    // We can recognize references to items in the bibliography by the fact
+    // that they point to a "metadata" element with a dictionary value that
+    // contains "kind = reference-data". This dictionary then also contains
+    // all sorts of other useful information, which we pass on to `format-citation`.
     if el != none and el.func() == metadata {
-      // metadata contains a dict with all the relevant information
       let target = query(it.target).first()
-      if target.value.kind == "reference-data" {
+      if type(target.value) == dictionary and "kind" in target.value and target.value.kind == "reference-data" {
         let citation-str = format-citation(target.value, it.supplement)
         link(it.target)[#citation-str]
       } else {
@@ -179,17 +175,6 @@
     } else {
       it
     }
-  }
-
-  show figure: it => {
-    // left-align figures that we abuse for the individual references
-    if it.kind == "reference" {
-      set align(left)
-      set block(width: 100%)
-      it
-    } else {
-      it
-    } 
   }
 
   doc
@@ -219,9 +204,7 @@
   }
 }
 
-// TODO: We probably need to let the style-specific formatter return a list of tuples,
-// which we will then typeset as a grid. Otherwise we can't do a cleanly formatted
-// numeric style.
+// Prints the bibliography for the current refsection.
 #let print-bibliography( 
   format-reference: (index, bib-entry, highlighting) => ([REFERENCE],),
   sorting: reference => 0, 
@@ -232,7 +215,7 @@
   let bib = bibliography.get()
 
   // extract references for the cited keys
-  let cited-keys = bib-count.final().keys()
+  let cited-keys = reference-collection.final().keys()
   let bibl-unsorted = ()
   for lbl in cited-keys {
     let key = str(lbl)
@@ -248,13 +231,14 @@
     #heading(bibliography-title, numbering: none)
   ]
 
-  // print formatted references
-  // format-reference: (index, reference) -> array(content)
+  // Format the references, based on format-reference: (index, reference, highlighting) -> array(content).
+  // Each call to format-reference returns an array of content, for the columns of one printed reference.
   let sorted = bibl-unsorted.sorted(key: sorting)
   let formatted-references = sorted.enumerate().map(it => format-reference(it.at(0), it.at(1), highlighting))  // -> array(array(content))
   let num-columns = if formatted-references.len() == 0 { 0 } else { formatted-references.at(0).len() }
   let cells = ()
 
+  // collect cells
   for index in range(sorted.len()) {
     let reference = sorted.at(index)
     let formatted-reference = formatted-references.at(index)
@@ -265,10 +249,10 @@
       key: reference.entry_key,
       index: index,
       reference: reference,
-      year: paper-year(reference),
-      last-names: reference.lastnames 
+      year: paper-year(reference)
     )
 
+    // store the data in "meta" in a metadata element, so it can later be access through the label
     let cell0 = [#metadata(meta)#label(reference.entry_key)#formatted-reference.at(0)]
     cells.push(cell0)
 
@@ -278,16 +262,15 @@
     }
   }
 
+  // layout the cells in a grid
   if num-columns > 0 {
-    // TODO this all looks a little too vertically loose
-
+    // allow grid-style argument to override default layout parameters
     let final-grid-style = (columns: num-columns, row-gutter: 1.2em, column-gutter: 0.5em)
     for (key, value) in grid-style.pairs() {
       final-grid-style.insert(key, value)
     }
 
-    grid(..final-grid-style,
-      ..cells)
+    grid(..final-grid-style, ..cells)
   } else {
     []
   }

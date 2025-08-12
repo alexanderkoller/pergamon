@@ -66,9 +66,9 @@
 // This is because we get the form from a "ref" supplement, which can't
 // have type "string" (it has to be "content"). 
 #let format-citation-acl(reference-dict, form) = {
-  // keys of reference-dict: key, index, reference, last-names, year
+  // keys of reference-dict: key, index, reference, year
 
-  let parsed-authors = reference-dict.last-names
+  let parsed-authors = reference-dict.reference.lastnames
   let year = reference-dict.year
 
   let authors-str = if parsed-authors.len() == 1 {
