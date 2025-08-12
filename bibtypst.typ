@@ -207,8 +207,9 @@
 
   while i < sorting-string.len() {
     let sort-key = sorting-string.at(i)
-    let sorting-function = if sort-key == "y" {
+    let sorting-function = if sort-key == "y" or sort-key == "d" {
       // year
+      // TODO: currently we ignore the rest of the date if "d" specified, fix that
       if i+1 < sorting-string.len() and sorting-string.at(i+1) == "d" {
         reference => -int(reference.fields.year)
         i += 1
@@ -225,7 +226,6 @@
       // volume
       reference => if "volume" in reference.fields { reference.fields.volume } else { "ZZZZZZZZZZ" }
     } else {
-      // TODO: implement "d" = full date (dd = date descending)
       // TODO: implement "a" = alphabetic label (if exists)
       panic(strfmt("Sorting key {} is not implemented yet.", sort-key))
     }
