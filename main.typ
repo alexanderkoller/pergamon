@@ -7,15 +7,18 @@
 #let darkblue = blue.darken(20%)
 
 #show link: set text(fill: darkblue)
-  
 
 #set heading(numbering: "1.1")
+
+#let fcite = format-citation-numeric
+#let fref = format-reference-numeric
+
 
 
 #add-bib-resource(read("bibliography.bib"))
 #add-bib-resource(read("other.bib"))
 
-#refsection(format-citation: format-citation-acl)[
+#refsection(format-citation: fcite)[
   // This show rule has to come inside the refsection, otherwise it is
   // overwritten by the show rule that is defined in refsection's source code.
   #show ref: it => if-reference(str(it.target), 
@@ -60,7 +63,7 @@
   @wu-etal-2024-reasoning
 
 
-  #print-bibliography(format-reference: format-reference-acl, sorting: it => (it.lastname-first-authors, -int(it.fields.year)),)
+  #print-bibliography(format-reference: fref, sorting: it => (it.lastname-first-authors, -int(it.fields.year)),)
 ]
 
 
