@@ -1,6 +1,7 @@
 
 #import "bibtypst.typ": add-bib-resource, refsection, print-bibliography, if-reference
 #import "bibtypst-acl.typ": format-citation-acl, format-reference-acl, citep, citet, citeg, citen
+#import "bibtypst-numeric.typ": format-citation-numeric, format-reference-numeric
 
 #let darkgreen = green.darken(20%)
 #let darkblue = blue.darken(20%)
@@ -30,10 +31,10 @@
     }
   )
   
-
+  #set par(justify: true)
 
   = Introduction <sec:intro>
-  sadfsdf
+  #lorem(100)
 
   = Another section
 
@@ -58,7 +59,7 @@
 
   @wu-etal-2024-reasoning
 
-  #set par(justify: true)
+
   #print-bibliography(format-reference: format-reference-acl, sorting: it => (it.lastname-first-authors, -int(it.fields.year)),)
 ]
 

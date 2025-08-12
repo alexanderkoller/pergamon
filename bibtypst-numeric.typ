@@ -33,7 +33,7 @@
 }
 
 
-#let format-reference-acl(index, reference, highlighting) = {
+#let format-reference-numeric(index, reference, highlighting) = {
   let bib-type = paper-type(reference)
   let authors =  paper-authors(reference)
   let award = if "award" in reference.fields { [ #strong(reference.fields.award).] } else { [] }
@@ -57,43 +57,14 @@
 
   let labeled = [#formatted]
 
-  (highlight(reference, labeled, highlighting),) // return length-1 tuple
+  (
+    [[#{index+1}]],
+    highlight(reference, labeled, highlighting)
+  )
 }
 
-
-// Regrettably, the form has to be specified as either "auto"
-// (a default value) or as a constant function that returns a string.
-// This is because we get the form from a "ref" supplement, which can't
-// have type "string" (it has to be "content"). 
-#let format-citation-acl(reference-dict, form) = {
+#let format-citation-numeric(reference-dict, form) = {
   // keys of reference-dict: key, index, reference, last-names, year
-
-  let parsed-authors = reference-dict.last-names
-  let year = reference-dict.year
-
-  let authors-str = if parsed-authors.len() == 1 {
-    parsed-authors.at(0)
-  } else if parsed-authors.len() == 2 {
-    strfmt("{} and {}", parsed-authors.at(0), parsed-authors.at(1))
-  } else {
-    parsed-authors.at(0) + " et al."
-  }
-
-  let fform = if form == auto { auto } else { form(none) } // str or auto
-
-  if fform == "t" {
-    strfmt("{} ({})", authors-str, year)
-  } else if fform == "g" {
-    strfmt("{}'s ({})", authors-str, year)
-  } else if fform == "n" {
-    strfmt("{} {}", authors-str, year)
-  } else { // auto or "p"
-    strfmt("({} {})", authors-str, year)    
-  }
+  return [[#{reference-dict.index+1}]]
 }
 
-
-#let citep(lbl) = ref(lbl, supplement: it => "p")
-#let citet(lbl) = ref(lbl, supplement: it => "t")
-#let citeg(lbl) = ref(lbl, supplement: it => "g")
-#let citen(lbl) = ref(lbl, supplement: it => "n")

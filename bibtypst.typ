@@ -100,14 +100,17 @@
   let parsed-names = parse-author-names(reference)
   let lastname-first-authors = ()
   let firstname-first-authors = ()
+  let lastnames = ()
 
   for (first, last) in parsed-names {
     lastname-first-authors.push(strfmt("{}, {}", last, first))
     firstname-first-authors.push(strfmt("{} {}", first, last))
+    lastnames.push(last)
   }
 
   reference.insert("lastname-first-authors", lastname-first-authors.join(" ")) // for sorting
   reference.insert("authors", concatenate-authors(firstname-first-authors))
+  reference.insert("lastnames", lastnames) // to construct citations
 
   reference
 }
@@ -122,6 +125,8 @@
 #let bib-count = state("citation-counter", (:))
 // #let bibliography = state("bibliography", none)
 #let bibliography = state("bibliography", (:))
+#let bib-counter = counter("bib-entry-id")
+
 
 // Unfortunately, we have to `read` the bib file from the Typst document,
 // because code in packages can't read files in the working directory.
@@ -152,21 +157,25 @@
   }
 
   show ref: it => {
-    // this has to be executed unconditionally, because the ref target
-    // only changes into a reference once it is cited
     let el = it.element
     let cite-key = str(it.target)
 
-    // collect key of citation
+    // this has to be executed unconditionally, because the ref target
+    // only changes into a reference once it is cited
     bib-count.update( dict => {
      dict.insert(cite-key, "1")
      return dict
     })
 
-    if el != none and  el.func() == figure and el.kind == "reference" {
-      let bib = bibliography.get()
-      let citation = format-citation(bib.at(cite-key), it.supplement)
-      link(it.target)[#citation]
+    if el != none and el.func() == metadata {
+      // metadata contains a dict with all the relevant information
+      let target = query(it.target).first()
+      if target.value.kind == "reference-data" {
+        let citation-str = format-citation(target.value, it.supplement)
+        link(it.target)[#citation-str]
+      } else {
+        it
+      }
     } else {
       it
     }
@@ -210,12 +219,16 @@
   }
 }
 
-
+// TODO: We probably need to let the style-specific formatter return a list of tuples,
+// which we will then typeset as a grid. Otherwise we can't do a cleanly formatted
+// numeric style.
 #let print-bibliography( 
-  format-reference: (bib-entry, highlighting) => [REFERENCE],
+  format-reference: (index, bib-entry, highlighting) => ([REFERENCE],),
   sorting: reference => 0, 
-  highlighting: it => it, 
+  highlighting: it => it,
+  grid-style: (:),
   bibliography-title: "References") = context {
+
   let bib = bibliography.get()
 
   // extract references for the cited keys
@@ -236,12 +249,46 @@
   ]
 
   // print formatted references
+  // format-reference: (index, reference) -> array(content)
   let sorted = bibl-unsorted.sorted(key: sorting)
-  for bib-entry in sorted {    
-    [#figure( kind: "reference", supplement: none, numbering: n => numbering("[1]", n), [
-      #format-reference(bib-entry, highlighting)
-    ])
-    #label(bib-entry.entry_key)
-    ]
+  let formatted-references = sorted.enumerate().map(it => format-reference(it.at(0), it.at(1), highlighting))  // -> array(array(content))
+  let num-columns = if formatted-references.len() == 0 { 0 } else { formatted-references.at(0).len() }
+  let cells = ()
+
+  for index in range(sorted.len()) {
+    let reference = sorted.at(index)
+    let formatted-reference = formatted-references.at(index)
+
+    // construct first cell of the row, it has to contain the metadata and label
+    let meta = (
+      kind: "reference-data",
+      key: reference.entry_key,
+      index: index,
+      reference: reference,
+      year: paper-year(reference),
+      last-names: reference.lastnames 
+    )
+
+    let cell0 = [#metadata(meta)#label(reference.entry_key)#formatted-reference.at(0)]
+    cells.push(cell0)
+
+    // add all the other cells, if any
+    for cell in formatted-reference.slice(1) {
+      cells.push(cell)
+    }
+  }
+
+  if num-columns > 0 {
+    // TODO this all looks a little too vertically loose
+
+    let final-grid-style = (columns: num-columns, row-gutter: 1.2em, column-gutter: 0.5em)
+    for (key, value) in grid-style.pairs() {
+      final-grid-style.insert(key, value)
+    }
+
+    grid(..final-grid-style,
+      ..cells)
+  } else {
+    []
   }
 }
