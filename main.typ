@@ -65,7 +65,7 @@
   @wu-etal-2024-reasoning
 
 
-  #print-bibliography(format-reference: fref, sorting: none)
+  #print-bibliography(format-reference: fref, sorting: "nyt")
 ]
 
 

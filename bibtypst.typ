@@ -196,7 +196,6 @@
 
   doc
 }
-// (it.lastname-first-authors, -int(it.fields.year)),)
 
 #let construct-sorting(sorting-string) = {
   let i = 0
@@ -222,9 +221,11 @@
     } else if sort-key == "t" {
       // paper title
       reference => reference.fields.title.trim()
+    } else if sort-key == "v" {
+      // volume
+      reference => if "volume" in reference.fields { reference.fields.volume } else { "ZZZZZZZZZZ" }
     } else {
       // TODO: implement "d" = full date (dd = date descending)
-      // TODO: implement "v" = volume
       // TODO: implement "a" = alphabetic label (if exists)
       panic(strfmt("Sorting key {} is not implemented yet.", sort-key))
     }
