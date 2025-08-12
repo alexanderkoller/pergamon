@@ -10,8 +10,10 @@
 
 #set heading(numbering: "1.1")
 
-#let fcite = format-citation-numeric
-#let fref = format-reference-numeric
+// #let fcite = format-citation-numeric
+// #let fref = format-reference-numeric
+#let fcite = format-citation-acl
+#let fref = format-reference-acl
 
 
 
