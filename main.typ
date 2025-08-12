@@ -65,7 +65,7 @@
   @wu-etal-2024-reasoning
 
 
-  #print-bibliography(format-reference: fref, sorting: it => (it.lastname-first-authors, -int(it.fields.year)),)
+  #print-bibliography(format-reference: fref, sorting: none)
 ]
 
 

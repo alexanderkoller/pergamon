@@ -196,17 +196,61 @@
 
   doc
 }
+// (it.lastname-first-authors, -int(it.fields.year)),)
 
+#let construct-sorting(sorting-string) = {
+  let i = 0
+  let ret = ()
+
+  if sorting-string == "none" {
+    return none
+  }
+
+  while i < sorting-string.len() {
+    let sort-key = sorting-string.at(i)
+    let sorting-function = if sort-key == "y" {
+      // year
+      if i+1 < sorting-string.len() and sorting-string.at(i+1) == "d" {
+        reference => -int(reference.fields.year)
+        i += 1
+      } else {
+        reference => int(reference.fields.year)
+      }
+    } else if sort-key == "n" {
+      // author name
+      reference => reference.lastname-first-authors
+    } else if sort-key == "t" {
+      // paper title
+      reference => reference.fields.title.trim()
+    } else {
+      // TODO: implement "d" = full date (dd = date descending)
+      // TODO: implement "v" = volume
+      // TODO: implement "a" = alphabetic label (if exists)
+      panic(strfmt("Sorting key {} is not implemented yet.", sort-key))
+    }
+
+    i += 1
+    ret.push(sorting-function)
+  }
+
+  it => ret.map(f => f(it))
+}
 
 // Prints the bibliography for the current refsection.
 #let print-bibliography( 
   format-reference: (index, bib-entry, highlighting) => ([REFERENCE],),
-  sorting: reference => 0, 
+  sorting: none, 
   highlighting: it => it,
   grid-style: (:),
   bibliography-title: "References") = context {
 
   let bib = bibliography.get()
+
+  // construct sorting function if necessary
+  let sorting-function = if type(sorting) == str { construct-sorting(sorting) } else { sorting }
+  if sorting-function == none {
+    sorting-function = it => 0
+  }
 
   // extract references for the cited keys
   let cited-keys = reference-collection.final().keys()
@@ -227,7 +271,7 @@
 
   // Format the references, based on format-reference: (index, reference, highlighting) -> array(content).
   // Each call to format-reference returns an array of content, for the columns of one printed reference.
-  let sorted = bibl-unsorted.sorted(key: sorting)
+  let sorted = bibl-unsorted.sorted(key: sorting-function)
   let formatted-references = sorted.enumerate().map(it => format-reference(it.at(0), it.at(1), highlighting))  // -> array(array(content))
   let num-columns = if formatted-references.len() == 0 { 0 } else { formatted-references.at(0).len() }
   let cells = ()
