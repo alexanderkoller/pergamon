@@ -133,6 +133,33 @@
   })
 }
 
+// Checks whether "it" is a reference (type `ref`) to an item in the bibliography.
+// If yes, it retrieves the metadata for that bib item and calls `citation-content`
+// on it; citation-content: dictionary => content.
+// Otherwise, it evaluates `other-content` on the ref item itself; by default,
+// it simply returns the ref item unchanged.
+//
+// We recognize references to items in the bibliography by the fact
+// that they point to a "metadata" element with a dictionary value that
+// contains "kind = reference-data". This dictionary value is passed as the
+// argument to `citation-content`.
+
+#let if-citation(it, citation-content, other-content: x => x) = {
+    let el = it.element
+    let cite-key = str(it.target)
+
+    if el != none and el.func() == metadata {
+      let target = query(it.target).first()
+      if type(target.value) == dictionary and "kind" in target.value and target.value.kind == "reference-data" {
+        citation-content(target.value)
+      } else {
+        other-content(it)
+      }
+    } else {
+      other-content(it)
+    }
+}
+
 // Defines a section of the document that shares a bibliography.
 // You need to load a bibliography with the "add-bibliography" function
 // in a place that is earlier than the refsection in rendering order.
@@ -150,7 +177,7 @@
   }
 
   show ref: it => {
-    let el = it.element
+    // let el = it.element
     let cite-key = str(it.target)
 
     // this has to be executed unconditionally, because the ref target
@@ -160,49 +187,16 @@
      return dict
     })
 
-    // We can recognize references to items in the bibliography by the fact
-    // that they point to a "metadata" element with a dictionary value that
-    // contains "kind = reference-data". This dictionary then also contains
-    // all sorts of other useful information, which we pass on to `format-citation`.
-    if el != none and el.func() == metadata {
-      let target = query(it.target).first()
-      if type(target.value) == dictionary and "kind" in target.value and target.value.kind == "reference-data" {
-        let citation-str = format-citation(target.value, it.supplement)
-        link(it.target)[#citation-str]
-      } else {
-        it
-      }
-    } else {
-      it
-    }
+    // Format references that are really citations.
+    if-citation(it, value => {
+      let citation-str = format-citation(value, it.supplement)
+      link(it.target)[#citation-str]
+    })
   }
 
   doc
 }
 
-// Generates content depending on whether the reference for a given key
-// matches the condition. "condition" is a function (reference => boolean);
-// "if-content" and "else-content" are functions (reference => content).
-// if-reference looks up the reference for the given key. If one exists
-// and the condition returns true for it, it returns the content that
-// "if-content" generates for the reference. Otherwise, it returns the
-// content that "else-content" generates.
-#let if-reference(key, condition, if-content, else-content) = context {
-  let bib = bibliography.get()
-
-  if key in bib {
-    let ref = bib.at(key)
-    // [#ref.fields.author]
-
-    if condition(ref) {
-      if-content(ref)
-    } else {
-      else-content(ref)
-    }
-  } else {
-    return else-content(ref)
-  }
-}
 
 // Prints the bibliography for the current refsection.
 #let print-bibliography( 

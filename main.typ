@@ -1,5 +1,5 @@
 
-#import "bibtypst.typ": add-bib-resource, refsection, print-bibliography, if-reference
+#import "bibtypst.typ": add-bib-resource, refsection, print-bibliography, if-citation
 #import "bibtypst-acl.typ": format-citation-acl, format-reference-acl, citep, citet, citeg, citen
 #import "bibtypst-numeric.typ": format-citation-numeric, format-reference-numeric
 
@@ -23,18 +23,18 @@
 #refsection(format-citation: fcite)[
   // This show rule has to come inside the refsection, otherwise it is
   // overwritten by the show rule that is defined in refsection's source code.
-  #show ref: it => if-reference(str(it.target), 
-    reference => reference.fields.author.contains("Koller"),
-    ref => {
+  // It colors the citation links based on whether the reference is to a PI publication.
+  #show ref: it => if-citation(it, value => {
+    if "Koller" in value.reference.lastnames {
       show link: set text(fill: darkgreen)
       it
-    }, 
-    ref => {
+    } else {
       show link: set text(fill: darkblue)
       set text(fill: darkblue)
       it
     }
-  )
+  })
+
   
   #set par(justify: true)
 
