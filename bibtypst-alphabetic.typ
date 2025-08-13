@@ -1,5 +1,8 @@
 
-// #import "@local/bibtypst:0.1.2": url-title, paper-authors, paper-type, paper-year, highlight, parse-author-names
+
+
+
+
 #import "bibtypst.typ": url-title, paper-authors, paper-type, paper-year, highlight, parse-author-names
 #import "@preview/oxifmt:0.2.1": strfmt
 
@@ -33,7 +36,31 @@
 }
 
 
-#let format-reference-acl(highlighting: x => x) = {
+#let add-label-alphabetic(maxalphanames: 3, labelalpha: 3, labelalphaothers: "+") = {
+  let labeler(reference) = {
+    // TODO - handle the case with no authors
+    // TODO - handle the case where reference.fields.label is already defined (then just keep it)
+    
+    let abbreviation = if reference.lastnames.len() == 1 {
+      reference.lastnames.at(0).slice(0, labelalpha)
+    } else {
+      let first-letters = reference.lastnames.map(s => s.at(0)).join("")
+      if reference.lastnames.len() > maxalphanames {
+        first-letters.slice(0, maxalphanames) + labelalphaothers
+      } else {
+        first-letters
+      }
+    }
+
+    reference.insert("label", strfmt("[{}{:02}]", abbreviation, calc.rem(paper-year(reference), 100)))
+    reference
+  }
+
+  labeler
+}
+
+
+#let format-reference-alphabetic(highlighting: x => x) = {
   let formatter(index, reference) = {
     let bib-type = paper-type(reference)
     let authors =  paper-authors(reference)
@@ -56,43 +83,16 @@
       [UNKOWN BIB TYPE]
     }
 
-    let labeled = [#formatted]
-
-    (highlight(reference, labeled, highlighting),) // return length-1 tuple
+    // let labeled = [#formatted]
+    (reference.label, highlight(reference, formatted, highlighting),) // return length-1 tuple
   }
+
   return formatter
 }
 
 
-// Regrettably, the form has to be specified as either "auto"
-// (a default value) or as a constant function that returns a string.
-// This is because we get the form from a "ref" supplement, which can't
-// have type "string" (it has to be "content"). 
-#let format-citation-acl(reference-dict, form) = {
-  // keys of reference-dict: key, index, reference, year
-
-  let parsed-authors = reference-dict.reference.lastnames
-  let year = reference-dict.year
-
-  let authors-str = if parsed-authors.len() == 1 {
-    parsed-authors.at(0)
-  } else if parsed-authors.len() == 2 {
-    strfmt("{} and {}", parsed-authors.at(0), parsed-authors.at(1))
-  } else {
-    parsed-authors.at(0) + " et al."
-  }
-
-  let fform = if form == auto { auto } else { form(none) } // str or auto
-
-  if fform == "t" {
-    strfmt("{} ({})", authors-str, year)
-  } else if fform == "g" {
-    strfmt("{}'s ({})", authors-str, year)
-  } else if fform == "n" {
-    strfmt("{} {}", authors-str, year)
-  } else { // auto or "p"
-    strfmt("({} {})", authors-str, year)    
-  }
+#let format-citation-alphabetic(reference-dict, form) = {
+  reference-dict.label
 }
 
 

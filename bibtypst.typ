@@ -225,8 +225,9 @@
     } else if sort-key == "v" {
       // volume
       reference => if "volume" in reference.fields { reference.fields.volume } else { "ZZZZZZZZZZ" }
+    } else if sort-key == "a" {
+      reference => if "label" in reference { reference.label } else { "ZZZZZZZZZ" }
     } else {
-      // TODO: implement "a" = alphabetic label (if exists)
       panic(strfmt("Sorting key {} is not implemented yet.", sort-key))
     }
 
@@ -239,9 +240,9 @@
 
 // Prints the bibliography for the current refsection.
 #let print-bibliography( 
-  format-reference: (index, bib-entry, highlighting) => ([REFERENCE],),
+  format-reference: (index, bib-entry) => ([REFERENCE],),
+  add-label: reference => reference,
   sorting: none, 
-  highlighting: it => it,
   grid-style: (:),
   bibliography-title: "References") = context {
 
@@ -272,8 +273,11 @@
 
   // Format the references, based on format-reference: (index, reference, highlighting) -> array(content).
   // Each call to format-reference returns an array of content, for the columns of one printed reference.
-  let sorted = bibl-unsorted.sorted(key: sorting-function)
-  let formatted-references = sorted.enumerate().map(it => format-reference(it.at(0), it.at(1), highlighting))  // -> array(array(content))
+  
+  // for styles that have meaningful labels, compute and insert them under the "label" key
+  let labeled-bibl-unsorted = bibl-unsorted.map(add-label)
+  let sorted = labeled-bibl-unsorted.sorted(key: sorting-function)
+  let formatted-references = sorted.enumerate().map(it => format-reference(it.at(0), it.at(1)))  // -> array(array(content))
   let num-columns = if formatted-references.len() == 0 { 0 } else { formatted-references.at(0).len() }
   let cells = ()
 
@@ -288,7 +292,8 @@
       key: reference.entry_key,
       index: index,
       reference: reference,
-      year: paper-year(reference)
+      year: paper-year(reference),
+      label: if formatted-reference.len() > 1 { formatted-reference.at(0) } else { none }
     )
 
     // store the data in "meta" in a metadata element, so it can later be access through the label

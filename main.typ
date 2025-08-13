@@ -2,6 +2,7 @@
 #import "bibtypst.typ": add-bib-resource, refsection, print-bibliography, if-citation
 #import "bibtypst-acl.typ": format-citation-acl, format-reference-acl, citep, citet, citeg, citen
 #import "bibtypst-numeric.typ": format-citation-numeric, format-reference-numeric
+#import "bibtypst-alphabetic.typ": format-citation-alphabetic, format-reference-alphabetic, add-label-alphabetic
 
 #let darkgreen = green.darken(20%)
 #let darkblue = blue.darken(20%)
@@ -11,9 +12,22 @@
 #set heading(numbering: "1.1")
 
 // #let fcite = format-citation-numeric
-// #let fref = format-reference-numeric
+// #let fref = format-reference-numeric()
+// #let fadd = x => x
+// #let sorting = "nyt"
+
+
+// #let fcite = format-citation-alphabetic
+// #let fref = format-reference-alphabetic() 
+// #let fadd = add-label-alphabetic()
+// #let sorting = "a"
+
 #let fcite = format-citation-acl
-#let fref = format-reference-acl
+#let fref = format-reference-acl()
+#let fadd = x => x
+#let sorting = "nyt"
+
+// highlighting: x => [*#x*])
 
 
 
@@ -65,7 +79,7 @@
   @wu-etal-2024-reasoning
 
 
-  #print-bibliography(format-reference: fref, sorting: "nyt")
+  #print-bibliography(format-reference: fref, add-label: fadd, sorting: sorting)
 ]
 
 
