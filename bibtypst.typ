@@ -293,7 +293,7 @@
       index: index,
       reference: reference,
       year: paper-year(reference),
-      label: if formatted-reference.len() > 1 { formatted-reference.at(0) } else { none }
+      label: reference.at("label", default: none)
     )
 
     // store the data in "meta" in a metadata element, so it can later be access through the label

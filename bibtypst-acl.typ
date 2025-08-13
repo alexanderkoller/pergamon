@@ -68,31 +68,34 @@
 // (a default value) or as a constant function that returns a string.
 // This is because we get the form from a "ref" supplement, which can't
 // have type "string" (it has to be "content"). 
-#let format-citation-acl(reference-dict, form) = {
-  // keys of reference-dict: key, index, reference, year
+#let format-citation-acl() = {
+  let formatter(reference-dict, form) = {
+    // keys of reference-dict: key, index, reference, year
 
-  let parsed-authors = reference-dict.reference.lastnames
-  let year = reference-dict.year
+    let parsed-authors = reference-dict.reference.lastnames
+    let year = reference-dict.year
 
-  let authors-str = if parsed-authors.len() == 1 {
-    parsed-authors.at(0)
-  } else if parsed-authors.len() == 2 {
-    strfmt("{} and {}", parsed-authors.at(0), parsed-authors.at(1))
-  } else {
-    parsed-authors.at(0) + " et al."
+    let authors-str = if parsed-authors.len() == 1 {
+      parsed-authors.at(0)
+    } else if parsed-authors.len() == 2 {
+      strfmt("{} and {}", parsed-authors.at(0), parsed-authors.at(1))
+    } else {
+      parsed-authors.at(0) + " et al."
+    }
+
+    let fform = if form == auto { auto } else { form(none) } // str or auto
+
+    if fform == "t" {
+      strfmt("{} ({})", authors-str, year)
+    } else if fform == "g" {
+      strfmt("{}'s ({})", authors-str, year)
+    } else if fform == "n" {
+      strfmt("{} {}", authors-str, year)
+    } else { // auto or "p"
+      strfmt("({} {})", authors-str, year)    
+    }
   }
-
-  let fform = if form == auto { auto } else { form(none) } // str or auto
-
-  if fform == "t" {
-    strfmt("{} ({})", authors-str, year)
-  } else if fform == "g" {
-    strfmt("{}'s ({})", authors-str, year)
-  } else if fform == "n" {
-    strfmt("{} {}", authors-str, year)
-  } else { // auto or "p"
-    strfmt("({} {})", authors-str, year)    
-  }
+  formatter
 }
 
 

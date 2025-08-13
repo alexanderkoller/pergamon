@@ -52,7 +52,7 @@
       }
     }
 
-    reference.insert("label", strfmt("[{}{:02}]", abbreviation, calc.rem(paper-year(reference), 100)))
+    reference.insert("label", strfmt("{}{:02}", abbreviation, calc.rem(paper-year(reference), 100)))
     reference
   }
 
@@ -84,15 +84,25 @@
     }
 
     // let labeled = [#formatted]
-    (reference.label, highlight(reference, formatted, highlighting),) // return length-1 tuple
+    ([[#reference.label]], highlight(reference, formatted, highlighting),) // return length-1 tuple
   }
 
   return formatter
 }
 
 
-#let format-citation-alphabetic(reference-dict, form) = {
-  reference-dict.label
+#let format-citation-alphabetic() = {
+  let formatter(reference-dict, form) = {
+    // keys of reference-dict: key, index, reference, last-names, year
+    let fform = if form == auto { auto } else { form(none) } // str or auto
+
+    if fform == "n" {
+      [#{reference-dict.label}]
+    } else {
+      return [[#{reference-dict.label}]]
+    }
+  }
+  formatter
 }
 
 

@@ -11,18 +11,18 @@
 
 #set heading(numbering: "1.1")
 
-// #let fcite = format-citation-numeric
+// #let fcite = format-citation-numeric()
 // #let fref = format-reference-numeric()
 // #let fadd = x => x
 // #let sorting = "nyt"
 
 
-// #let fcite = format-citation-alphabetic
+// #let fcite = format-citation-alphabetic()
 // #let fref = format-reference-alphabetic() 
 // #let fadd = add-label-alphabetic()
 // #let sorting = "a"
 
-#let fcite = format-citation-acl
+#let fcite = format-citation-acl()
 #let fref = format-reference-acl()
 #let fadd = x => x
 #let sorting = "nyt"

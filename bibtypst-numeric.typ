@@ -67,14 +67,16 @@
   return formatter
 }
 
-#let format-citation-numeric(reference-dict, form) = {
-  // keys of reference-dict: key, index, reference, last-names, year
-  let fform = if form == auto { auto } else { form(none) } // str or auto
+#let format-citation-numeric() = {
+  let formatter(reference-dict, form) = {
+    // keys of reference-dict: key, index, reference, last-names, year
+    let fform = if form == auto { auto } else { form(none) } // str or auto
 
-  if fform == "n" {
-    [#{reference-dict.index+1}]
-  } else {
-    return [[#{reference-dict.index+1}]]
+    if fform == "n" {
+      [#{reference-dict.index+1}]
+    } else {
+      return [[#{reference-dict.index+1}]]
+    }
   }
+  formatter
 }
-
