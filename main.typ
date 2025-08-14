@@ -17,15 +17,15 @@
 // #let sorting = "nyt"
 
 
-// #let fcite = format-citation-alphabetic()
-// #let fref = format-reference-alphabetic() 
-// #let fadd = add-label-alphabetic()
-// #let sorting = "a"
+#let fcite = format-citation-alphabetic()
+#let fref = format-reference-alphabetic() 
+#let fadd = add-label-alphabetic()
+#let sorting = "a"
 
-#let fcite = format-citation-acl()
-#let fref = format-reference-acl()
-#let fadd = x => x
-#let sorting = "nyt"
+// #let fcite = format-citation-acl()
+// #let fref = format-reference-acl()
+// #let fadd = x => x
+// #let sorting = "nyt"
 
 // highlighting: x => [*#x*])
 
@@ -76,7 +76,7 @@
 
   @irtg-sgraph-15
 
-  @wu-etal-2024-reasoning
+  @wu-etal-2024-reasoning @knuth1990 @yao2025language
 
 
   #print-bibliography(format-reference: fref, add-label: fadd, sorting: sorting)

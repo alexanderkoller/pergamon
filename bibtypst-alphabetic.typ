@@ -3,7 +3,7 @@
 
 
 
-#import "bibtypst.typ": url-title, paper-authors, paper-type, paper-year, highlight, parse-author-names
+#import "bibtypst.typ": url-title, paper-authors, paper-type, paper-year, highlight, parse-author-names, concatenate-authors
 #import "@preview/oxifmt:0.2.1": strfmt
 
 
@@ -63,20 +63,24 @@
 #let format-reference-alphabetic(highlighting: x => x) = {
   let formatter(index, reference) = {
     let bib-type = paper-type(reference)
-    let authors =  paper-authors(reference)
+    let authors =  concatenate-authors(reference.parsed-author-names.map(x => x.at(1) + ", " + x.at(0)))
     let award = if "award" in reference.fields { [ #strong(reference.fields.award).] } else { [] }
     let key = reference.entry_key
 
     let formatted = if bib-type == "misc" {
-        [#authors (#paper-year(reference)). #url-title(reference). #reference.fields.howpublished.#award]
+        // [<label>] Author or Organization. \emph{Title}. Year. \url{…}
+        [#authors. _#url-title(reference)._ #reference.fields.howpublished, #paper-year(reference).]
     } else if bib-type == "article" {
-        [#authors (#paper-year(reference)). #url-title(reference). #journal-suffix(reference).#award]
-    } else if bib-type == "inproceedings" {
-        [#authors (#paper-year(reference)). #url-title(reference). In _#{reference.fields.booktitle}_.#award]
-    } else if bib-type == "incollection" {
-        [#authors (#paper-year(reference)). #url-title(reference). In _#{reference.fields.booktitle}_.#award]
+        // [<label>] Author. “Title of the Article.” \emph{Journal Name} volume(issue), pp. xx–yy, Year.
+        [#authors. "#url-title(reference)". #journal-suffix(reference), #paper-year(reference).] 
+    } else if bib-type == "inproceedings" or bib-type == "incollection" {
+        // [<label>] Author. “Title of the Paper.” In: \emph{Proceedings Title} (Editor, eds.). Series, Volume. Publisher, Location, Year, pp. xx–yy.
+        [#authors. "#url-title(reference)". In: _#{reference.fields.booktitle}_.  #paper-year(reference).]
     } else if bib-type == "book" {
-        [#authors (#paper-year(reference)). _#url-title(reference)_. #reference.fields.publisher.]
+        [#authors. _#url-title(reference)_.  #reference.fields.publisher, #paper-year(reference).]
+        // [<label>] Author. \emph{Title}. Edition. Publisher, Location, Year.
+
+        // TODO - deal with missing fields (e.g. publisher)
         // TODO - distinguish authors and editor(s), cf. https://apastyle.apa.org/style-grammar-guidelines/references/examples/book-references
         // TODO - include edition if specified
     } else {
