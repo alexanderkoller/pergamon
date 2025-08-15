@@ -76,7 +76,7 @@
 
   @irtg-sgraph-15
 
-  @wu-etal-2024-reasoning @knuth1990 @yao2025language
+  @wu-etal-2024-reasoning @knuth1990 @yao2025language @hershcovichItMeaningThat2021
 
 
   #print-bibliography(format-reference: fref, add-label: fadd, sorting: sorting)

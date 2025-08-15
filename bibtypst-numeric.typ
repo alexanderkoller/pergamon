@@ -7,30 +7,26 @@
 
 // under the assumption that this is an @article reference, format the journal name + volume + number
 #let journal-suffix(reference) = {
-  let suffix = ([#emph(reference.fields.journal)],)
+  let suffix = [#emph(reference.fields.journal)]
 
   if "volume" in reference.fields {
     if "number" in reference.fields {
       // number + volume
-      
-      suffix.push([ ])
-      suffix.push(reference.fields.volume)
-      suffix.push([(])
-      suffix.push(reference.fields.number)
-      suffix.push([)])
+
+      suffix += [ *#reference.fields.volume*(#reference.fields.number)]
     } else {
       // number only
-      suffix.push([ ])
-      suffix.push(reference.fields.volume)
+      suffix += [ #reference.fields.volume]
     }
   }
 
+  suffix += [ (#paper-year(reference))]
+
   if "pages" in reference.fields {
-    suffix.push([, ])
-    suffix.push(reference.fields.pages)
+    suffix += [, pp. #reference.fields.pages]
   } 
 
-  suffix.join("")
+  return suffix 
 }
 
 
@@ -42,16 +38,17 @@
     let key = reference.entry_key
 
     let formatted = if bib-type == "misc" {
-        [#authors (#paper-year(reference)). #url-title(reference). #reference.fields.howpublished.#award]
+        // Author/Org. *Title* or “Title”. [Howpublished/Note.] [Year.] [URL]
+        [#authors. "#url-title(reference)". #reference.fields.howpublished. #paper-year(reference).]
     } else if bib-type == "article" {
         // Author(s). “Title.” Journal Name 〈volume〉[〈number〉] (〈year〉), pp. 〈pages〉[. DOI/URL]
-        [#authors. "#url-title(reference)". #journal-suffix(reference) (#paper-year(reference)).]
-    } else if bib-type == "inproceedings" {
-        [#authors (#paper-year(reference)). #url-title(reference). In _#{reference.fields.booktitle}_.#award]
-    } else if bib-type == "incollection" {
-        [#authors (#paper-year(reference)). #url-title(reference). In _#{reference.fields.booktitle}_.#award]
+        [#authors. "#url-title(reference)". #journal-suffix(reference).]
+    } else if bib-type == "inproceedings" or bib-type == "incollection" {
+        // Author(s). “Chapter Title.” In: *Collection Title*. Ed. by Editor(s). Place: Publisher, Year, pp. 〈pages〉. [DOI/URL]
+        [#authors. "#url-title(reference)." In: _#{reference.fields.booktitle}_, #paper-year(reference).]
     } else if bib-type == "book" {
-        [#authors (#paper-year(reference)). _#url-title(reference)_. #reference.fields.publisher.]
+        // Author(s)/Editor(s). *Title*. [Edition.] Place: Publisher, Year. [DOI/URL]
+        [#authors. _#url-title(reference)_. #reference.fields.publisher, #paper-year(reference).]
         // TODO - distinguish authors and editor(s), cf. https://apastyle.apa.org/style-grammar-guidelines/references/examples/book-references
         // TODO - include edition if specified
     } else {
