@@ -186,7 +186,7 @@
   /// it wants, but it does not need to generate a hyperlink to the bibliography;
   /// the citation string is automatically wrapped in a `link` by Bibtypst.
   /// -> function
-  format-citation: reference => [CITATION], 
+  format-citation: (reference, form) => [CITATION], 
 
   /// The section of the document that is to be wrapped in this `refsection`.
   /// -> content
@@ -359,8 +359,8 @@
   }
 
   // "References" heading
-  if bibliography-title != none [
-    #heading(bibliography-title, numbering: none)
+  if title != none [
+    #heading(title, numbering: none)
   ]
 
   // Format the references, based on format-reference: (index, reference, highlighting) -> array(content).
