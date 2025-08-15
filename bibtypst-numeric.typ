@@ -12,6 +12,7 @@
   if "volume" in reference.fields {
     if "number" in reference.fields {
       // number + volume
+      
       suffix.push([ ])
       suffix.push(reference.fields.volume)
       suffix.push([(])
@@ -43,7 +44,8 @@
     let formatted = if bib-type == "misc" {
         [#authors (#paper-year(reference)). #url-title(reference). #reference.fields.howpublished.#award]
     } else if bib-type == "article" {
-        [#authors (#paper-year(reference)). #url-title(reference). #journal-suffix(reference).#award]
+        // Author(s). “Title.” Journal Name 〈volume〉[〈number〉] (〈year〉), pp. 〈pages〉[. DOI/URL]
+        [#authors. "#url-title(reference)". #journal-suffix(reference) (#paper-year(reference)).]
     } else if bib-type == "inproceedings" {
         [#authors (#paper-year(reference)). #url-title(reference). In _#{reference.fields.booktitle}_.#award]
     } else if bib-type == "incollection" {
