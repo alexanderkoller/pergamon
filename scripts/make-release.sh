@@ -22,7 +22,10 @@ cp README.md $RELEASE_DIR/
 cp LICENSE $RELEASE_DIR/
 
 # replace version in typst.toml
-sed "s/VERSION/$VERSION/g" typst-template.toml > $RELEASE_DIR/typst.toml
+sed -i '.bak' "s/^version = \".*\"/version = \"$VERSION\"/" typst.toml
+# -i .bak is Mac-specific
+cp typst.toml $RELEASE_DIR
+# old: sed "s/VERSION/$VERSION/g" typst-template.toml > $RELEASE_DIR/typst.toml
 
 echo "Package is ready for release in $RELEASE_DIR."
 

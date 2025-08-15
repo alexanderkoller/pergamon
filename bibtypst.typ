@@ -122,9 +122,22 @@
 #let bibliography = state("bibliography", (:))
 
 
-// Unfortunately, we have to `read` the bib file from the Typst document,
-// because code in packages can't read files in the working directory.
-#let add-bib-resource(bibtex_string) = {
+/// Parses Bibtex references and makes them available to Bibtypst.
+/// Due to architectural limitations in Typst, Bibtypst cannot read 
+/// Bibtex from a file. You will therefore typically call this function as
+/// ```typ
+/// #add-bib-resource(read("bibliography.bib")
+/// ```
+/// 
+/// You can call `add-bib-resource` multiple times, and this will add
+/// the contents of multiple bib files.
+/// 
+/// -> none
+#let add-bib-resource(
+    /// A Bibtex string to be parsed.
+    /// -> str
+    bibtex_string
+  ) = {
   bibliography.update(old-bib => {
     for (key, value) in load-bibliography(bibtex_string).pairs() {
       old-bib.insert(key, value)
@@ -161,12 +174,24 @@
     }
 }
 
-// Defines a section of the document that shares a bibliography.
-// You need to load a bibliography with the "add-bibliography" function
-// in a place that is earlier than the refsection in rendering order.
-// Place the rendered bibliography into the document with the
-// "print-bibliography" function.
-#let refsection(format-citation: reference => [CITATION], doc) = {
+/// Defines a section of the document that shares a bibliography.
+/// You need to load a bibliography with the "add-bibliography" function
+/// in a place that is earlier than the refsection in rendering order.
+/// -> none
+#let refsection(
+  /// A function that generates the citation string for a given #link(<sec:reference>)[reference].
+  /// This function will typically be defined in a Bibtypst style, to be
+  /// compatible with the `format-reference` function that is passed to
+  /// @print-bibliography. Note that `format-citation` can return any content
+  /// it wants, but it does not need to generate a hyperlink to the bibliography;
+  /// the citation string is automatically wrapped in a `link` by Bibtypst.
+  /// -> function
+  format-citation: reference => [CITATION], 
+
+  /// The section of the document that is to be wrapped in this `refsection`.
+  /// -> content
+  doc) = {
+
   // reset the keys that are cited in this section
   reference-collection.update((:))
 
@@ -239,13 +264,79 @@
   it => ret.map(f => f(it))
 }
 
-// Prints the bibliography for the current refsection.
+/// Prints the bibliography for the current @refsection.
+///
+/// -> none
 #let print-bibliography( 
-  format-reference: (index, bib-entry) => ([REFERENCE],),
-  add-label: reference => reference,
-  sorting: none, 
-  grid-style: (:),
-  bibliography-title: "References") = context {
+    /// A function that renders the reference for inclusion in the
+    /// printed bibliography. This function will typically be defined
+    /// in a Bibtypst style, to be compatible with the `format-citation`
+    /// function that is passed to @refsection.
+    /// 
+    /// `format-reference` is passed the position of the reference in the
+    /// bibliography as a zero-based `int` in the first argument.
+    /// It is passed the current #link(<sec:reference>)[reference]
+    /// in the second argument.
+    /// 
+    /// It returns an
+    /// array of contents. The elements of this array will be laid out as the columns
+    /// of a grid, in the same row, permitting e.g. bibliography layouts with one
+    /// column for the reference label and one with the reference itself. For this reason,
+    /// all calls to `format-reference` should return arrays of the same length.
+    /// 
+    /// -> function
+    format-reference: (index, bib-entry) => ([REFERENCE],),
+
+    /// A function that enriches a #link(<sec:reference>)[reference] with
+    /// extra information. The intended use case is to add a `label` field to the
+    /// reference dictionary, based on the authors and year. The added fields are 
+    /// guaranteed to be available both
+    /// from `format-reference` and from `format-citation` (in @refsection).
+    /// 
+    /// The `add-label` function takes a reference as argument and returns an (enriched)
+    /// reference.
+    /// 
+    /// -> function
+    add-label: reference => reference,
+
+    /// A function that defines the order in which references are shown in the bibliography.
+    /// `sorting` takes a #link(<sec:reference>)[reference] as input and returns a value that can be 
+    /// #link("https://typst.app/docs/reference/foundations/array/#definitions-sorted")[sorted],
+    /// e.g. a number, a string, or an array of sortable values.
+    /// 
+    /// Alternatively, you can specify a Biblatex-style sorting string. The following strings are
+    /// supported:
+    /// - `n`: author name (lastname firstname)
+    /// - `t`: paper title
+    /// - `y` or `d`: the year in which the paper was published; write `yd` or `dd` for descending order
+    /// - `v`: volume, if defined
+    /// - `a`: the contents of the `label` field (if defined); for the `alphabetic` style, this amounts to the alphabetic paper key
+    /// 
+    /// For instance, `"nydt"` sorts the references first by author name, then by descending year, then by title.   
+    /// Note that Bibtypst currently makes no distinction between the year and the full date.
+    /// 
+    /// If `none` or the string `"none"` is passed as the `sorting` argument, the references
+    /// are sorted in an arbitrary order. There is currently no reliable support for sorting
+    /// the references in the order in which they were cited in the document.
+    /// 
+    /// -> function | str | none
+    sorting: none, 
+
+    /// A dictionary for styling the #link("https://typst.app/docs/reference/layout/grid/")[grid]
+    /// in which the bibliography is laid out. By default, the grid is laid out with `row-gutter: 1.2em` and
+    /// `column-gutter: 0.5em`. You can overwrite these values and specify new ones with this argument;
+    /// the revised style specification will be passed to the `grid` function.
+    /// 
+    /// -> dict
+    grid-style: (:),
+
+    /// The title that will be typeset above the bibliography in the document.
+    /// The string given here will be rendered as a first-level heading without numbering.
+    /// Pass `none` to suppress the bibliography title.
+    /// 
+    /// -> str | none
+    title: "References"
+  ) = context {
 
   let bib = bibliography.get()
 
