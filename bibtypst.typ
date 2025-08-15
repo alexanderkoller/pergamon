@@ -158,7 +158,49 @@
 // contains "kind = reference-data". This dictionary value is passed as the
 // argument to `citation-content`.
 
-#let if-citation(it, citation-content, other-content: x => x) = {
+/// Helper function that conditionally renders a reference to a bibliography entry.
+/// The first argument is assumed to be a Typst #link("https://typst.app/docs/reference/model/ref/")[ref]
+/// element, obtained e.g. as the argument of a show rule. If this `ref` is a citation
+/// pointing to a bibliography entry managed by Bibtypst, the function passes the metadata
+/// of this bib entry to the `citation-content` function and returns the content this
+/// function generated. Otherwise, the `ref` is passed to `other-content` for further processing.
+/// 
+/// The primary purpose of `if-citation` is to facilitate the definition of show rules.
+/// A typical example is the following show rule, which colors references to my own publications
+/// green and all others blue.
+/// 
+/// ```typ
+/// #show ref: it => if-citation(it, value => {
+///    if "Koller" in value.reference.lastnames {
+///      show link: set text(fill: green)
+///      it
+///    } else {
+///      show link: set text(fill: blue)
+///      it
+///  }})
+/// ```
+/// 
+/// -> content
+#let if-citation(
+    /// A Typst `ref` element.
+    /// -> ref
+    it, 
+
+    /// A function that maps the metadata associated with a Bibtypst reference to
+    /// a piece of content. The metadata is a dictionary with keys (reference, index,
+    /// key, year, label); `reference` is a reference dictionary (see @sec:reference),
+    /// `key` and `year` are those fields from the reference for easy access, `index`
+    /// is the position in the bibliography, and `label` is the label that was generated
+    /// by the add-label function that was passed to @print-bibliography.
+    /// -> function
+    citation-content, 
+
+    /// A function that maps the `ref` to a piece of content. The default argument
+    /// simply leaves the `ref` untouched, permitting other show rules to trigger and
+    /// render it appropriately.
+    /// -> function
+    other-content: x => x
+  ) = {
     let el = it.element
     let cite-key = str(it.target)
 
@@ -320,7 +362,21 @@
     /// the references in the order in which they were cited in the document.
     /// 
     /// -> function | str | none
-    sorting: none, 
+    sorting: none,
+
+    /// Determines whether the printed bibliography should contains all references from the loaded bibliographies
+    /// (`true`) or only those that were cited in the current refsection (`false`).
+    /// -> bool
+    show-all: false,
+
+    /// Filters which references should be included in the printed bibliography. This makes sense only if
+    /// `show-all` is `true`, otherwise not all your citations will be resolved to bibliography entries.
+    /// The parameter should be a function that takes a #link(<sec:reference>)[reference] as argument
+    /// and returns a boolean value. The printed bibliography will contain exactly those references
+    /// for which the function returned `true`.
+    /// -> function
+    /// 
+    filtering: reference => true,
 
     /// A dictionary for styling the #link("https://typst.app/docs/reference/layout/grid/")[grid]
     /// in which the bibliography is laid out. By default, the grid is laid out with `row-gutter: 1.2em` and
@@ -347,16 +403,25 @@
   }
 
   // extract references for the cited keys
-  let cited-keys = reference-collection.final().keys()
   let bibl-unsorted = ()
-  for lbl in cited-keys {
-    let key = str(lbl)
 
-    if key in bib { // skip references to labels that are not bib keys
-      let bib-entry = fix-authors(bib.at(key))
-      bibl-unsorted.push(bib-entry)
+  if show-all {
+    for reference in bib.values() {
+      bibl-unsorted.push(fix-authors(reference))
+    }
+  } else {
+    let cited-keys = reference-collection.final().keys()
+    for lbl in cited-keys {
+      let key = str(lbl)
+
+      if key in bib { // skip references to labels that are not bib keys
+        let bib-entry = fix-authors(bib.at(key))
+        bibl-unsorted.push(bib-entry)
+      }
     }
   }
+
+  bibl-unsorted = bibl-unsorted.filter(filtering)
 
   // "References" heading
   if title != none [
