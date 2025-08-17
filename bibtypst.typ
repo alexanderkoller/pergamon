@@ -124,10 +124,13 @@
 
 /// Parses Bibtex references and makes them available to Bibtypst.
 /// Due to architectural limitations in Typst, Bibtypst cannot read 
-/// Bibtex from a file. You will therefore typically call this function as
+/// Bibtex from a file. You will therefore typically call `read` yourself, like this:
+/// #import "@preview/zebraw:0.5.5": *
+/// #zebraw(lang: false,
 /// ```typ
-/// #add-bib-resource(read("bibliography.bib")
+/// #add-bib-resource(read("bibliography.bib"))
 /// ```
+/// )
 /// 
 /// You can call `add-bib-resource` multiple times, and this will add
 /// the contents of multiple bib files.
