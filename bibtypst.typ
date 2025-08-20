@@ -8,13 +8,14 @@
 
 
 // make title a hyperlink if DOI or URL are defined
-#let url-title(reference) = {
+#let url-title(reference, eval-mode: none) = {
+  let title = if eval-mode == none { reference.fields.title.trim() } else { eval(reference.fields.title.trim(), mode: eval-mode) }
   if "doi" in reference.fields {
-    link("https://doi.org/" + reference.fields.doi)[#reference.fields.title.trim()]
+    link("https://doi.org/" + reference.fields.doi)[#title]
   } else if "url" in reference.fields {
-    link(reference.fields.url)[#reference.fields.title.trim()]
+    link(reference.fields.url)[#title]
   } else {
-    reference.fields.title.trim()
+    title
   }
 }
 
@@ -330,7 +331,7 @@
     /// all calls to `format-reference` should return arrays of the same length.
     /// 
     /// -> function
-    format-reference: (index, bib-entry) => ([REFERENCE],),
+    format-reference: (index, bib-entry, eval-mode) => ([REFERENCE],),
 
     /// A function that enriches a #link(<sec:reference>)[reference] with
     /// extra information. The intended use case is to add a `label` field to the
@@ -389,6 +390,15 @@
     /// -> dict
     grid-style: (:),
 
+    /// The output of `format-reference` can be passed through the Typst #link("https://typst.app/docs/reference/foundations/eval/")[eval]
+    /// function
+    /// for final rendering. This is useful e.g. to typeset math in a paper title correctly.
+    /// Pass the `eval` mode in this argument, or pass `none` if you don't want to call
+    /// `eval`.
+    /// 
+    /// -> str | none
+    eval-mode: "markup",
+
     /// The title that will be typeset above the bibliography in the document.
     /// The string given here will be rendered as a first-level heading without numbering.
     /// Pass `none` to suppress the bibliography title.
@@ -437,7 +447,7 @@
   // for styles that have meaningful labels, compute and insert them under the "label" key
   let labeled-bibl-unsorted = bibl-unsorted.map(add-label)
   let sorted = labeled-bibl-unsorted.sorted(key: sorting-function)
-  let formatted-references = sorted.enumerate().map(it => format-reference(it.at(0), it.at(1)))  // -> array(array(content))
+  let formatted-references = sorted.enumerate().map(it => format-reference(it.at(0), it.at(1), eval-mode))  // -> array(array(content))
   let num-columns = if formatted-references.len() == 0 { 0 } else { formatted-references.at(0).len() }
   let cells = ()
 

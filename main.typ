@@ -11,10 +11,10 @@
 
 #set heading(numbering: "1.1")
 
-// #let fcite = format-citation-numeric()
-// #let fref = format-reference-numeric()
-// #let fadd = x => x
-// #let sorting = "nyt"
+#let fcite = format-citation-numeric()
+#let fref = format-reference-numeric()
+#let fadd = x => x
+#let sorting = "nyt"
 
 
 // #let fcite = format-citation-alphabetic()
@@ -22,10 +22,10 @@
 // #let fadd = add-label-alphabetic()
 // #let sorting = "a"
 
-#let fcite = format-citation-acl()
-#let fref = format-reference-acl()
-#let fadd = x => x
-#let sorting = "nyt"
+// #let fcite = format-citation-acl()
+// #let fref = format-reference-acl()
+// #let fadd = x => x
+// #let sorting = "nyt"
 
 // highlighting: x => [*#x*])
 
@@ -77,7 +77,7 @@
   @irtg-sgraph-15
 
   @wu-etal-2024-reasoning @knuth1990 @yao2025language @hershcovichItMeaningThat2021
-
+  @abgrallMeasurementsppmKpm2016
 
   #print-bibliography(format-reference: fref, add-label: fadd, sorting: sorting)
 ]

@@ -61,23 +61,24 @@
 
 
 #let format-reference-alphabetic(highlighting: x => x) = {
-  let formatter(index, reference) = {
+  let formatter(index, reference, eval-mode) = {
     let bib-type = paper-type(reference)
     let authors =  concatenate-authors(reference.parsed-author-names.map(x => x.at(1) + ", " + x.at(0)))
     let award = if "award" in reference.fields { [ #strong(reference.fields.award).] } else { [] }
     let key = reference.entry_key
+    let utitle = url-title(reference, eval-mode: eval-mode)
 
     let formatted = if bib-type == "misc" {
         // [<label>] Author or Organization. \emph{Title}. Year. \url{…}
-        [#authors. _#url-title(reference)._ #reference.fields.howpublished, #paper-year(reference).]
+        [#authors. #emph(utitle). #reference.fields.howpublished, #paper-year(reference).]
     } else if bib-type == "article" {
         // [<label>] Author. “Title of the Article.” \emph{Journal Name} volume(issue), pp. xx–yy, Year.
-        [#authors. "#url-title(reference)". #journal-suffix(reference), #paper-year(reference).] 
+        [#authors. "#utitle". #journal-suffix(reference), #paper-year(reference).] 
     } else if bib-type == "inproceedings" or bib-type == "incollection" {
         // [<label>] Author. “Title of the Paper.” In: \emph{Proceedings Title} (Editor, eds.). Series, Volume. Publisher, Location, Year, pp. xx–yy.
-        [#authors. "#url-title(reference)". In: _#{reference.fields.booktitle}_.  #paper-year(reference).]
+        [#authors. "#utitle". In: _#{reference.fields.booktitle}_.  #paper-year(reference).]
     } else if bib-type == "book" {
-        [#authors. _#url-title(reference)_.  #reference.fields.publisher, #paper-year(reference).]
+        [#authors. #emph(utitle).  #reference.fields.publisher, #paper-year(reference).]
         // [<label>] Author. \emph{Title}. Edition. Publisher, Location, Year.
 
         // TODO - deal with missing fields (e.g. publisher)

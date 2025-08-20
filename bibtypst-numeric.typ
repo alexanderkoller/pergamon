@@ -31,24 +31,25 @@
 
 
 #let format-reference-numeric(highlighting: x => x) = {
-  let formatter(index, reference) = {
+  let formatter(index, reference, eval-mode) = {
     let bib-type = paper-type(reference)
     let authors =  paper-authors(reference)
     let award = if "award" in reference.fields { [ #strong(reference.fields.award).] } else { [] }
     let key = reference.entry_key
+    let utitle = url-title(reference, eval-mode: eval-mode)
 
     let formatted = if bib-type == "misc" {
         // Author/Org. *Title* or “Title”. [Howpublished/Note.] [Year.] [URL]
-        [#authors. "#url-title(reference)". #reference.fields.howpublished. #paper-year(reference).]
+        [#authors. "#utitle". #reference.fields.howpublished. #paper-year(reference).]
     } else if bib-type == "article" {
         // Author(s). “Title.” Journal Name 〈volume〉[〈number〉] (〈year〉), pp. 〈pages〉[. DOI/URL]
-        [#authors. "#url-title(reference)". #journal-suffix(reference).]
+        [#authors. "#utitle". #journal-suffix(reference).]
     } else if bib-type == "inproceedings" or bib-type == "incollection" {
         // Author(s). “Chapter Title.” In: *Collection Title*. Ed. by Editor(s). Place: Publisher, Year, pp. 〈pages〉. [DOI/URL]
-        [#authors. "#url-title(reference)." In: _#{reference.fields.booktitle}_, #paper-year(reference).]
+        [#authors. "#utitle." In: _#{reference.fields.booktitle}_, #paper-year(reference).]
     } else if bib-type == "book" {
         // Author(s)/Editor(s). *Title*. [Edition.] Place: Publisher, Year. [DOI/URL]
-        [#authors. _#url-title(reference)_. #reference.fields.publisher, #paper-year(reference).]
+        [#authors. #emph(utitle). #reference.fields.publisher, #paper-year(reference).]
         // TODO - distinguish authors and editor(s), cf. https://apastyle.apa.org/style-grammar-guidelines/references/examples/book-references
         // TODO - include edition if specified
     } else {

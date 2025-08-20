@@ -34,22 +34,23 @@
 
 
 #let format-reference-acl(highlighting: x => x) = {
-  let formatter(index, reference) = {
+  let formatter(index, reference, eval-mode) = {
     let bib-type = paper-type(reference)
     let authors =  paper-authors(reference)
     let award = if "award" in reference.fields { [ #strong(reference.fields.award).] } else { [] }
     let key = reference.entry_key
+    let utitle = url-title(reference, eval-mode: eval-mode)
 
     let formatted = if bib-type == "misc" {
-        [#authors (#paper-year(reference)). #url-title(reference). #reference.fields.howpublished.#award]
+        [#authors (#paper-year(reference)). #utitle. #reference.fields.howpublished.#award]
     } else if bib-type == "article" {
-        [#authors (#paper-year(reference)). #url-title(reference). #journal-suffix(reference).#award]
+        [#authors (#paper-year(reference)). #utitle. #journal-suffix(reference).#award]
     } else if bib-type == "inproceedings" {
-        [#authors (#paper-year(reference)). #url-title(reference). In _#{reference.fields.booktitle}_.#award]
+        [#authors (#paper-year(reference)). #utitle. In _#{reference.fields.booktitle}_.#award]
     } else if bib-type == "incollection" {
-        [#authors (#paper-year(reference)). #url-title(reference). In _#{reference.fields.booktitle}_.#award]
+        [#authors (#paper-year(reference)). #utitle. In _#{reference.fields.booktitle}_.#award]
     } else if bib-type == "book" {
-        [#authors (#paper-year(reference)). _#url-title(reference)_. #reference.fields.publisher.]
+        [#authors (#paper-year(reference)). #emph(utitle). #reference.fields.publisher.]
         // TODO - distinguish authors and editor(s), cf. https://apastyle.apa.org/style-grammar-guidelines/references/examples/book-references
         // TODO - include edition if specified
     } else {
