@@ -13,27 +13,39 @@
   }
 }
 
-#let fjoin(connector, ..xx) = {
+#let fjoin(connector, format: it => it, add-space: true, ..xx) = {
   let xs = xx.pos()
   let ret = ""
   let empty = true
+  let rightmost-nonempty-index = -1
 
+  // find rightmost index of value that is not none
+  for (i, x) in xs.enumerate() {
+    if x != none {
+      rightmost-nonempty-index = i
+    }
+  }
+  
+  // do the actual formatting
   for (i, x) in xs.enumerate() {
     if x != none {
       ret += x
       empty = false
 
-      if i < xs.len()-1 {
+      if i < rightmost-nonempty-index {
         // ret += "<" + final-character(x) + ">"
         if final-character(x) != connector {
           ret += connector
         }
-        ret += " "
+
+        if add-space {
+          ret += " "
+        }
       }
     }
   }
 
-  return if empty { none } else { ret }
+  return if empty { none } else { format(ret) }
 }
 
 // !#fjoin(".", "foo.", "bar", "baz")!

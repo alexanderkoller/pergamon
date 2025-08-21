@@ -3,6 +3,7 @@
 #import "bibtypst-acl.typ": format-citation-acl, format-reference-acl, citep, citet, citeg, citen
 #import "bibtypst-numeric.typ": format-citation-numeric, format-reference-numeric
 #import "bibtypst-alphabetic.typ": format-citation-alphabetic, format-reference-alphabetic, add-label-alphabetic
+#import "bibtypst-styles.typ": *
 
 #let darkgreen = green.darken(20%)
 #let darkblue = blue.darken(20%)
@@ -11,10 +12,17 @@
 
 #set heading(numbering: "1.1")
 
-#let fcite = format-citation-numeric()
-#let fref = format-reference-numeric()
+
+#let fcite = format-citation-acl()
+#let fref = format-reference()
 #let fadd = x => x
 #let sorting = "nyt"
+
+
+// #let fcite = format-citation-numeric()
+// #let fref = format-reference-numeric()
+// #let fadd = x => x
+// #let sorting = "nyt"
 
 
 // #let fcite = format-citation-alphabetic()
