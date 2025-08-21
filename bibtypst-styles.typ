@@ -1,6 +1,7 @@
 #import "bibtypst.typ": *
 #import "templating.typ": *
 
+// TODO - make these configurable
 #let bibstring = (
   "editor": "Ed.",
   "editors": "Eds.",
@@ -163,10 +164,19 @@
     use-editor: true,
     multi-list-delim: ", ",
     final-list-delim: list => if list.len() > 2 { ", and" } else { " and " },
-    subtitlepunct: "?", // XXX
+    subtitlepunct: ".",
     format-journaltitle: it => emph(it),
     format-issuetitle: it => emph(it),
     format-series: it => it,
+    format-title: bib-type => {
+      if bib-type in ("article", "inbook", "incollection", "inproceedings", "patent", "thesis", "unpublished") {
+        it => ["#it"]
+      } else if bib-type in ("suppbook", "suppcollection", "suppperiodical") {
+        it => it
+      } else {
+        it => emph(it)
+      }
+    },
     format-volume-periodical: it => it, // volume field in journals and other periodicals
     format-volume-other: it => [#bibstring.volume #it], // volume field in other bibtypes
     format-number-periodical: it => it,
@@ -176,34 +186,36 @@
     bibeidpunct: ","
     // name-title-delim: ","
   ) = {
-    let options = (
-      link-titles: link-titles,
-      eval-mode: eval-mode,
-      use-author: use-author,
-      use-translator: use-translator,
-      use-editor: use-editor,
-      multi-list-delim: multi-list-delim,
-      final-list-delim: final-list-delim,
-      subtitlepunct: subtitlepunct,
-      format-journaltitle: format-journaltitle,
-      format-series: format-series,
-      format-volume-periodical: format-volume-periodical,
-      format-volume-other: format-volume-other,
-      format-number-periodical: format-number-periodical,
-      format-number-other: format-number-other,
-      format-parens: format-parens,
-      bibeidpunct: bibeidpunct,
-      volume-number-separator: volume-number-separator
-    )
-
+    
     let formatter(index, reference, eval-mode) = {
       let bib-type = paper-type(reference)
+      let options = (
+        link-titles: link-titles,
+        eval-mode: eval-mode,
+        use-author: use-author,
+        use-translator: use-translator,
+        use-editor: use-editor,
+        multi-list-delim: multi-list-delim,
+        final-list-delim: final-list-delim,
+        subtitlepunct: subtitlepunct,
+        format-journaltitle: format-journaltitle,
+        format-series: format-series,
+        format-volume-periodical: format-volume-periodical,
+        format-volume-other: format-volume-other,
+        format-number-periodical: format-number-periodical,
+        format-number-other: format-number-other,
+        format-parens: format-parens,
+        format-title: format-title(bib-type),
+        bibeidpunct: bibeidpunct,
+        volume-number-separator: volume-number-separator
+      )
+
 
       if bib-type == "article" {
         // For now, I am mapping both \newunit and \newblock to periods.
         let ret = periods(
           author-translator-others(reference, options),
-          url-title-x(reference, options),
+          options.at("format-title")(url-title-x(reference, options)),
           join-list(fd(reference, "language"), options), // TODO: parse language field
           // TODO: \usebibmacro{byauthor}
           // TODO: \usebibmacro{bytranslator+others}
