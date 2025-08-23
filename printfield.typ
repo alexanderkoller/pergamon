@@ -9,7 +9,8 @@
     if field == "issn" {
       [ISSN #value]
     } else if field == "pages" {
-      if value.contains("-") or value.contains("–") { // the second one is an emdash
+      if value.contains("-") or value.contains(sym.dash.en) {
+        // Typst biblatex library converts "--" into an endash "–"
         [pp. #value]
       } else {
         [p. #value]
