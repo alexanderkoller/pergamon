@@ -20,6 +20,8 @@
 )
 
 
+
+
 #let join-list(list, options) = {
   if list == none or list.len() == 0 {
     none
@@ -58,6 +60,33 @@
 }
 
 
+#let printfield(reference, field, style: none) = {
+  let value = fd(reference, field)
+
+  if value == none {
+    none
+  } else {
+    field = lower(field)
+
+    if field == "issn" {
+      [ISSN #value]
+    } else if field == "pages" {
+      if value.contains("-") or value.contains("–") { // the second one is an emdash
+        [pp. #value]
+      } else {
+        [p. #value]
+      }
+    } else if field == "volume" {
+      if reference.entry_type in ("article", "periodical") {
+        value
+      } else {
+        [#bibstring.volume #value]
+      }
+    } else {
+      value
+    }
+  }
+}
 
 #let ifdef(reference, field, fn) = {
   let value = fd(reference, field)
@@ -70,7 +99,7 @@
   if options.use-editor and fd(reference, "editor") != none {
     // TODO - parse and re-concatenate editors like we do with authors
     // TODO - choose between bibstring.editor and bibstring.editors depending on length of editor list
-    [#reference.editor, #bibstring.editor]
+    [#printfield(reference, "editor"), #bibstring.editor]
   } else {
     none
   }
@@ -81,7 +110,7 @@
   if options.use-translator and fd(reference, "translator") != none {
     // TODO - parse and re-concatenate editors like we do with authors
     // TODO - choose between bibstring.editor and bibstring.editors depending on length of editor list
-    [#reference.translator, #bibstring.translator]
+    [#printfield(reference, "translator"), #bibstring.translator]
   } else {
     none
   }
@@ -100,8 +129,8 @@
 
 // standard.bbx volume+number+eid
 #let volume-number-eid(reference, options) = {
-  let volume = fd(reference, "volume", format: options.format-volume-periodical)
-  let number = fd(reference, "number", format: options.format-number-periodical)
+  let volume = printfield(reference, "volume")
+  let number = printfield(reference, "number")
 
   let a = if volume == none and number == none {
     none
@@ -207,7 +236,7 @@
 
 // standard.bbx note+pages
 #let note-pages(reference, options) = {
-  fjoin(options.bibpagespunct, fd(reference, "note"), fd(reference, "pages"))
+  fjoin(options.bibpagespunct, fd(reference, "note"), printfield(reference, "pages"))
 }
 
 // biblatex.def eprint
@@ -290,10 +319,6 @@
         it => emph(it)
       }
     },
-    format-volume-periodical: it => it, // volume field in journals and other periodicals
-    format-volume-other: it => [#bibstring.volume #it], // volume field in other bibtypes
-    format-number-periodical: it => it,
-    format-number-other: it => it,
     format-parens: it => [(#it)],
     format-brackets: it => [[#it]],
     volume-number-separator: ".",
@@ -316,10 +341,10 @@
         subtitlepunct: subtitlepunct,
         format-journaltitle: format-journaltitle,
         format-series: format-series,
-        format-volume-periodical: format-volume-periodical,
-        format-volume-other: format-volume-other,
-        format-number-periodical: format-number-periodical,
-        format-number-other: format-number-other,
+        // format-volume-periodical: format-volume-periodical,
+        // format-volume-other: format-volume-other,
+        // format-number-periodical: format-number-periodical,
+        // format-number-other: format-number-other,
         format-parens: format-parens,
         format-brackets: format-brackets,
         format-title: format-title(bib-type),
@@ -345,7 +370,7 @@
           spaces(bibstring.in, journal-issue-title(reference, options)),
           byeditor-others(reference, options),
           note-pages(reference, options),
-          if print-isbn {  ifdef(reference, "issn", issn => [ISSN #issn]) } else { none },
+          if print-isbn { printfield(reference, "issn") } else { none },
           doi-eprint-url(reference, options),
           // addendum-pubstate(reference, options)
 
