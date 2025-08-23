@@ -40,7 +40,25 @@
   })
 }
 
+// make title a hyperlink if DOI or URL are defined
+#let link-title(reference, options) = {
+  let title = if options.eval-mode == none { reference.fields.title.trim() } else { eval(reference.fields.title.trim(), mode: options.eval-mode) }
+
+  if not options.link-titles {
+    title 
+  } else if "doi" in reference.fields {
+    link("https://doi.org/" + reference.fields.doi)[#title]
+  } else if "url" in reference.fields {
+    link(reference.fields.url)[#title]
+  } else {
+    title
+  }
+}
+
 #let field-formats = (
+
+  // Used in the bibliography and bibliography lists
+
   "doi": (value, reference, field, options, style) => {
     [DOI: #link("https://doi.org/" + value)]
   },
@@ -131,7 +149,40 @@
 
   "pubstate": (value, reference, field, options, style) => {
     options.bibstring.at(value, default: value)
-  }
+  },
+
+  "title": (value, reference, field, options, style) => {
+    let bib-type = reference.entry_type
+    let title = link-title(reference, options)
+
+    if bib-type in ("article", "inbook", "incollection", "inproceedings", "patent", "thesis", "unpublished") {
+      options.at("format-quotes")(title)
+    } else if bib-type in ("suppbook", "suppcollection", "suppperiodical") {
+      title
+    } else {
+      emph(title)
+    }
+  },
+
+  "type": (value, reference, field, options, style) => {
+    options.bibstring.at(value, default: value)
+  },
+
+  "url": (value, reference, field, options, style) => {
+    [URL: #link(value, value)]
+  },
+
+  "urldate": (value, reference, field, options, style) => {
+    options.at("format-parens")([#options.bibstring.urlseen #value])
+  },
+
+  "version": (value, reference, field, options, style) => {
+    [#options.bibstring.version #value]
+  },
+
+  "volumes": (value, reference, field, options, style) => {
+    [#value #options.bibstring.volumes]
+  },
 
   /*
   TODO currently unsupported:
@@ -147,38 +198,6 @@
   */
 )
 
-
-/*
-\DeclareFieldFormat{title}{\mkbibemph{#1}}
-\DeclareFieldFormat
-  [article,inbook,incollection,inproceedings,patent,thesis,unpublished]
-  {title}{\mkbibquote{#1\isdot}}
-\DeclareFieldFormat
-  [suppbook,suppcollection,suppperiodical]
-  {title}{#1}
-
-\DeclareFieldFormat{type}{\ifbibstring{#1}{\bibstring{#1}}{#1}}
-\DeclareFieldFormat{url}{\mkbibacro{URL}\addcolon\space\url{#1}}
-\DeclareFieldFormat{urldate}{\mkbibparens{\bibstring{urlseen}\space#1}}
-\DeclareFieldFormat{version}{\bibstring{version}~#1}
-\DeclareFieldFormat{volume}{\bibstring{volume}~#1}% volume of a book
-\DeclareFieldFormat[article,periodical]{volume}{#1}% volume of a journal
-\DeclareFieldFormat{volumes}{#1~\bibstring{volumes}}
-
-
-% Generic formats for \printtext and \printfield
-
-\DeclareFieldFormat{emph}{\mkbibemph{#1}}
-\DeclareFieldFormat{bold}{\mkbibbold{#1}}
-\DeclareFieldFormat{smallcaps}{\textsc{#1}}
-\DeclareFieldFormat{parens}{\mkbibparens{#1}}
-\DeclareFieldFormat{brackets}{\mkbibbrackets{#1}}
-\DeclareFieldFormat{bibhyperref}{\bibhyperref{#1}}
-\DeclareFieldFormat{bibhyperlink}{\bibhyperlink{\thefield{entrykey}}{#1}}
-\DeclareFieldFormat{bibhypertarget}{\bibhypertarget{\thefield{entrykey}}{#1}}
-\DeclareFieldFormat{titlecase}{#1}
-\DeclareFieldFormat{noformat}{#1}
-*/
 
 
 #let printfield(reference, field, options, style: none) = {

@@ -8,6 +8,7 @@
 
 
 // make title a hyperlink if DOI or URL are defined
+// OBSOLETE once we commit to bibtypst-styles.typ
 #let url-title(reference, eval-mode: none) = {
   let title = if eval-mode == none { reference.fields.title.trim() } else { eval(reference.fields.title.trim(), mode: eval-mode) }
   if "doi" in reference.fields {
@@ -20,20 +21,6 @@
 }
 
 
-// make title a hyperlink if DOI or URL are defined
-#let url-title-x(reference, options) = {
-  let title = if options.eval-mode == none { reference.fields.title.trim() } else { eval(reference.fields.title.trim(), mode: options.eval-mode) }
-
-  if not options.link-titles {
-    title 
-  } else if "doi" in reference.fields {
-    link("https://doi.org/" + reference.fields.doi)[#title]
-  } else if "url" in reference.fields {
-    link(reference.fields.url)[#title]
-  } else {
-    title
-  }
-}
 
 #let paper-type(reference) = reference.entry_type
 

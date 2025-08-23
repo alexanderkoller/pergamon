@@ -196,17 +196,9 @@
     format-journaltitle: it => emph(it),
     format-issuetitle: it => emph(it),
     format-series: it => it,
-    format-title: bib-type => {
-      if bib-type in ("article", "inbook", "incollection", "inproceedings", "patent", "thesis", "unpublished") {
-        it => ["#it"]
-      } else if bib-type in ("suppbook", "suppcollection", "suppperiodical") {
-        it => it
-      } else {
-        it => emph(it)
-      }
-    },
     format-parens: it => [(#it)],
     format-brackets: it => [[#it]],
+    format-quotes: it => ["#it"],
     volume-number-separator: ".",
     bibeidpunct: ",",
     bibpagespunct: ",",
@@ -230,7 +222,7 @@
         format-series: format-series,
         format-parens: format-parens,
         format-brackets: format-brackets,
-        format-title: format-title(bib-type),
+        format-quotes: format-quotes,
         bibeidpunct: bibeidpunct,
         bibpagespunct: bibpagespunct,
         print-isbn: print-isbn,
@@ -245,13 +237,12 @@
       if bib-type == "article" {
         // For now, I am mapping both \newunit and \newblock to periods.
         let ret = periods(
-          // [#type(fd(reference, "edition"))],
           author-translator-others(reference, options),
-          options.at("format-title")(url-title-x(reference, options)),
+          printfield(reference, "title", options),
           join-list(fd(reference, "language"), options), // TODO: parse language field
           // TODO: \usebibmacro{byauthor}
           // TODO: \usebibmacro{bytranslator+others}
-          fd(reference, "version"),
+          printfield(reference, "version", options),
           spaces(options.bibstring.in, journal-issue-title(reference, options)),
           byeditor-others(reference, options),
           note-pages(reference, options),
