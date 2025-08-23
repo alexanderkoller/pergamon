@@ -11,7 +11,9 @@
   "withannotator": "With annotations by",
   "withintroduction": "With an introduction by",
   "withforeword": "With a foreword by",
-  "withafterword": "With an afterword by"
-    
+  "withafterword": "With an afterword by",
+  "edition": "edition", // e.g. 3rd edition
+  "chapter": "Chapter",  // e.g. Chapter 3
+  "jourser": "series", // e.g. third series
 )
 

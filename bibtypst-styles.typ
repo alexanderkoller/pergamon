@@ -1,52 +1,8 @@
 #import "bibtypst.typ": *
 #import "templating.typ": *
 #import "bibstrings.typ": default-bibstring
-#import "printfield.typ": format-for-printfield
-
-#let join-list(list, options) = {
-  if list == none or list.len() == 0 {
-    none
-  } else if list.len() == 1 {
-    list.at(0)
-  } else {
-    let ret = list.at(0)
-    for i in range(1, list.len()) {
-        if i == list.len() - 1 {
-          ret += options.final-list-delim(list)
-        }
-        ret += list.at(i)
-    }
-    return ret
-  }
-}
-
-// Map "modern" Biblatex field names to legacy field names as they
-// might appear in the bib file. 
-#let field-aliases = (
-  "journaltitle": ("journal",)
-)
-
-#let fd(reference, field, format: x => x) = {
-  if field in reference.fields {
-    return format(reference.fields.at(field).trim())
-  } else if field in field-aliases {
-    for alias in field-aliases.at(field) {
-      if alias in reference.fields {
-        return format(reference.fields.at(alias).trim())
-      }
-    }
-  } else {
-    return none
-  }
-}
-
-#let printfield(reference, field, options, style: none) = format-for-printfield(fd(reference, field), reference, field, options, style:style)
-
-#let ifdef(reference, field, fn) = {
-  let value = fd(reference, field)
-
-  if value == none { none } else { fn(value) }
-}
+#import "printfield.typ": printfield
+#import "bib-util.typ": join-list, fd, ifdef
 
 // biblatex.def editor+others
 #let editor-others(reference, options) = {
@@ -193,35 +149,11 @@
   fjoin(options.bibpagespunct, fd(reference, "note"), printfield(reference, "pages", options))
 }
 
-// biblatex.def eprint
-#let eprint(reference, options) = {
-  let eprint-type = fd(reference, "eprinttype")
-
-  ifdef(reference, "eprint", eprint => {
-    if eprint-type != none and lower(eprint-type) == "hdl" {
-      [HDL: #link("http://hdl.handle.net/" + eprint, eprint)]
-    } else if eprint-type != none and lower(eprint-type) == "arxiv" {
-      let suffix = ifdef(reference, "eprintclass", eprintclass => options.at("format-brackets")(eprintclass))
-      [arXiv: #link("https://arxiv.org/abs/" + eprint, spaces(eprint, suffix))]
-    } else if eprint-type != none and lower(eprint-type) == "jstor" {
-      [JSTOR: #link("http://www.jstor.org/stable/" + eprint, eprint)]
-    } else if eprint-type != none and lower(eprint-type) == "pubmed" {
-      [PMID: #link("http://www.ncbi.nlm.nih.gov/pubmed/" + eprint, eprint)]
-    } else if eprint-type != none and (lower(eprint-type) == "googlebooks" or lower(eprint-type) == "google books") {
-      [Google Books: #link("http://books.google.com/books?id=" + eprint, eprint)]
-    } else {
-      let suffix = ifdef(reference, "eprintclass", eprintclass => options.at("format-brackets")(eprintclass))
-      if eprint-type == none { eprint-type = "eprint" }
-      [#eprint-type: #link(eprint, spaces(eprint, suffix))]
-    }
-  })
-}
-
 // standard.bbx doi+eprint+url
 #let doi-eprint-url(reference, options) = {
   periods(
     if options.print-doi { fd(reference, "doi") } else { none },
-    if options.print-eprint { eprint(reference, options) } else { none },
+    if options.print-eprint { printfield(reference, "eprint", options) } else { none },
     if options.print-url { fd(reference, "url") } else { none },
   )
 }
@@ -313,6 +245,7 @@
       if bib-type == "article" {
         // For now, I am mapping both \newunit and \newblock to periods.
         let ret = periods(
+          // [#type(fd(reference, "edition"))],
           author-translator-others(reference, options),
           options.at("format-title")(url-title-x(reference, options)),
           join-list(fd(reference, "language"), options), // TODO: parse language field
