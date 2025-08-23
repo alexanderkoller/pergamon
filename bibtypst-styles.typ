@@ -1,26 +1,7 @@
 #import "bibtypst.typ": *
 #import "templating.typ": *
-
-// TODO - make these configurable
-#let bibstring = (
-  "editor": "Ed.",
-  "editors": "Eds.",
-  "translator": "translator",
-  "translators": "translators",
-  "in": "In:",
-  "volume": "Volume",
-  "byeditor": "Edited by",
-  "bytranslator": "Translated by",
-  "withcommentator": "With a commentary by",
-  "withannotator": "With annotations by",
-  "withintroduction": "With an introduction by",
-  "withforeword": "With a foreword by",
-  "withafterword": "With an afterword by"
-    
-)
-
-
-
+#import "bibstrings.typ": default-bibstring
+#import "printfield.typ": format-for-printfield
 
 #let join-list(list, options) = {
   if list == none or list.len() == 0 {
@@ -59,34 +40,7 @@
   }
 }
 
-
-#let printfield(reference, field, style: none) = {
-  let value = fd(reference, field)
-
-  if value == none {
-    none
-  } else {
-    field = lower(field)
-
-    if field == "issn" {
-      [ISSN #value]
-    } else if field == "pages" {
-      if value.contains("-") or value.contains("–") { // the second one is an emdash
-        [pp. #value]
-      } else {
-        [p. #value]
-      }
-    } else if field == "volume" {
-      if reference.entry_type in ("article", "periodical") {
-        value
-      } else {
-        [#bibstring.volume #value]
-      }
-    } else {
-      value
-    }
-  }
-}
+#let printfield(reference, field, options, style: none) = format-for-printfield(fd(reference, field), reference, field, options, style:style)
 
 #let ifdef(reference, field, fn) = {
   let value = fd(reference, field)
@@ -99,7 +53,7 @@
   if options.use-editor and fd(reference, "editor") != none {
     // TODO - parse and re-concatenate editors like we do with authors
     // TODO - choose between bibstring.editor and bibstring.editors depending on length of editor list
-    [#printfield(reference, "editor"), #bibstring.editor]
+    [#printfield(reference, "editor", options), #options.bibstring.editor]
   } else {
     none
   }
@@ -110,7 +64,7 @@
   if options.use-translator and fd(reference, "translator") != none {
     // TODO - parse and re-concatenate editors like we do with authors
     // TODO - choose between bibstring.editor and bibstring.editors depending on length of editor list
-    [#printfield(reference, "translator"), #bibstring.translator]
+    [#printfield(reference, "translator", options), #options.bibstring.translator]
   } else {
     none
   }
@@ -129,8 +83,8 @@
 
 // standard.bbx volume+number+eid
 #let volume-number-eid(reference, options) = {
-  let volume = printfield(reference, "volume")
-  let number = printfield(reference, "number")
+  let volume = printfield(reference, "volume", options)
+  let number = printfield(reference, "number", options)
 
   let a = if volume == none and number == none {
     none
@@ -201,11 +155,11 @@
 // biblatex.def withothers
 #let withothers(reference, options) = {
   periods(
-    ifdef(reference, "commentator", commentator => spaces(bibstring.withcommentator, commentator)),
-    ifdef(reference, "annotator", annotator => spaces(bibstring.withannotator, annotator)),
-    ifdef(reference, "introduction", introduction => spaces(bibstring.withintroduction, introduction)),
-    ifdef(reference, "foreword", foreword => spaces(bibstring.withforeword, foreword)),
-    ifdef(reference, "afterword", afterword => spaces(bibstring.withafterword, afterword))
+    ifdef(reference, "commentator", commentator => spaces(options.bibstring.withcommentator, commentator)),
+    ifdef(reference, "annotator", annotator => spaces(options.bibstring.withannotator, annotator)),
+    ifdef(reference, "introduction", introduction => spaces(options.bibstring.withintroduction, introduction)),
+    ifdef(reference, "foreword", foreword => spaces(options.bibstring.withforeword, foreword)),
+    ifdef(reference, "afterword", afterword => spaces(options.bibstring.withafterword, afterword))
   )
 }
 
@@ -215,7 +169,7 @@
 
   periods(
     // TODO bibstring.bytranslator should be expanded as in bytranslator+othersstrg
-    ifdef(reference, "translator", translator => spaces(bibstring.bytranslator, translator)),
+    ifdef(reference, "translator", translator => spaces(options.bibstring.bytranslator, translator)),
     withothers(reference, options)
   )
 }
@@ -226,7 +180,7 @@
 
   periods(
     // TODO bibstring.byeditor should be expanded as in byeditor+othersstrg
-    ifdef(reference, "editor", reference => spaces(bibstring.byeditor, editor)),
+    ifdef(reference, "editor", reference => spaces(options.bibstring.byeditor, editor)),
 
     // TODO: support editora etc.,  \usebibmacro{byeditorx}%
 
@@ -236,7 +190,7 @@
 
 // standard.bbx note+pages
 #let note-pages(reference, options) = {
-  fjoin(options.bibpagespunct, fd(reference, "note"), printfield(reference, "pages"))
+  fjoin(options.bibpagespunct, fd(reference, "note"), printfield(reference, "pages", options))
 }
 
 // biblatex.def eprint
@@ -325,6 +279,7 @@
     bibeidpunct: ",",
     bibpagespunct: ",",
     print-isbn: false,
+    bibstring: default-bibstring
     // name-title-delim: ","
   ) = {
     
@@ -341,10 +296,6 @@
         subtitlepunct: subtitlepunct,
         format-journaltitle: format-journaltitle,
         format-series: format-series,
-        // format-volume-periodical: format-volume-periodical,
-        // format-volume-other: format-volume-other,
-        // format-number-periodical: format-number-periodical,
-        // format-number-other: format-number-other,
         format-parens: format-parens,
         format-brackets: format-brackets,
         format-title: format-title(bib-type),
@@ -354,7 +305,8 @@
         print-url: print-url,
         print-doi: print-doi,
         print-eprint: print-eprint,
-        volume-number-separator: volume-number-separator
+        volume-number-separator: volume-number-separator,
+        bibstring: bibstring
       )
 
 
@@ -367,10 +319,10 @@
           // TODO: \usebibmacro{byauthor}
           // TODO: \usebibmacro{bytranslator+others}
           fd(reference, "version"),
-          spaces(bibstring.in, journal-issue-title(reference, options)),
+          spaces(options.bibstring.in, journal-issue-title(reference, options)),
           byeditor-others(reference, options),
           note-pages(reference, options),
-          if print-isbn { printfield(reference, "issn") } else { none },
+          if print-isbn { printfield(reference, "issn", options) } else { none },
           doi-eprint-url(reference, options),
           // addendum-pubstate(reference, options)
 
