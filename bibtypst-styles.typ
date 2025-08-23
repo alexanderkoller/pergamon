@@ -8,7 +8,15 @@
   "translator": "translator",
   "translators": "translators",
   "in": "In:",
-  "volume": "Volume"
+  "volume": "Volume",
+  "byeditor": "Edited by",
+  "bytranslator": "Translated by",
+  "withcommentator": "With a commentary by",
+  "withannotator": "With annotations by",
+  "withintroduction": "With an introduction by",
+  "withforeword": "With a foreword by",
+  "withafterword": "With an afterword by"
+    
 )
 
 
@@ -49,6 +57,13 @@
   }
 }
 
+
+
+#let ifdef(reference, field, fn) = {
+  let value = fd(reference, field)
+
+  if value == none { none } else { fn(value) }
+}
 
 // biblatex.def editor+others
 #let editor-others(reference, options) = {
@@ -152,12 +167,110 @@
       issue(reference, options)
     )
   }
-
 }
+
+// biblatex.def withothers
+#let withothers(reference, options) = {
+  periods(
+    ifdef(reference, "commentator", commentator => spaces(bibstring.withcommentator, commentator)),
+    ifdef(reference, "annotator", annotator => spaces(bibstring.withannotator, annotator)),
+    ifdef(reference, "introduction", introduction => spaces(bibstring.withintroduction, introduction)),
+    ifdef(reference, "foreword", foreword => spaces(bibstring.withforeword, foreword)),
+    ifdef(reference, "afterword", afterword => spaces(bibstring.withafterword, afterword))
+  )
+}
+
+// biblatex.def bytranslator+others
+#let bytranslator-others(reference, options) = {
+  let translator = fd(reference, "translator")
+
+  periods(
+    // TODO bibstring.bytranslator should be expanded as in bytranslator+othersstrg
+    ifdef(reference, "translator", translator => spaces(bibstring.bytranslator, translator)),
+    withothers(reference, options)
+  )
+}
+
+// biblatex.def byeditor+others
+#let byeditor-others(reference, options) = {
+  let editor = fd(reference, "editor")
+
+  periods(
+    // TODO bibstring.byeditor should be expanded as in byeditor+othersstrg
+    ifdef(reference, "editor", reference => spaces(bibstring.byeditor, editor)),
+
+    // TODO: support editora etc.,  \usebibmacro{byeditorx}%
+
+    bytranslator-others(reference, options)
+  )
+}
+
+// standard.bbx note+pages
+#let note-pages(reference, options) = {
+  fjoin(options.bibpagespunct, fd(reference, "note"), fd(reference, "pages"))
+}
+
+// biblatex.def eprint
+#let eprint(reference, options) = {
+  let eprint-type = fd(reference, "eprinttype")
+
+  ifdef(reference, "eprint", eprint => {
+    if eprint-type != none and lower(eprint-type) == "hdl" {
+      [HDL: #link("http://hdl.handle.net/" + eprint, eprint)]
+    } else if eprint-type != none and lower(eprint-type) == "arxiv" {
+      let suffix = ifdef(reference, "eprintclass", eprintclass => options.at("format-brackets")(eprintclass))
+      [arXiv: #link("https://arxiv.org/abs/" + eprint, spaces(eprint, suffix))]
+    } else if eprint-type != none and lower(eprint-type) == "jstor" {
+      [JSTOR: #link("http://www.jstor.org/stable/" + eprint, eprint)]
+    } else if eprint-type != none and lower(eprint-type) == "pubmed" {
+      [PMID: #link("http://www.ncbi.nlm.nih.gov/pubmed/" + eprint, eprint)]
+    } else if eprint-type != none and (lower(eprint-type) == "googlebooks" or lower(eprint-type) == "google books") {
+      [Google Books: #link("http://books.google.com/books?id=" + eprint, eprint)]
+    } else {
+      let suffix = ifdef(reference, "eprintclass", eprintclass => options.at("format-brackets")(eprintclass))
+      if eprint-type == none { eprint-type = "eprint" }
+      [#eprint-type: #link(eprint, spaces(eprint, suffix))]
+    }
+  })
+}
+
+// standard.bbx doi+eprint+url
+#let doi-eprint-url(reference, options) = {
+  periods(
+    if options.print-doi { fd(reference, "doi") } else { none },
+    if options.print-eprint { eprint(reference, options) } else { none },
+    if options.print-url { fd(reference, "url") } else { none },
+  )
+}
+
+// GLOBAL TODO: check DeclareFieldFormat for all printfield commands
+/*
+
+\DeclareFieldFormat{eprint}{%
+  
+\DeclareFieldFormat{eprint:hdl}{%
+  
+\DeclareFieldAlias{eprint:HDL}{eprint:hdl}
+\DeclareFieldFormat{eprint:arxiv}{%
+  
+\DeclareFieldAlias{eprint:arXiv}{eprint:arxiv}
+\DeclareFieldFormat{eprint:jstor}{%
+
+\DeclareFieldAlias{eprint:JSTOR}{eprint:jstor}
+\DeclareFieldFormat{eprint:pubmed}{%
+  
+\DeclareFieldAlias{eprint:PubMed}{eprint:pubmed}
+\DeclareFieldFormat{eprint:googlebooks}{%
+  
+\DeclareFieldAlias{eprint:Google Books}{eprint:googlebooks}
+*/
 
 #let format-reference(
     highlighting: x => x,
     link-titles: true,
+    print-url: false,
+    print-doi: false,
+    print-eprint: true,
     eval-mode: "markup",
     use-author: true,
     use-translator: true,
@@ -182,8 +295,11 @@
     format-number-periodical: it => it,
     format-number-other: it => it,
     format-parens: it => [(#it)],
+    format-brackets: it => [[#it]],
     volume-number-separator: ".",
-    bibeidpunct: ","
+    bibeidpunct: ",",
+    bibpagespunct: ",",
+    print-isbn: false,
     // name-title-delim: ","
   ) = {
     
@@ -205,8 +321,14 @@
         format-number-periodical: format-number-periodical,
         format-number-other: format-number-other,
         format-parens: format-parens,
+        format-brackets: format-brackets,
         format-title: format-title(bib-type),
         bibeidpunct: bibeidpunct,
+        bibpagespunct: bibpagespunct,
+        print-isbn: print-isbn,
+        print-url: print-url,
+        print-doi: print-doi,
+        print-eprint: print-eprint,
         volume-number-separator: volume-number-separator
       )
 
@@ -221,6 +343,23 @@
           // TODO: \usebibmacro{bytranslator+others}
           fd(reference, "version"),
           spaces(bibstring.in, journal-issue-title(reference, options)),
+          byeditor-others(reference, options),
+          note-pages(reference, options),
+          if print-isbn {  ifdef(reference, "issn", issn => [ISSN #issn]) } else { none },
+          doi-eprint-url(reference, options),
+          // addendum-pubstate(reference, options)
+
+          // \usebibmacro{addendum+pubstate}%
+          // 
+          // 
+          // 
+          // TODO: support this at some point
+          //   \setunit{\bibpagerefpunct}\newblock
+          // \usebibmacro{pageref}%
+          // \newunit\newblock
+          // \iftoggle{bbx:related}
+          //   {\usebibmacro{related:init}%
+          //   \usebibmacro{related}}
         )
 
         (ret + ".",)
@@ -232,34 +371,6 @@
 
   formatter
 }
-/*
-
-  \printfield{version}%
-  \newunit\newblock
-  \usebibmacro{in:}%
-  \usebibmacro{journal+issuetitle}%
-  \newunit
-  \usebibmacro{byeditor+others}%
-  \newunit
-  \usebibmacro{note+pages}%
-  \newunit\newblock
-  \iftoggle{bbx:isbn}
-    {\printfield{issn}}
-    {}%
-  \newunit\newblock
-  \usebibmacro{doi+eprint+url}%
-  \newunit\newblock
-  \usebibmacro{addendum+pubstate}%
-  \setunit{\bibpagerefpunct}\newblock
-  \usebibmacro{pageref}%
-  \newunit\newblock
-  \iftoggle{bbx:related}
-    {\usebibmacro{related:init}%
-     \usebibmacro{related}}
-    {}%
-  \usebibmacro{finentry}}
-  */
-
 
 
 
