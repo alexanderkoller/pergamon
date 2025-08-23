@@ -158,29 +158,17 @@
   )
 }
 
-// GLOBAL TODO: check DeclareFieldFormat for all printfield commands
-/*
+// standard.bbx addendum+pubstate
+#let addendum-pubstate(reference, options) = {
+  periods(
+    printfield(reference, "addendum", options),
+    printfield(reference, "pubstate", options)
+  )
+}
 
-\DeclareFieldFormat{eprint}{%
-  
-\DeclareFieldFormat{eprint:hdl}{%
-  
-\DeclareFieldAlias{eprint:HDL}{eprint:hdl}
-\DeclareFieldFormat{eprint:arxiv}{%
-  
-\DeclareFieldAlias{eprint:arXiv}{eprint:arxiv}
-\DeclareFieldFormat{eprint:jstor}{%
-
-\DeclareFieldAlias{eprint:JSTOR}{eprint:jstor}
-\DeclareFieldFormat{eprint:pubmed}{%
-  
-\DeclareFieldAlias{eprint:PubMed}{eprint:pubmed}
-\DeclareFieldFormat{eprint:googlebooks}{%
-  
-\DeclareFieldAlias{eprint:Google Books}{eprint:googlebooks}
-*/
 
 #let format-reference(
+    label: (index, reference) => none, // to generate the label in the first column
     highlighting: x => x,
     link-titles: true,
     print-url: false,
@@ -242,18 +230,16 @@
           join-list(fd(reference, "language"), options), // TODO: parse language field
           // TODO: \usebibmacro{byauthor}
           // TODO: \usebibmacro{bytranslator+others}
+          //   - the "others" macros construct bibstring keys like "editorstrfo" to
+          //     cover multiple roles of the same person at once
           printfield(reference, "version", options),
           spaces(options.bibstring.in, journal-issue-title(reference, options)),
           byeditor-others(reference, options),
           note-pages(reference, options),
           if print-isbn { printfield(reference, "issn", options) } else { none },
           doi-eprint-url(reference, options),
-          // addendum-pubstate(reference, options)
+          addendum-pubstate(reference, options)
 
-          // \usebibmacro{addendum+pubstate}%
-          // 
-          // 
-          // 
           // TODO: support this at some point
           //   \setunit{\bibpagerefpunct}\newblock
           // \usebibmacro{pageref}%
@@ -263,10 +249,22 @@
           //   \usebibmacro{related}}
         )
 
-        (ret + ".",)
+        let lbl = label(index, reference)
+        if lbl == none {
+          (ret + ".",)
+        } else {
+          (lbl, ret + ".")
+        }
         // ([#reference],)
       } else {
-        ([HALLO],)
+        let lbl = label(index, reference)
+        let dummy = [UNSUPPORTED REFERENCE (key=#reference.entry_key, bibtype=#reference.entry_type)]
+
+        if lbl == none {
+          (dummy,)
+        } else {
+          (lbl, dummy)
+        }
       }
   }
 
