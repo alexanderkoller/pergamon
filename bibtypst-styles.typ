@@ -174,6 +174,49 @@
   }
 }
 
+
+#let driver-article(reference, options) = {
+    // TODO - it's okay if either year or date is defined
+    // -> revamping dates and years is a major coherent work package that I should look at
+    require-fields(reference, options, "author", "title", "journaltitle", "year")
+
+    // For now, I am mapping both \newunit and \newblock to periods.
+    let ret = periods(
+      author-translator-others(reference, options),
+      printfield(reference, "title", options),
+      join-list(fd(reference, "language", options), options), // TODO: parse language field
+      // TODO: \usebibmacro{byauthor}
+      // TODO: \usebibmacro{bytranslator+others}
+      //   - the "others" macros construct bibstring keys like "editorstrfo" to
+      //     cover multiple roles of the same person at once
+      printfield(reference, "version", options),
+      spaces(options.bibstring.in, journal-issue-title(reference, options)),
+      byeditor-others(reference, options),
+      note-pages(reference, options),
+      if options.print-isbn { printfield(reference, "issn", options) } else { none },
+      doi-eprint-url(reference, options),
+      addendum-pubstate(reference, options)
+
+      // TODO: support this at some point
+      //   \setunit{\bibpagerefpunct}\newblock
+      // \usebibmacro{pageref}%
+      // \newunit\newblock
+      // \iftoggle{bbx:related}
+      //   {\usebibmacro{related:init}%
+      //   \usebibmacro{related}}
+    )
+
+    ret
+}
+
+#let driver-dummy(reference, options) = {
+  [UNSUPPORTED REFERENCE (key=#reference.entry_key, bibtype=#reference.entry_type)]
+}
+
+#let bibliography-drivers = (
+  "article": driver-article
+)
+
 /// Generates a reference formatter using the specified options.
 /// References are formatted essentially as in the standard BibLaTeX.
 #let format-reference(
@@ -253,74 +296,35 @@
         suppressed-fields: suppressed-fields
       )
 
-      // TODO - enforce mandatory fields
+      // typeset reference
+      let driver = bibliography-drivers.at(lower(bib-type), default: driver-dummy)
+      let ret = driver(reference, options)
 
-
-      if bib-type == "article" {
-        // TODO - it's okay if either year or date is defined
-        // -> revamping dates and years is a major coherent work package that I should look at
-        require-fields(reference, options, "author", "title", "journaltitle", "year")
-
-        // For now, I am mapping both \newunit and \newblock to periods.
-        let ret = periods(
-          author-translator-others(reference, options),
-          printfield(reference, "title", options),
-          join-list(fd(reference, "language", options), options), // TODO: parse language field
-          // TODO: \usebibmacro{byauthor}
-          // TODO: \usebibmacro{bytranslator+others}
-          //   - the "others" macros construct bibstring keys like "editorstrfo" to
-          //     cover multiple roles of the same person at once
-          printfield(reference, "version", options),
-          spaces(options.bibstring.in, journal-issue-title(reference, options)),
-          byeditor-others(reference, options),
-          note-pages(reference, options),
-          if print-isbn { printfield(reference, "issn", options) } else { none },
-          doi-eprint-url(reference, options),
-          addendum-pubstate(reference, options)
-
-          // TODO: support this at some point
-          //   \setunit{\bibpagerefpunct}\newblock
-          // \usebibmacro{pageref}%
-          // \newunit\newblock
-          // \iftoggle{bbx:related}
-          //   {\usebibmacro{related:init}%
-          //   \usebibmacro{related}}
-        )
-
-        if additional-fields != none {
-          for field in additional-fields {
-            if type(field) == str {
-              let value = printfield(reference, field, options)
-              if value != none {
-                ret += ". "
-                ret += value
-              }
-            } else if type(field) == function {
-              let value = field(reference, options)
-              if value != none {
-                ret += ". "
-                ret += value
-              }
+      // add additional fields, if specified
+      if additional-fields != none {
+        for field in additional-fields {
+          if type(field) == str {
+            let value = printfield(reference, field, options)
+            if value != none {
+              ret += ". "
+              ret += value
+            }
+          } else if type(field) == function {
+            let value = field(reference, options)
+            if value != none {
+              ret += ". "
+              ret += value
             }
           }
         }
+      }
 
-        let lbl = label(index, reference)
-        if lbl == none {
-          (ret + ".",)
-        } else {
-          (lbl, ret + ".")
-        }
-        // ([#reference],)
+      // add label if requested
+      let lbl = label(index, reference)
+      if lbl == none {
+        (ret + ".",)
       } else {
-        let lbl = label(index, reference)
-        let dummy = [UNSUPPORTED REFERENCE (key=#reference.entry_key, bibtype=#reference.entry_type)]
-
-        if lbl == none {
-          (dummy,)
-        } else {
-          (lbl, dummy)
-        }
+        (lbl, ret + ".")
       }
   }
 
