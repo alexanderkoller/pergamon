@@ -167,6 +167,13 @@
 }
 
 
+#let require-fields(reference, options, ..fields) = {
+  for field in fields.pos() {
+    assert(fd(reference, field, options) != none, message: strfmt("Required field '{}' is missing in entry '{}'!", field, reference.entry_key))
+    }
+  }
+}
+
 /// Generates a reference formatter using the specified options.
 /// References are formatted essentially as in the standard BibLaTeX.
 #let format-reference(
@@ -251,6 +258,10 @@
 
 
       if bib-type == "article" {
+        // TODO - it's okay if either year or date is defined
+        // -> revamping dates and years is a major coherent work package that I should look at
+        require-fields(reference, options, "author", "title", "journaltitle", "year")
+
         // For now, I am mapping both \newunit and \newblock to periods.
         let ret = periods(
           author-translator-others(reference, options),

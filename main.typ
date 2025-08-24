@@ -17,7 +17,7 @@
 #let fref = format-reference(
   // additional-fields: ("award",)
   additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),
-  suppress-fields: ("issn",),
+  suppress-fields: ("issn", "year"),
   print-isbn: true
 )
 #let fadd = x => x
