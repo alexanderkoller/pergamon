@@ -91,7 +91,7 @@
   @irtg-sgraph-15
 
   @wu-etal-2024-reasoning @knuth1990 @yao2025language @hershcovichItMeaningThat2021
-  @abgrallMeasurementsppmKpm2016 @kuhlmann2003tiny
+  @abgrallMeasurementsppmKpm2016 @kuhlmann2003tiny @fake-mastersthesis
 
   #print-bibliography(format-reference: fref, add-label: fadd, sorting: sorting)
 ]

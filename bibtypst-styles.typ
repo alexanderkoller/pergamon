@@ -2,7 +2,7 @@
 #import "templating.typ": *
 #import "bibstrings.typ": default-bibstring
 #import "printfield.typ": printfield
-#import "bib-util.typ": join-list, fd, ifdef
+#import "bib-util.typ": join-list, fd, ifdef, type-aliases
 
 // biblatex.def authorstrg
 #let authorstrg(reference, options) = {
@@ -617,6 +617,11 @@
         bibstring: bibstring,
         suppressed-fields: suppressed-fields
       )
+
+      // process type aliases
+      if reference.entry_type in type-aliases {
+        reference = type-aliases.at(reference.entry_type)(reference)
+      }
 
       // typeset reference
       let driver = bibliography-drivers.at(lower(reference.entry_type), default: driver-dummy)
