@@ -10,10 +10,14 @@
   // TODO - implement all the "strg" stuff correctly
 }
 
+#let language(reference, options) = {
+  join-list(fd(reference, "language", options), options) // TODO: parse language field
+}
+
 // biblatex.def author
 #let author(reference, options) = {
   fjoin(options.author-type-delim,
-    printfield(reference, "author", options), // TODO - was \printnames{author}
+    reference.authors, // TODO - was \printnames{author}
     authorstrg(reference, options)
   )
 }
@@ -278,19 +282,26 @@
   spaces(printfield(reference, "series", options), printfield(reference, "number", options))
 }
 
-// standard.bbx publisher+location+date
-#let publisher-location-date(reference, options) = {
-  let publisher = printfield(reference, "publisher", options)
-
+#let xxx-location-date(reference, options, xxx) = {
   commas(
     fjoin(
       ":",
       printfield(reference, "location", options), // Biblatex: printlist{location}
-      printfield(reference, "publisher", options)
+      printfield(reference, xxx, options)
     ),
     date(reference, options)
   )
 }
+
+// standard.bbx publisher+location+date
+#let publisher-location-date(reference, options) = xxx-location-date(reference, options, "publisher")
+
+// standard.bbx organization+location+date
+#let organization-location-date(reference, options) = xxx-location-date(reference, options, "organization")
+
+// standard.bbx institution+location+date
+#let institution-location-date(reference, options) = xxx-location-date(reference, options, "institution")
+
 
 // chapter+pages
 #let chapter-pages(reference, options) = {
@@ -343,7 +354,7 @@
     periods(
       author-translator-others(reference, options),
       printfield(reference, "title", options),
-      join-list(fd(reference, "language", options), options), // TODO: parse language field
+      language(reference, options),
       // TODO: \usebibmacro{byauthor}
       // TODO: \usebibmacro{bytranslator+others}
       //   - the "others" macros construct bibstring keys like "editorstrfo" to
@@ -381,7 +392,7 @@
   periods(
     author-translator-others(reference, options),
     printfield(reference, "title", options),
-    join-list(fd(reference, "language", options), options), // TODO: parse language field
+    language(reference, options),
     // TODO:   \usebibmacro{byauthor}%
     spaces(options.bibstring.in, maintitle-booktitle(reference, options)),
     event-venue-date(reference, options),
@@ -409,7 +420,7 @@
   periods(
     author-translator-others(reference, options),
     printfield(reference, "title", options),
-    join-list(fd(reference, "language", options), options), // TODO: parse language field - cf. TODO above about \printlist
+    language(reference, options),
     // TODO:   \usebibmacro{byauthor}%
     spaces(options.bibstring.in, maintitle-booktitle(reference, options)),
     byeditor-others(reference, options),
@@ -431,12 +442,13 @@
 
 #let driver-book(reference, options) = {
   // TODO - it's okay if either year or date is defined
+  // TODO - it's probably okay if there is an editor rather than an author
   require-fields(reference, options, "author", "title", "year")
 
   periods(
     author-editor-others-translator-others(reference, options),
     maintitle-title(reference, options),
-    join-list(fd(reference, "language", options), options), // TODO: parse language field - cf. TODO above about \printlist
+    language(reference, options),
     // TODO:  \usebibmacro{byauthor}%
     byeditor-others(reference, options),
     printfield(reference, "edition", options),
@@ -455,15 +467,65 @@
   )
 }
 
+#let driver-misc(reference, options) = {
+  // TODO - it's okay if either year or date is defined
+  require-fields(reference, options, "author", "title", "year")
+
+  periods(
+    author-editor-others-translator-others(reference, options),
+    printfield(reference, "title", options),
+    language(reference, options),
+    // TODO:  \usebibmacro{byauthor}%
+    byeditor-others(reference, options),
+    printfield(reference, "howpublished", options),
+    printfield(reference, "type", options),
+    printfield(reference, "version", options),
+    printfield(reference, "note", options),
+    organization-location-date(reference, options), // XX
+    doi-eprint-url(reference, options),
+    addendum-pubstate(reference, options)
+    
+    // TODO see [1] above
+  )
+}
+
+
+#let driver-thesis(reference, options) = {
+  // TODO - it's okay if either year or date is defined
+  require-fields(reference, options, "author", "title", "type", "institution", "year")
+
+  periods(
+    author(reference, options),
+    printfield(reference, "title", options),
+    language(reference, options),
+    // TODO:  \usebibmacro{byauthor}%
+    printfield(reference, "note", options),
+    printfield(reference, "type", options),
+    institution-location-date(reference, options),
+    chapter-pages(reference, options),
+    printfield(reference, "pagetotal", options),
+    if options.print-isbn { printfield(reference, "isbn", options) } else { none },
+    doi-eprint-url(reference, options),
+    addendum-pubstate(reference, options)
+    
+    // TODO see [1] above
+  )
+
+}
+
 #let driver-dummy(reference, options) = {
   [UNSUPPORTED REFERENCE (key=#reference.entry_key, bibtype=#reference.entry_type)]
 }
+
+// TODO resolve type aliases (phdthesis -> thesis)
 
 #let bibliography-drivers = (
   "article": driver-article,
   "inproceedings": driver-inproceedings,
   "incollection": driver-incollection,
-  "book": driver-book
+  "book": driver-book,
+  "misc": driver-misc,
+  "thesis": driver-thesis
 )
 
 /// Wraps a function in `none`-handling code. `nn(func)`
