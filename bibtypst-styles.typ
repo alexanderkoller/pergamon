@@ -6,7 +6,7 @@
 
 // biblatex.def editor+others
 #let editor-others(reference, options) = {
-  if options.use-editor and fd(reference, "editor") != none {
+  if options.use-editor and fd(reference, "editor", options) != none {
     // TODO - parse and re-concatenate editors like we do with authors
     // TODO - choose between bibstring.editor and bibstring.editors depending on length of editor list
     [#printfield(reference, "editor", options), #options.bibstring.editor]
@@ -17,7 +17,7 @@
 
 // biblatex.def translator+others
 #let translator-others(reference, options) = {
-  if options.use-translator and fd(reference, "translator") != none {
+  if options.use-translator and fd(reference, "translator", options) != none {
     // TODO - parse and re-concatenate editors like we do with authors
     // TODO - choose between bibstring.editor and bibstring.editors depending on length of editor list
     [#printfield(reference, "translator", options), #options.bibstring.translator]
@@ -28,7 +28,7 @@
 
 // biblatex.def author/translator+others
 #let author-translator-others(reference, options) = {
-  if options.use-author and fd(reference, "author") != none {
+  if options.use-author and fd(reference, "author", options) != none {
     // TODO - make configurable
     reference.authors
   } else {
@@ -52,17 +52,17 @@
     volume + options.volume-number-separator + number
   }
 
-  fjoin(options.bibeidpunct, a, fd(reference, "eid"))
+  fjoin(options.bibeidpunct, a, fd(reference, "eid", options))
 }
 
 
 
-#let date(reference, options) = fd(reference, "year") // TODO this is probably incomplete
+#let date(reference, options) = fd(reference, "year", options) // TODO this is probably incomplete
 
 // standard.bbx issue+date
 #let issue-date(reference, options) = {
   spaces(
-    fd(reference, "issue"),
+    printfield(reference, "issue", options),
     date(reference, options),
     format: options.format-parens
   )
@@ -71,8 +71,8 @@
 // biblatex.def issue
 // -- in contrast to the original, we include the preceding colon here
 #let issue(reference, options) = {
-  let issuetitle = fd(reference, "issuetitle")
-  let issuesubtitle = fd(reference, "issuesubtitle")
+  let issuetitle = fd(reference, "issuetitle", options)
+  let issuesubtitle = fd(reference, "issuesubtitle", options)
 
   if issuetitle == none and issuesubtitle == none {
     none
@@ -80,27 +80,27 @@
     [: ]
     periods(
       fjoin(options.subtitlepunct, format: options.format-issuetitle, issuetitle, issuesubtitle),
-      fd(reference, "issuetitleaddon")
+      printfield(reference, "issuetitleaddon", options)
     )
   }
 }
 
 // standard.bbx journal+issuetitle
 #let journal-issue-title(reference, options) = {
-  let jt = fd(reference, "journaltitle")
-  let jst = fd(reference, "journalsubtitle")
+  let jt = fd(reference, "journaltitle", options)
+  let jst = fd(reference, "journalsubtitle", options)
 
   if jt == none and jst == none {
     none
   } else {
     let journaltitle = periods(
       fjoin(options.subtitlepunct, jt, none, format: options.format-journaltitle),
-      fd(reference, "journaltitleaddon")
+      printfield(reference, "journaltitleaddon", options)
     )
 
     spaces(
       journaltitle,
-      fd(reference, "series", format: options.format-series),
+      printfield(reference, "series", options),
       volume-number-eid(reference, options),
       issue-date(reference, options),
       issue(reference, options)
@@ -111,32 +111,32 @@
 // biblatex.def withothers
 #let withothers(reference, options) = {
   periods(
-    ifdef(reference, "commentator", commentator => spaces(options.bibstring.withcommentator, commentator)),
-    ifdef(reference, "annotator", annotator => spaces(options.bibstring.withannotator, annotator)),
-    ifdef(reference, "introduction", introduction => spaces(options.bibstring.withintroduction, introduction)),
-    ifdef(reference, "foreword", foreword => spaces(options.bibstring.withforeword, foreword)),
-    ifdef(reference, "afterword", afterword => spaces(options.bibstring.withafterword, afterword))
+    ifdef(reference, "commentator", options, commentator => spaces(options.bibstring.withcommentator, commentator)),
+    ifdef(reference, "annotator", options, annotator => spaces(options.bibstring.withannotator, annotator)),
+    ifdef(reference, "introduction", options, introduction => spaces(options.bibstring.withintroduction, introduction)),
+    ifdef(reference, "foreword", options, foreword => spaces(options.bibstring.withforeword, foreword)),
+    ifdef(reference, "afterword", options, afterword => spaces(options.bibstring.withafterword, afterword))
   )
 }
 
 // biblatex.def bytranslator+others
 #let bytranslator-others(reference, options) = {
-  let translator = fd(reference, "translator")
+  let translator = fd(reference, "translator", options)
 
   periods(
     // TODO bibstring.bytranslator should be expanded as in bytranslator+othersstrg
-    ifdef(reference, "translator", translator => spaces(options.bibstring.bytranslator, translator)),
+    ifdef(reference, "translator", options, translator => spaces(options.bibstring.bytranslator, translator)),
     withothers(reference, options)
   )
 }
 
 // biblatex.def byeditor+others
 #let byeditor-others(reference, options) = {
-  let editor = fd(reference, "editor")
+  let editor = fd(reference, "editor", options)
 
   periods(
     // TODO bibstring.byeditor should be expanded as in byeditor+othersstrg
-    ifdef(reference, "editor", reference => spaces(options.bibstring.byeditor, editor)),
+    ifdef(reference, "editor", options, reference => spaces(options.bibstring.byeditor, editor)),
 
     // TODO: support editora etc.,  \usebibmacro{byeditorx}%
 
@@ -146,15 +146,15 @@
 
 // standard.bbx note+pages
 #let note-pages(reference, options) = {
-  fjoin(options.bibpagespunct, fd(reference, "note"), printfield(reference, "pages", options))
+  fjoin(options.bibpagespunct, printfield(reference, "note", options), printfield(reference, "pages", options))
 }
 
 // standard.bbx doi+eprint+url
 #let doi-eprint-url(reference, options) = {
   periods(
-    if options.print-doi { fd(reference, "doi") } else { none },
+    if options.print-doi { printfield(reference, "doi", options) } else { none },
     if options.print-eprint { printfield(reference, "eprint", options) } else { none },
-    if options.print-url { fd(reference, "url") } else { none },
+    if options.print-url { printfield(reference, "url", options) } else { none },
   )
 }
 
@@ -185,7 +185,6 @@
     subtitlepunct: ".",
     format-journaltitle: it => emph(it),
     format-issuetitle: it => emph(it),
-    format-series: it => it,
     format-parens: it => [(#it)],
     format-brackets: it => [[#it]],
     format-quotes: it => ["#it"],
@@ -203,12 +202,27 @@
     /// pass `none` to indicate that no additional fields need to be printed.
     /// 
     /// -> function | none
-    additional-fields: none
+    additional-fields: none,
+
+    /// An array of field names that should not be printed. References are treated
+    /// as if they do not contain values for these fields, even if the Bibtex file
+    /// defines them. Instead of an array, you can also pass `none` to indicate that
+    /// no fields should be suppressed.
+    suppress-fields: none
+
     // name-title-delim: ","
   ) = {
     
     let formatter(index, reference, eval-mode) = {
       let bib-type = paper-type(reference)
+
+      let suppressed-fields = (:)
+      if suppress-fields != none {
+        for field in suppress-fields {
+          suppressed-fields.insert(field, 1)
+        }
+      }
+
       let options = (
         link-titles: link-titles,
         eval-mode: eval-mode,
@@ -219,7 +233,6 @@
         final-list-delim: final-list-delim,
         subtitlepunct: subtitlepunct,
         format-journaltitle: format-journaltitle,
-        format-series: format-series,
         format-parens: format-parens,
         format-brackets: format-brackets,
         format-quotes: format-quotes,
@@ -230,8 +243,11 @@
         print-doi: print-doi,
         print-eprint: print-eprint,
         volume-number-separator: volume-number-separator,
-        bibstring: bibstring
+        bibstring: bibstring,
+        suppressed-fields: suppressed-fields
       )
+
+      // TODO - enforce mandatory fields
 
 
       if bib-type == "article" {
@@ -239,7 +255,7 @@
         let ret = periods(
           author-translator-others(reference, options),
           printfield(reference, "title", options),
-          join-list(fd(reference, "language"), options), // TODO: parse language field
+          join-list(fd(reference, "language", options), options), // TODO: parse language field
           // TODO: \usebibmacro{byauthor}
           // TODO: \usebibmacro{bytranslator+others}
           //   - the "others" macros construct bibstring keys like "editorstrfo" to

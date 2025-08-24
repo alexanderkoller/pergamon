@@ -18,13 +18,13 @@
 
 
 #let eprint(reference, options) = {
-  let eprint-type = fd(reference, "eprinttype")
+  let eprint-type = fd(reference, "eprinttype", options)
 
-  ifdef(reference, "eprint", eprint => {
+  ifdef(reference, "eprint", options, eprint => {
     if eprint-type != none and lower(eprint-type) == "hdl" {
       [HDL: #link("http://hdl.handle.net/" + eprint, eprint)]
     } else if eprint-type != none and lower(eprint-type) == "arxiv" {
-      let suffix = ifdef(reference, "eprintclass", eprintclass => options.at("format-brackets")(eprintclass))
+      let suffix = ifdef(reference, "eprintclass", options, eprintclass => options.at("format-brackets")(eprintclass))
       [arXiv: #link("https://arxiv.org/abs/" + eprint, spaces(eprint, suffix))]
     } else if eprint-type != none and lower(eprint-type) == "jstor" {
       [JSTOR: #link("http://www.jstor.org/stable/" + eprint, eprint)]
@@ -33,7 +33,7 @@
     } else if eprint-type != none and (lower(eprint-type) == "googlebooks" or lower(eprint-type) == "google books") {
       [Google Books: #link("http://books.google.com/books?id=" + eprint, eprint)]
     } else {
-      let suffix = ifdef(reference, "eprintclass", eprintclass => options.at("format-brackets")(eprintclass))
+      let suffix = ifdef(reference, "eprintclass", options, eprintclass => options.at("format-brackets")(eprintclass))
       if eprint-type == none { eprint-type = "eprint" }
       [#eprint-type: #link(eprint, spaces(eprint, suffix))]
     }
@@ -201,7 +201,7 @@
 
 
 #let printfield(reference, field, options, style: none) = {
-  let value = fd(reference, field)
+  let value = fd(reference, field, options)
   
   if value == none {
     none
