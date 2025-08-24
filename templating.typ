@@ -53,6 +53,7 @@
 #let commas(..x) = fjoin(",", ..x)
 #let periods(..x) = fjoin(".", ..x)
 #let spaces(..x) = fjoin("", ..x)
+#let epsilons(..x) = fjoin("", ..x, add-space: false)
 #let first-of(..x) = {
   let xs = x.pos()
   let index = xs.position(not-none)

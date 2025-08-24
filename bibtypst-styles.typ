@@ -4,6 +4,20 @@
 #import "printfield.typ": printfield
 #import "bib-util.typ": join-list, fd, ifdef
 
+// biblatex.def authorstrg
+#let authorstrg(reference, options) = {
+  printfield(reference, "authortype", options)
+  // TODO - implement all the "strg" stuff correctly
+}
+
+// biblatex.def author
+#let author(reference, options) = {
+  fjoin(options.author-type-delim,
+    printfield(reference, "author", options), // TODO - was \printnames{author}
+    authorstrg(reference, options)
+  )
+}
+
 // biblatex.def editor+others
 #let editor-others(reference, options) = {
   if options.use-editor and fd(reference, "editor", options) != none {
@@ -206,6 +220,25 @@
   )
 }
 
+// standard.bbx maintitle+title
+#let maintitle-title(reference, options) = {
+  let maintitle = fd(reference, "maintitle", options).trim()
+  let title = fd(reference, "title", options).trim()
+  let print-maintitle = (maintitle != title)
+
+  let volume-prefix = if print-maintitle { epsilons(printfield(reference, "volume", options), printfield(reference, "part", options)) } else { none }
+
+  periods(
+    if print-maintitle {
+      periods(
+        printfield(reference, "maintitle", options),
+        printfield(reference, "mainsubtitle", options)
+      )
+    } else { none },
+    fjoin(":", volume-prefix, printfield(reference, "title", options))
+  )
+}
+
 // TODO: "printeventdate" is referenced from event+venue+date,
 // but I can't figure out where it is defined or what it means.
 // It is _not_ the year, that comes later.
@@ -266,6 +299,31 @@
     printfield(reference, "eid", options),
     printfield(reference, "pages", options)
   )
+}
+
+// biblatex.def author/editor+others/translator+others
+#let author-editor-others-translator-others(reference, options) = {
+  // TODO: implement the "useauthor" option
+  first-of(
+    author(reference, options),
+    editor-others(reference, options),
+    translator-others(reference, options)
+  )
+
+// \newbibmacro*{author/editor+others/translator+others}{%
+//   \ifboolexpr{
+//     test \ifuseauthor
+//     and
+//     not test {\ifnameundef{author}}
+//   }
+//     {\usebibmacro{author}}
+//     {\ifboolexpr{
+//        test \ifuseeditor
+//        and
+//        not test {\ifnameundef{editor}}
+//      }
+//        {\usebibmacro{editor+others}}
+//        {\usebibmacro{translator+others}}}}
 }
 
 #let require-fields(reference, options, ..fields) = {
@@ -343,13 +401,69 @@
   )
 }
 
+
+#let driver-incollection(reference, options) = {
+  // TODO - it's okay if either year or date is defined
+  require-fields(reference, options, "author", "title", "editor", "booktitle", "year")
+
+  periods(
+    author-translator-others(reference, options),
+    printfield(reference, "title", options),
+    join-list(fd(reference, "language", options), options), // TODO: parse language field - cf. TODO above about \printlist
+    // TODO:   \usebibmacro{byauthor}%
+    spaces(options.bibstring.in, maintitle-booktitle(reference, options)),
+    byeditor-others(reference, options),
+    printfield(reference, "edition", options),
+    volume-part-if-maintitle-undef(reference, options),
+    printfield(reference, "volumes", options),
+    series-number(reference, options),
+    printfield(reference, "note", options),
+    publisher-location-date(reference, options),
+    chapter-pages(reference, options),
+    if options.print-isbn { printfield(reference, "isbn", options) } else { none },
+    doi-eprint-url(reference, options),
+    addendum-pubstate(reference, options)
+    
+    // TODO see [1] above
+  )
+}
+
+
+#let driver-book(reference, options) = {
+  // TODO - it's okay if either year or date is defined
+  require-fields(reference, options, "author", "title", "year")
+
+  periods(
+    author-editor-others-translator-others(reference, options),
+    maintitle-title(reference, options),
+    join-list(fd(reference, "language", options), options), // TODO: parse language field - cf. TODO above about \printlist
+    // TODO:  \usebibmacro{byauthor}%
+    byeditor-others(reference, options),
+    printfield(reference, "edition", options),
+    volume-part-if-maintitle-undef(reference, options),
+    printfield(reference, "volumes", options),
+    series-number(reference, options),
+    printfield(reference, "note", options),
+    publisher-location-date(reference, options),
+    chapter-pages(reference, options),
+    printfield(reference, "pagetotal", options),
+    if options.print-isbn { printfield(reference, "isbn", options) } else { none },
+    doi-eprint-url(reference, options),
+    addendum-pubstate(reference, options)
+    
+    // TODO see [1] above
+  )
+}
+
 #let driver-dummy(reference, options) = {
   [UNSUPPORTED REFERENCE (key=#reference.entry_key, bibtype=#reference.entry_type)]
 }
 
 #let bibliography-drivers = (
   "article": driver-article,
-  "inproceedings": driver-inproceedings
+  "inproceedings": driver-inproceedings,
+  "incollection": driver-incollection,
+  "book": driver-book
 )
 
 /// Wraps a function in `none`-handling code. `nn(func)`
@@ -376,6 +490,7 @@
     use-editor: true,
     multi-list-delim: ", ",
     final-list-delim: list => if list.len() > 2 { ", and" } else { " and " },
+    author-type-delim: ",",
     subtitlepunct: ".",
     format-journaltitle: it => emph(it),
     format-issuetitle: it => emph(it),
@@ -424,6 +539,7 @@
         use-editor: use-editor,
         multi-list-delim: multi-list-delim,
         final-list-delim: final-list-delim,
+        author-type-delim: author-type-delim,
         subtitlepunct: subtitlepunct,
         format-journaltitle: format-journaltitle,
         format-parens: format-parens,

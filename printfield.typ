@@ -120,6 +120,11 @@
     emph(value)
   },
 
+  "mainsubtitle": (value, reference, field, options, style) => {
+    emph(value)
+  },
+
+
   "booktitle": (value, reference, field, options, style) => {
     emph(value)
   },
