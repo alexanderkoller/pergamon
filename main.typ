@@ -46,6 +46,7 @@
 
 #add-bib-resource(read("bibliography.bib"))
 #add-bib-resource(read("other.bib"))
+#add-bib-resource(read("physics.bib"))
 
 #refsection(format-citation: fcite)[
   // This show rule has to come inside the refsection, otherwise it is

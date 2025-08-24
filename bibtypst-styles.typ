@@ -133,6 +133,7 @@
 // biblatex.def byeditor+others
 #let byeditor-others(reference, options) = {
   let editor = fd(reference, "editor", options)
+  // TODO: parse editor names and recombine as for authors
 
   periods(
     // TODO bibstring.byeditor should be expanded as in byeditor+othersstrg
@@ -166,6 +167,106 @@
   )
 }
 
+#let maintitle(reference, options) = {
+  periods(
+    fjoin(options.subtitlepunct, 
+      printfield(reference, "maintitle", options, style: "titlecase"), 
+      printfield(reference, "mainsubtitle", options, style: "titlecase")),
+    printfield(reference, "maintitleaddon", options)
+  )
+
+  // missing:  {\printtext[maintitle]{
+}
+
+#let booktitle(reference, options) = {
+  periods(
+    fjoin(options.subtitlepunct, 
+      printfield(reference, "booktitle", options, style: "titlecase"), 
+      printfield(reference, "booksubtitle", options, style: "titlecase")),
+    printfield(reference, "booktitleaddon", options)
+  )
+
+  // missing:  {\printtext[booktitle]{
+}
+
+
+// standard.bbx maintitle+booktitle
+#let maintitle-booktitle(reference, options) = {
+  spaces(
+    ifdef(reference, "maintitle", options, maintitle => {
+      spaces(
+        maintitle(reference, options),
+        ifdef(reference, "volume", options, volume => {
+          [#printfield(reference, "volume", options)
+           #printfield(reference, "part", options):]           
+        })
+      )
+    }),
+    booktitle(reference, options)
+  )
+}
+
+// TODO: "printeventdate" is referenced from event+venue+date,
+// but I can't figure out where it is defined or what it means.
+// It is _not_ the year, that comes later.
+#let print-event-date(reference, options) = {
+  // printfield(reference, "year", options)
+  none
+}
+
+// standard.bbx event+venue+date
+#let event-venue-date(reference, options) = {
+  let format-parens = options.at("format-parens")
+
+  spaces(
+    periods(
+      printfield(reference, "eventtitle", options),
+      printfield(reference, "eventtitleaddon", options),
+    ),
+    format-parens(
+      commas(
+        printfield(reference, "venue", options),
+        print-event-date(reference, options)
+      )
+    )
+  )
+}
+
+#let volume-part-if-maintitle-undef(reference, options) = {
+  if fd(reference, "maintitle", options) == none {
+    spaces(printfield(reference, "volume", options), printfield(reference, "part", options))
+  } else {
+    none
+  }
+}
+
+// standard.bbx series+number
+#let series-number(reference, options) = {
+  spaces(printfield(reference, "series", options), printfield(reference, "number", options))
+}
+
+// standard.bbx publisher+location+date
+#let publisher-location-date(reference, options) = {
+  let publisher = printfield(reference, "publisher", options)
+
+  commas(
+    fjoin(
+      ":",
+      printfield(reference, "location", options), // Biblatex: printlist{location}
+      printfield(reference, "publisher", options)
+    ),
+    date(reference, options)
+  )
+}
+
+// chapter+pages
+#let chapter-pages(reference, options) = {
+  fjoin(options.bibpagespunct,
+    printfield(reference, "chapter", options),
+    printfield(reference, "eid", options),
+    printfield(reference, "pages", options)
+  )
+}
 
 #let require-fields(reference, options, ..fields) = {
   for field in fields.pos() {
@@ -181,7 +282,7 @@
     require-fields(reference, options, "author", "title", "journaltitle", "year")
 
     // For now, I am mapping both \newunit and \newblock to periods.
-    let ret = periods(
+    periods(
       author-translator-others(reference, options),
       printfield(reference, "title", options),
       join-list(fd(reference, "language", options), options), // TODO: parse language field
@@ -197,7 +298,7 @@
       doi-eprint-url(reference, options),
       addendum-pubstate(reference, options)
 
-      // TODO: support this at some point
+      // TODO: support this at some point [1]
       //   \setunit{\bibpagerefpunct}\newblock
       // \usebibmacro{pageref}%
       // \newunit\newblock
@@ -205,8 +306,41 @@
       //   {\usebibmacro{related:init}%
       //   \usebibmacro{related}}
     )
+}
 
-    ret
+
+
+#let driver-inproceedings(reference, options) = {
+  // TODO - it's okay if either year or date is defined
+  require-fields(reference, options, "author", "title", "booktitle", "year")
+
+  // LIMITATION: If the date (= year) is followed directly by the pages, Biblatex separates
+  // them with a comma rather than a period. I think is works because the \setunit in chapter+pages
+  // can retroactively modify the end-of-unit marker from publisher+location+date. Bibtypst
+  // can't do this without major changes to the way we concatenate strings, so we have to live 
+  // with periods for now. (Same for @articles.)
+
+  periods(
+    author-translator-others(reference, options),
+    printfield(reference, "title", options),
+    join-list(fd(reference, "language", options), options), // TODO: parse language field
+    // TODO:   \usebibmacro{byauthor}%
+    spaces(options.bibstring.in, maintitle-booktitle(reference, options)),
+    event-venue-date(reference, options),
+    byeditor-others(reference, options),
+    volume-part-if-maintitle-undef(reference, options),
+    printfield(reference, "volumes", options),
+    series-number(reference, options),
+    printfield(reference, "note", options),
+    printfield(reference, "organization", options),
+    publisher-location-date(reference, options),
+    chapter-pages(reference, options),
+    if options.print-isbn { printfield(reference, "isbn", options) } else { none },
+    doi-eprint-url(reference, options),
+    addendum-pubstate(reference, options)
+    
+    // TODO see [1] above
+  )
 }
 
 #let driver-dummy(reference, options) = {
@@ -214,8 +348,18 @@
 }
 
 #let bibliography-drivers = (
-  "article": driver-article
+  "article": driver-article,
+  "inproceedings": driver-inproceedings
 )
+
+/// Wraps a function in `none`-handling code. `nn(func)`
+/// behaves like `func` on arguments that are not `none`,
+/// and it returns `none` if the argument is `none`.
+/// Only works for functions `func` that have a single argument.
+/// -> function
+#let nn(func) = {
+  it => if it == none { none } else { func(it) }
+}
 
 /// Generates a reference formatter using the specified options.
 /// References are formatted essentially as in the standard BibLaTeX.
@@ -236,9 +380,11 @@
     format-journaltitle: it => emph(it),
     format-issuetitle: it => emph(it),
     // TODO - make the other titles in printfield configurable as well
-    format-parens: it => [(#it)],
-    format-brackets: it => [[#it]],
-    format-quotes: it => ["#it"],
+
+    // make sure these all play nice with none arguments
+    format-parens: nn(it => [(#it)]),
+    format-brackets: nn(it => [[#it]]),
+    format-quotes: nn(it => ["#it"]),
     volume-number-separator: ".",
     bibeidpunct: ",",
     bibpagespunct: ",",
@@ -263,8 +409,6 @@
   ) = {
     
     let formatter(index, reference, eval-mode) = {
-      let bib-type = paper-type(reference)
-
       let suppressed-fields = (:)
       if suppress-fields != none {
         for field in suppress-fields {
@@ -297,7 +441,7 @@
       )
 
       // typeset reference
-      let driver = bibliography-drivers.at(lower(bib-type), default: driver-dummy)
+      let driver = bibliography-drivers.at(lower(reference.entry_type), default: driver-dummy)
       let ret = driver(reference, options)
 
       // add additional fields, if specified
