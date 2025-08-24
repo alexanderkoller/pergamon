@@ -109,11 +109,11 @@
   },
 
   "journaltitle": (value, reference, field, options, style) => {
-    emph(value)
+    options.at("format-journaltitle")(value)
   },
 
   "issuetitle": (value, reference, field, options, style) => {
-    emph(value)
+    options.at("format-issuetitle")(value)
   },
 
   "maintitle": (value, reference, field, options, style) => {

@@ -192,6 +192,7 @@
     subtitlepunct: ".",
     format-journaltitle: it => emph(it),
     format-issuetitle: it => emph(it),
+    // TODO - make the other titles in printfield configurable as well
     format-parens: it => [(#it)],
     format-brackets: it => [[#it]],
     format-quotes: it => ["#it"],
@@ -216,8 +217,6 @@
     /// defines them. Instead of an array, you can also pass `none` to indicate that
     /// no fields should be suppressed.
     suppress-fields: none
-
-    // name-title-delim: ","
   ) = {
     
     let formatter(index, reference, eval-mode) = {
