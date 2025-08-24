@@ -139,3 +139,8 @@ TODO: conditional coloring of references -- use to explain `if-citation`
 <sec:reference>
 
 (explain them here)
+
+== The default reference style
+
+#let style-docs = tidy.parse-module(read("bibtypst-styles.typ"))
+#tidy.show-module(style-docs, style: tidy.styles.default, show-outline: false)

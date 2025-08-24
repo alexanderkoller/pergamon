@@ -14,7 +14,10 @@
 
 
 #let fcite = format-citation-acl()
-#let fref = format-reference()
+#let fref = format-reference(
+  // additional-fields: ("award",)
+  additional-fields: ((reference, options) => ifdef(reference, "award", award => [*#award*]),)
+)
 #let fadd = x => x
 #let sorting = "nyt"
 

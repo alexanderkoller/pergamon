@@ -167,6 +167,8 @@
 }
 
 
+/// Generates a reference formatter using the specified options.
+/// References are formatted essentially as in the standard BibLaTeX.
 #let format-reference(
     label: (index, reference) => none, // to generate the label in the first column
     highlighting: x => x,
@@ -191,7 +193,17 @@
     bibeidpunct: ",",
     bibpagespunct: ",",
     print-isbn: false,
-    bibstring: default-bibstring
+    bibstring: default-bibstring,
+
+    /// An array of additional fields which will be printed at the end of each
+    /// bibliography entry. Fields can be specified either as a string, in which case
+    /// the field with that name is printed using `printfield`; or they can be
+    /// specified as a function `(reference, options) -> content`, in which case the
+    /// returned content will be printed directly. Instead of an array, you can also
+    /// pass `none` to indicate that no additional fields need to be printed.
+    /// 
+    /// -> function | none
+    additional-fields: none
     // name-title-delim: ","
   ) = {
     
@@ -248,6 +260,24 @@
           //   {\usebibmacro{related:init}%
           //   \usebibmacro{related}}
         )
+
+        if additional-fields != none {
+          for field in additional-fields {
+            if type(field) == str {
+              let value = printfield(reference, field, options)
+              if value != none {
+                ret += ". "
+                ret += value
+              }
+            } else if type(field) == function {
+              let value = field(reference, options)
+              if value != none {
+                ret += ". "
+                ret += value
+              }
+            }
+          }
+        }
 
         let lbl = label(index, reference)
         if lbl == none {
