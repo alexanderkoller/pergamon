@@ -8,7 +8,7 @@
     let ret = list.at(0)
     for i in range(1, list.len()) {
         if i == list.len() - 1 {
-          ret += options.final-list-delim(list)
+          ret += (options.final-list-delim)(list)
         }
         ret += list.at(i)
     }
@@ -20,17 +20,19 @@
 // Map "modern" Biblatex field names to legacy field names as they
 // might appear in the bib file. Should be complete, as per biblatex.def
 #let field-aliases = (
-  "journaltitle": ("journal",),
-  "langid": ("hyphenation",),
-  "location": ("address",),
-  "institution": ("school",),
-  "annotation": ("annote",),
-  "eprinttype": ("archiveprefix",),
-  "eprintclass": ("primaryclass",),
-  "sortkey": ("key",),
-  "file": ("pdf",)
+  "journaltitle": "journal",
+  "langid": "hyphenation",
+  "location": "address",
+  "institution": "school",
+  "annotation": "annote",
+  "eprinttype": "archiveprefix",
+  "eprintclass": "primaryclass",
+  "sortkey": "key",
+  "file": "pdf"
 )
 
+
+// Map legacy Bibtex entry types to their "modern" Biblatex names.
 #let type-aliases = (
   "conference": reference => { reference.insert("entry_type", "inproceedings"); return reference },
   "electronic": reference => { reference.insert("entry_type", "online"); return reference },
@@ -59,16 +61,14 @@
 
 
 #let fd(reference, field, options, format: x => x) = {
+  let legacy-field = field-aliases.at(field, default: "dummy-field-name")
+  
   if field in options.at("suppressed-fields", default: ()) {
     return none
   } else if field in reference.fields {
     return format(reference.fields.at(field).trim())
-  } else if field in field-aliases {
-    for alias in field-aliases.at(field) {
-      if alias in reference.fields {
-        return format(reference.fields.at(alias).trim())
-      }
-    }
+  } else if legacy-field in reference.fields {
+    return format(reference.fields.at(legacy-field).trim())    
   } else {
     return none
   }

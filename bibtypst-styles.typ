@@ -213,7 +213,7 @@
   spaces(
     ifdef(reference, "maintitle", options, maintitle => {
       spaces(
-        maintitle(reference, options),
+        maintitle,
         ifdef(reference, "volume", options, volume => {
           [#printfield(reference, "volume", options)
            #printfield(reference, "part", options):]           
@@ -604,6 +604,7 @@
         author-type-delim: author-type-delim,
         subtitlepunct: subtitlepunct,
         format-journaltitle: format-journaltitle,
+        format-issuetitle: format-issuetitle,
         format-parens: format-parens,
         format-brackets: format-brackets,
         format-quotes: format-quotes,
