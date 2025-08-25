@@ -189,6 +189,10 @@
     [#value #options.bibstring.volumes]
   },
 
+  "extradate": (value, reference, field, options, style) => {
+    numbering("a", value+1)
+  },
+
   /*
   TODO currently unsupported:
 

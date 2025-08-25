@@ -113,7 +113,21 @@
   @wu-etal-2024-reasoning @knuth1990 @yao2025language @hershcovichItMeaningThat2021
   @abgrallMeasurementsppmKpm2016 @kuhlmann2003tiny @fake-mastersthesis
 
-  #print-bibliography(format-reference: fref, add-label: fadd, sorting: sorting)
+  @multi1 @multi2
+
+  #print-bibliography(format-reference: fref, add-label: fadd, sorting: sorting,
+    label-generator: (reference, index) => {
+      // this is just a quick & dirty approximation of what it would look like for authoryear
+      let final-index = calc.min(2, reference.lastnames.len())
+      let names = reference.lastnames.slice(0, final-index)
+      if final-index < reference.lastnames.len() {
+        names += ("et al",) // in biblatex this is an option
+      }
+
+      ((names, reference.fields.year),
+      strfmt("{} {}", names, reference.fields.year))
+    }
+  )
 ]
 
 

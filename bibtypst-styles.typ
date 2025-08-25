@@ -29,7 +29,10 @@
 
 
 #let date(reference, options) = {
-  fd(reference, "year", options) // TODO this is probably incomplete
+  epsilons(
+    fd(reference, "year", options), // TODO this is probably incomplete
+    printfield(reference, "extradate", options)
+  )
 }
 
 #let authors-with-year(reference, options) = {
@@ -827,7 +830,11 @@
     // keys of reference-dict: key, index, reference, year
 
     let parsed-authors = reference-dict.reference.lastnames
-    let year = reference-dict.year
+    let year = str(reference-dict.year) // TODO - get rid of the extra year key
+
+    if "extradate" in reference-dict.reference.fields {
+      year += numbering("a", reference-dict.reference.fields.extradate + 1)
+    }
 
     let authors-str = if parsed-authors.len() == 1 {
       parsed-authors.at(0)

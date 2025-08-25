@@ -66,9 +66,9 @@
   if field in options.at("suppressed-fields", default: ()) {
     return none
   } else if field in reference.fields {
-    return format(reference.fields.at(field).trim())
+    return format(reference.fields.at(field))
   } else if legacy-field in reference.fields {
-    return format(reference.fields.at(legacy-field).trim())    
+    return format(reference.fields.at(legacy-field))
   } else {
     return none
   }
@@ -79,4 +79,23 @@
   let value = fd(reference, field, options)
 
   if value == none { none } else { fn(value) }
+}
+
+// Convert an array of (key, value) pairs into a "multimap":
+// a dictionary in which each key is assigned to an array of all
+// the values with which it appeared.
+// 
+// Example: (("a", 1), ("a", 2), ("b", 3)) -> (a: (1, 2), b: (3,))
+#let collect-deduplicate(pairs) = {
+  let ret = (:)
+
+  for (key, value) in pairs {
+    if key in ret {
+      ret.at(key).push(value)
+    } else {
+      ret.insert(key, (value,))
+    }
+  }
+
+  return ret
 }
