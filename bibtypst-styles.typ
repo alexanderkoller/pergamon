@@ -4,6 +4,19 @@
 #import "printfield.typ": printfield
 #import "bib-util.typ": join-list, fd, ifdef, type-aliases
 
+
+
+
+// If, else none. If the `guard` evaluates to `true`,
+// evaluate `value-func` and return the result. Otherwise return `none`.
+#let ifen(guard, value-func) = {
+  if guard {
+    value-func()
+  } else {
+    none
+  }
+}
+
 // biblatex.def authorstrg
 #let authorstrg(reference, options) = {
   printfield(reference, "authortype", options)
@@ -14,10 +27,23 @@
   join-list(fd(reference, "language", options), options) // TODO: parse language field
 }
 
+
+#let date(reference, options) = {
+  fd(reference, "year", options) // TODO this is probably incomplete
+}
+
+#let authors-with-year(reference, options) = {
+  spaces(
+    // TODO - make configurable
+    reference.authors, // TODO - was \printnames{author}
+    ifen(options.print-date-after-authors, () => (options.format-parens)(date(reference, options)))
+  )
+}
+
 // biblatex.def author
 #let author(reference, options) = {
   fjoin(options.author-type-delim,
-    reference.authors, // TODO - was \printnames{author}
+    authors-with-year(reference, options),
     authorstrg(reference, options)
   )
 }
@@ -47,8 +73,7 @@
 // biblatex.def author/translator+others
 #let author-translator-others(reference, options) = {
   if options.use-author and fd(reference, "author", options) != none {
-    // TODO - make configurable
-    reference.authors
+    authors-with-year(reference, options)
   } else {
     translator-others(reference, options)
   }
@@ -75,13 +100,13 @@
 
 
 
-#let date(reference, options) = fd(reference, "year", options) // TODO this is probably incomplete
+
 
 // standard.bbx issue+date
 #let issue-date(reference, options) = {
   spaces(
     printfield(reference, "issue", options),
-    date(reference, options),
+    ifen(not options.print-date-after-authors, () => date(reference, options)),
     format: options.format-parens
   )
 }
@@ -289,7 +314,7 @@
       printfield(reference, "location", options), // Biblatex: printlist{location}
       printfield(reference, xxx, options)
     ),
-    date(reference, options)
+    ifen(not options.print-date-after-authors, () => date(reference, options))
   )
 }
 
@@ -546,6 +571,14 @@
     print-url: false,
     print-doi: false,
     print-eprint: true,
+
+    /// If `true`, Bibtypst will print the date right after the authors, e.g.
+    /// 'Smith (2020). "A cool paper".' If `false`, Bibtypst will follow the
+    /// normal behavior of BibLaTeX and place the date towards the end of the
+    /// reference.
+    /// -> bool
+    print-date-after-authors: true,
+
     eval-mode: "markup",
     use-author: true,
     use-translator: true,
@@ -614,6 +647,7 @@
         print-url: print-url,
         print-doi: print-doi,
         print-eprint: print-eprint,
+        print-date-after-authors: print-date-after-authors,
         volume-number-separator: volume-number-separator,
         bibstring: bibstring,
         suppressed-fields: suppressed-fields

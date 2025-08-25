@@ -1,8 +1,11 @@
 
 
 // TODO: Can I automate capitalization? E.g. periods function should ensure uppercase
+// (this should be done with a printfield style argument)
 
 // TODO: Internationalize to other languages than English
+
+// TODO: also include the short bibstring and let the user choose
 
 // converted from english.lbx
 #let default-bibstring = (
