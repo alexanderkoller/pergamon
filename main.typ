@@ -115,7 +115,7 @@
 
   @multi1 @multi2
 
-  #print-bibliography(format-reference: fref, add-label: fadd, sorting: sorting,
+  #print-bibliography(format-reference: fref, sorting: sorting,
     label-generator: (reference, index) => {
       // this is just a quick & dirty approximation of what it would look like for authoryear
       let final-index = calc.min(2, reference.lastnames.len())

@@ -374,8 +374,6 @@
     /// -> function
     format-reference: (index, bib-entry, eval-mode) => ([REFERENCE],),
 
-
-
     /// Generates label information for the given reference. The function takes
     /// the reference and its index in the sorted bibliography as input and returns
     /// values `(label, label-repr)`, where `label` can be anything the style finds
@@ -383,27 +381,19 @@
     /// of the label. These string representations are used to detect label collisions,
     /// which cause the generation of extradates.
     /// 
+    /// The default implementation simply returns a number that is guaranteed to be
+    /// unique to each reference. Styles that want to work with `extradate` will almost
+    /// certainly want to pass a different function here.
+    /// 
+    /// The function passed as `label-generator` does not control whether labels
+    /// are printed in the bibliography; it only computes information for internal use.
+    /// A style can decide whether it wants to print labels through its `format-reference`
+    /// function.
+    /// 
     /// Note that `label-repr` _must_ be a `str`.
     /// 
     /// -> function
     label-generator: (reference, index) => (index + 1, str(index + 1)),
-
-    /// If `true`, display the labels computed by `label-generator` in a column
-    /// to the left of the rendered references (e.g. alphabetic, numeric).
-    /// -> bool
-    display-labels: false,
-
-    /// A function that enriches a #link(<sec:reference>)[reference] with
-    /// extra information. The intended use case is to add a `label` field to the
-    /// reference dictionary, based on the authors and year. The added fields are 
-    /// guaranteed to be available both
-    /// from `format-reference` and from `format-citation` (in @refsection).
-    /// 
-    /// The `add-label` function takes a reference as argument and returns an (enriched)
-    /// reference.
-    /// 
-    /// -> function
-    add-label: reference => reference,
 
     /// A function that defines the order in which references are shown in the bibliography.
     /// `sorting` takes a #link(<sec:reference>)[reference] as input and returns a value that can be 
@@ -495,85 +485,7 @@
   }
 
   bibl-unsorted = bibl-unsorted.filter(filtering)
-
-  // "References" heading
-  if title != none [
-    #heading(title, numbering: none)
-  ]
-
   let sorted = label-sort-deduplicate(bibl-unsorted, label-generator, sorting-function)
-
-  // // Generate preliminary labels
-  // for (index, reference) in bibl-unsorted.enumerate() {
-  //   // call label-generator with meaningless indices, just in case it is needed
-  //   let (lbl, lbl-repr) = label-generator(reference, index)
-  //   bibl-unsorted.at(index).insert("label", lbl)
-  //   bibl-unsorted.at(index).insert("label-repr", lbl-repr)
-  // }
-
-  // // Sort and collect label collisions
-  // let sorted = bibl-unsorted.sorted(key: sorting-function)
-  // let sorted-labeled = sorted.enumerate().map(pair => (pair.at(1).at("label-repr"), pair.at(0)))
-  // let grouped = collect-deduplicate(sorted-labeled) // dict label-repr => list(reference-index)
-
-  // // [*grouped:* #grouped]
-
-  // // Add extradates where needed
-  // for (lbl-repr, indices) in grouped {
-  //   if indices.len() > 1 {
-  //     let extradate = 0
-  //     for ix in indices {
-  //       sorted.at(ix).at("fields").insert("extradate", extradate)
-  //       extradate += 1
-  //     }
-  //   }
-  // }
-
-  // // [*with extradate: * #sorted]
-  
-  // // Generate final labels
-  // for (index, reference) in sorted.enumerate() {
-  //   // call label-generator with meaningless indices, just in case it is needed
-  //   let (lbl, lbl-repr) = label-generator(reference, index)
-  //   sorted.at(index).insert("label", lbl)
-  //   sorted.at(index).insert("label-repr", lbl-repr)
-  // }
-
-
-
-
-  
-
-
-
-
-  // If I can assume that label collisions can only be caused by references with adjacent indices,
-  // the label collision avoidance ("2020a") could happen on `sorted`.
-
-  // Format the references, based on format-reference: (index, reference, highlighting) -> array(content).
-  // Each call to format-reference returns an array of content, for the columns of one printed reference.
-  
-  // for styles that have meaningful labels, compute and insert them under the "label" key
-  // 
-  // 
-  // 
-  // let labeled-bibl-unsorted = bibl-unsorted.map(add-label)
-  // let sorted = labeled-bibl-unsorted.sorted(key: sorting-function)
-
-  /*
-  // \usepackage[style=authoryear, maxcitenames=1, maxbibnames=999, uniquelist=false]{biblatex}
-  Biblatex deduplication behavior:
-  - Identical author lists and year => add extradate
-  - Different author lists => spell out citation until unambiguous
-  - With option "uniquelist=false" => add a, b to make the "et al." citation unique, even if the full author lists differ
-  - same applies to "alphabetic": [B+20a]
-  - no extradates for "numeric", as I thought
-  */
-
-
-
-
-
   let formatted-references = sorted.enumerate().map(it => format-reference(it.at(0), it.at(1), eval-mode))  // -> array(array(content))
   let num-columns = if formatted-references.len() == 0 { 0 } else { formatted-references.at(0).len() }
   let cells = ()
@@ -602,6 +514,12 @@
       cells.push(cell)
     }
   }
+
+
+  // "References" heading
+  if title != none [
+    #heading(title, numbering: none)
+  ]
 
   // layout the cells in a grid
   if num-columns > 0 {
