@@ -13,9 +13,9 @@
   }
 }
 
-#let fjoin(connector, format: it => it, add-space: true, ..xx) = {
+#let fjoin(connector, format: it => it, add-space: true, finish-with-connector: false, ..xx) = {
   let xs = xx.pos()
-  let ret = ""
+  let parts = () // acts as a stringbuffer, so fjoin can run in linear time
   let empty = true
   let rightmost-nonempty-index = -1
 
@@ -29,23 +29,30 @@
   // do the actual formatting
   for (i, x) in xs.enumerate() {
     if x != none {
-      ret += x
+      parts.push(x)
       empty = false
 
       if i < rightmost-nonempty-index {
-        // ret += "<" + final-character(x) + ">"
         if final-character(x) != connector {
-          ret += connector
+          parts.push(connector)
         }
 
         if add-space {
-          ret += " "
+          parts.push(" ")
         }
       }
     }
   }
 
-  return if empty { none } else { format(ret) }
+  if empty {
+    none
+  } else {
+    if finish-with-connector {
+      parts.push(connector)
+    }
+    let ret = parts.join("")
+    format(ret)
+  }
 }
 
 // !#fjoin(".", "foo.", "bar", "baz")!
