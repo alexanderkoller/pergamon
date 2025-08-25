@@ -566,7 +566,7 @@
 /// References are formatted essentially as in the standard BibLaTeX.
 #let format-reference(
     label: (index, reference) => none, // to generate the label in the first column
-    highlighting: x => x,
+    highlight: (laid-out-reference, index, reference) => laid-out-reference,
     link-titles: true,
     print-url: false,
     print-doi: false,
@@ -683,10 +683,12 @@
 
       // add label if requested
       let lbl = label(index, reference)
+      let highlighted = highlight(ret + ".", reference, index)
+
       if lbl == none {
-        (ret + ".",)
+        (highlighted,)
       } else {
-        (lbl, ret + ".")
+        (lbl, highlighted)
       }
   }
 

@@ -1,8 +1,8 @@
 
 #import "bibtypst.typ": add-bib-resource, refsection, print-bibliography, if-citation
-#import "bibtypst-acl.typ": format-citation-acl, format-reference-acl, citep, citet, citeg, citen
-#import "bibtypst-numeric.typ": format-citation-numeric, format-reference-numeric
-#import "bibtypst-alphabetic.typ": format-citation-alphabetic, format-reference-alphabetic, add-label-alphabetic
+// #import "bibtypst-acl.typ": format-citation-acl, format-reference-acl, citep, citet, citeg, citen
+// #import "bibtypst-numeric.typ": format-citation-numeric, format-reference-numeric
+// #import "bibtypst-alphabetic.typ": format-citation-alphabetic, format-reference-alphabetic, add-label-alphabetic
 #import "bibtypst-styles.typ": *
 
 #let darkgreen = green.darken(20%)
@@ -13,12 +13,26 @@
 #set heading(numbering: "1.1")
 
 
+#let citep(lbl) = ref(lbl, supplement: it => "p")
+#let citet(lbl) = ref(lbl, supplement: it => "t")
+#let citeg(lbl) = ref(lbl, supplement: it => "g")
+#let citen(lbl) = ref(lbl, supplement: it => "n")
+
+
 #let fcite = format-citation-acl()
 #let fref = format-reference(
   // additional-fields: ("award",)
   additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),
   suppress-fields: ("issn",),
-  print-isbn: true
+  print-isbn: true,
+  highlight: (x, reference, index) => {
+   if "highlight" in reference.fields.at("keywords", default: ()) {
+      [#text(size: 8pt)[#emoji.star.box] #x]
+      // strong(x)
+   } else {
+      x
+   }
+}
 )
 #let fadd = x => x
 #let sorting = "nyt"
@@ -41,7 +55,13 @@
 // #let sorting = "nyt"
 
 // highlighting: x => [*#x*])
-
+// highlight: (x, reference, index) => {
+//    if "highlight" in reference.fields.at("keywords", default: ()) {
+//       strong(x)
+//    } else {
+//       x
+//    }
+// }
 
 
 #add-bib-resource(read("bibliography.bib"))

@@ -36,13 +36,13 @@
 #let paper-year(reference) = int(reference.fields.year)
 
 
-#let highlight(reference, formatted, highlighting) = {
-  if "keywords" in reference.fields and reference.fields.keywords.contains("highlight") {
-    highlighting(formatted)
-  } else {
-    formatted
-  }
-}
+// #let highlight(reference, formatted, highlighting) = {
+//   if "keywords" in reference.fields and reference.fields.keywords.contains("highlight") {
+//     highlighting(formatted)
+//   } else {
+//     formatted
+//   }
+// }
 
 
 // returns a list of author names, in the form ((first, last), (first, last), ...)
