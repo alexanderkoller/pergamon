@@ -861,7 +861,7 @@
     }
   }
 
-  let label-generator(reference, index) = {
+  let label-generator(index, reference) = {
     // TODO - handle the case with no authors
     
     let abbreviation = if reference.lastnames.len() == 1 {
@@ -922,7 +922,7 @@
     }
   }
 
-  let label-generator(reference, index) = {
+  let label-generator(index, reference) = {
     let parsed-authors = reference.lastnames
     let year = str(reference.fields.year) // TODO - get rid of the extra year key
 
@@ -960,7 +960,7 @@
     }
   }
 
-  let label-generator(reference, index) = {
+  let label-generator(index, reference) = {
     (index + 1, str(index + 1))
   }
 

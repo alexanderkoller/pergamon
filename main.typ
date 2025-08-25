@@ -23,10 +23,10 @@
 // #let fcite = format-citation-authoryear() // format-parens: nn(it => [[#it]]))
 
 // Alphabetic:
-#let fcite = format-citation-alphabetic()
+// #let fcite = format-citation-alphabetic()
 
 // Numeric:
-// #let fcite = format-citation-numeric()
+#let fcite = format-citation-numeric()
 
 #let fref = format-reference(
   reference-label: fcite.reference-label,

@@ -319,7 +319,7 @@
   // Generate preliminary labels; note that the indices we pass to label-generator
   // are meaningless at this point, but they are guaranteed to be all different.
   for (index, reference) in bibl-unsorted.enumerate() {
-    let (lbl, lbl-repr) = label-generator(reference, index)
+    let (lbl, lbl-repr) = label-generator(index, reference)
     bibl-unsorted.at(index).insert("label", lbl)
     bibl-unsorted.at(index).insert("label-repr", lbl-repr)
   }
@@ -343,7 +343,7 @@
   // Generate final labels
   for (index, reference) in sorted.enumerate() {
     // call label-generator with meaningless indices, just in case it is needed
-    let (lbl, lbl-repr) = label-generator(reference, index)
+    let (lbl, lbl-repr) = label-generator(index, reference)
     sorted.at(index).insert("label", lbl)
     sorted.at(index).insert("label-repr", lbl-repr)
   }
@@ -372,7 +372,7 @@
     /// all calls to `format-reference` should return arrays of the same length.
     /// 
     /// -> function
-    format-reference: (index, bib-entry, eval-mode) => ([REFERENCE],),
+    format-reference: (index, reference, eval-mode) => ([REFERENCE],),
 
     /// Generates label information for the given reference. The function takes
     /// the reference and its index in the sorted bibliography as input and returns
@@ -393,7 +393,7 @@
     /// Note that `label-repr` _must_ be a `str`.
     /// 
     /// -> function
-    label-generator: (reference, index) => (index + 1, str(index + 1)),
+    label-generator: (index, reference) => (index + 1, str(index + 1)),
 
     /// A function that defines the order in which references are shown in the bibliography.
     /// `sorting` takes a #link(<sec:reference>)[reference] as input and returns a value that can be 
