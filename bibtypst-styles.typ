@@ -606,6 +606,24 @@
     /// -> bool
     print-eprint: true,
 
+    /// If `true`, prints the reference's author if it is defined.
+    /// -> bool
+    use-author: true,
+
+    /// If `true`, prints the reference's translator if it is defined.
+    /// Note that support for "authors" that are not the author is currently
+    /// weak. See #link("https://github.com/alexanderkoller/bibtypst/issues/28")[issue 28]
+    /// to track progress on this.
+    /// -> bool
+    use-translator: true,
+
+    /// If `true`, prints the reference's editor if it is defined.
+    /// Note that support for "authors" that are not the author is currently
+    /// weak. See #link("https://github.com/alexanderkoller/bibtypst/issues/28")[issue 28]
+    /// to track progress on this.
+    /// -> bool
+    use-editor: true,
+
     /// If `true`, Bibtypst will print the date right after the authors, e.g.
     /// 'Smith (2020). "A cool paper".' If `false`, Bibtypst will follow the
     /// normal behavior of BibLaTeX and place the date towards the end of the
@@ -613,20 +631,41 @@
     /// -> bool
     print-date-after-authors: true,
 
+    /// When Bibtypst renders a reference, the title is processed by Typst's
+    /// #link("https://typst.app/docs/reference/foundations/eval/")[eval] function.
+    /// The `eval-mode` argument you specify here is passed as the `mode` argument
+    /// to `eval`. 
+    /// 
+    /// The default value of `"markup"` renders the title as if it were ordinary
+    /// Typst content, typesetting e.g. mathematical expressions correctly.
+    /// 
+    /// -> str
     eval-mode: "markup",
-    use-author: true,
-    use-translator: true,
-    use-editor: true,
-    multi-list-delim: ", ",
-    final-list-delim: list => if list.len() > 2 { ", and" } else { " and " },
-    author-type-delim: ",",
-    subtitlepunct: ".",
-    format-journaltitle: it => emph(it),
-    format-issuetitle: it => emph(it),
-    // TODO - make the other titles in printfield configurable as well
 
-    // make sure these all play nice with none arguments
-    // 
+    /// String that is used to combine the final author in an author list
+    /// with the previous authors.
+    /// -> str
+    final-list-delim: list => if list.len() > 2 { ", and" } else { " and " },
+
+
+    /// String that is used to combine the name of an author with the author
+    /// type, e.g. "Smith, editor".
+    /// -> str
+    author-type-delim: ",",
+
+    /// String that is used to combine a title with a subtitle.
+    /// -> str
+    subtitlepunct: ".",
+
+    /// Renders the title of a journal as content. The default argument
+    /// typesets it in italics.
+    /// -> function
+    format-journaltitle: it => emph(it),
+
+    /// Renders the title of a special issue as content. The default argument
+    /// typesets it in italics.
+    /// -> function
+    format-issuetitle: it => emph(it),
   
     /// Wraps text in round brackets. The argument needs to be a function
     /// that takes one argument (`str` or `content`) and returns `content`.
@@ -658,10 +697,28 @@
     /// -> function    
     format-quotes: nn(it => ["#it"]),
 
+    /// Separator symbol for "volume" and "number" fields, e.g. in `@article`s.
+    /// -> str
     volume-number-separator: ".",
+
+    /// Separator symbol that connects the EID (Scopus Electronic Identifier)
+    /// from other journal information.
+    /// -> str
     bibeidpunct: ",",
+
+    /// Separator symbol that connects the "pages" field with related information.
+    /// -> str
     bibpagespunct: ",",
+
+    /// If `true`, prints the ISBN or ISSN of the reference if it is defined.
+    /// -> bool
     print-isbn: false,
+
+    /// The bibstring table. This is a dictionary that maps language-independent
+    /// IDs of bibliographic constants (such as "In: " or "edited by") to
+    /// their language-dependent surface forms. Replace some or all of the values
+    /// with your own surface forms to control the way the bibliography is rendered.
+    /// -> dict
     bibstring: default-bibstring,
 
     /// An array of additional fields which will be printed at the end of each
@@ -679,7 +736,7 @@
     /// defines them. Instead of an array, you can also pass `none` to indicate that
     /// no fields should be suppressed.
     /// -> array | none
-    suppress-fields: none
+    suppress-fields: none,
   ) = {
     
     let formatter(index, reference, eval-mode) = {
@@ -696,7 +753,7 @@
         use-author: use-author,
         use-translator: use-translator,
         use-editor: use-editor,
-        multi-list-delim: multi-list-delim,
+        // multi-list-delim: multi-list-delim,
         final-list-delim: final-list-delim,
         author-type-delim: author-type-delim,
         subtitlepunct: subtitlepunct,
