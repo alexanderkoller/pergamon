@@ -927,5 +927,29 @@
     (lbl, lbl-repr)
   }
 
-  ("formatter": formatter, "label-generator": label-generator)
+  ("formatter": formatter, "label-generator": label-generator, "reference-label": (index, reference) => none)
+}
+
+
+#let format-citation-numeric() = {
+  let formatter(reference-dict, form) = {
+    let fform = if form == auto { auto } else { form(none) } // str or auto
+    let lbl = reference-dict.reference.label
+
+    if fform == "n" {
+      [#{reference-dict.index+1}]
+    } else {
+      return [[#{reference-dict.index+1}]]
+    }
+  }
+
+  let label-generator(reference, index) = {
+    (index + 1, str(index + 1))
+  }
+
+  let reference-label(index, reference) = {
+    [[#reference.label]]
+  }
+
+  ("formatter": formatter, "label-generator": label-generator, "reference-label": reference-label)
 }
