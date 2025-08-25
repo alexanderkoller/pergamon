@@ -2,7 +2,7 @@
 #import "templating.typ": *
 #import "bibstrings.typ": default-bibstring
 #import "printfield.typ": printfield
-#import "bib-util.typ": join-list, fd, ifdef, type-aliases
+#import "bib-util.typ": join-list, fd, ifdef, type-aliases, nn
 
 
 
@@ -555,15 +555,6 @@
   "misc": driver-misc,
   "thesis": driver-thesis
 )
-
-// Wraps a function in `none`-handling code. `nn(func)`
-// behaves like `func` on arguments that are not `none`,
-// and it returns `none` if the argument is `none`.
-// Only works for functions `func` that have a single argument.
-// -> function
-#let nn(func) = {
-  it => if it == none { none } else { func(it) }
-}
 
 /// Generates a reference formatter using the specified options.
 /// References are formatted essentially as in the standard BibLaTeX.
