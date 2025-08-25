@@ -553,11 +553,11 @@
   "thesis": driver-thesis
 )
 
-/// Wraps a function in `none`-handling code. `nn(func)`
-/// behaves like `func` on arguments that are not `none`,
-/// and it returns `none` if the argument is `none`.
-/// Only works for functions `func` that have a single argument.
-/// -> function
+// Wraps a function in `none`-handling code. `nn(func)`
+// behaves like `func` on arguments that are not `none`,
+// and it returns `none` if the argument is `none`.
+// Only works for functions `func` that have a single argument.
+// -> function
 #let nn(func) = {
   it => if it == none { none } else { func(it) }
 }
@@ -565,11 +565,45 @@
 /// Generates a reference formatter using the specified options.
 /// References are formatted essentially as in the standard BibLaTeX.
 #let format-reference(
-    label: (index, reference) => none, // to generate the label in the first column
-    highlight: (laid-out-reference, index, reference) => laid-out-reference,
+    /// Generates a label to be printed in the first column of the bibliography.
+    /// This is useful e.g. for use with the alphabetic and numeric citation style.
+    /// By default, the function returns constant `none`, indicating that there
+    /// should be no label.
+    /// -> function
+    label: (index, reference) => none,
+
+    /// Selectively highlights certain bibliography entries. The parameter
+    /// is a function that is applied at the final stage of the rendering process,
+    /// where the whole rest of the entry has already been rendered. This is
+    /// an opportunity to e.g. mark certain entries in the bibliography by
+    /// boldfacing them or prepending them with a marker symbol.
+    /// 
+    /// The highlighting function accepts arguments `rendered-reference`
+    /// (`str` or `content` representing the reference as it is printed),
+    /// `index` (position of the reference in the bibliography), and
+    /// `reference` (the Bibtex reference dictionary). It returns `content`.
+    /// The default implementation simply returns the `rendered-reference`
+    /// unmodified.
+    /// 
+    /// -> function
+    highlight: (rendered-reference, index, reference) => rendered-reference,
+
+    /// If `true`, titles are rendered as hyperlinks pointing to the reference's
+    /// DOI or URL. When both are defined, the DOI takes precedence.
+    /// -> bool
     link-titles: true,
+
+    /// If `true`, prints the reference's URL at the end of the bibliography entry.
+    /// -> bool
     print-url: false,
+
+    /// If `true`, prints the reference's DOI at the end of the bibliograph entry.
+    /// -> bool
     print-doi: false,
+
+    /// If `true`, prints the reference's eprint information at the end of the
+    /// bibliography entry. This could be a reference to arXiv or JSTOR.
+    /// -> bool
     print-eprint: true,
 
     /// If `true`, Bibtypst will print the date right after the authors, e.g.
@@ -592,9 +626,38 @@
     // TODO - make the other titles in printfield configurable as well
 
     // make sure these all play nice with none arguments
+    // 
+  
+    /// Wraps text in round brackets. The argument needs to be a function
+    /// that takes one argument (`str` or `content`) and returns `content`.
+    /// 
+    /// It is essential that if the argument is `none`, the function must
+    /// also return `none`. This can be achieved conveniently with the `nn`
+    /// function wrapper, defined in `bibtypst-styles.typ`.
+    /// 
+    /// -> function
     format-parens: nn(it => [(#it)]),
+
+    /// Wraps text in square brackets. The argument needs to be a function
+    /// that takes one argument (`str` or `content`) and returns `content`.
+    /// 
+    /// It is essential that if the argument is `none`, the function must
+    /// also return `none`. This can be achieved conveniently with the `nn`
+    /// function wrapper, defined in `bibtypst-styles.typ`.
+    /// 
+    /// -> function    
     format-brackets: nn(it => [[#it]]),
+
+    /// Wraps text in double quotes. The argument needs to be a function
+    /// that takes one argument (`str` or `content`) and returns `content`.
+    /// 
+    /// It is essential that if the argument is `none`, the function must
+    /// also return `none`. This can be achieved conveniently with the `nn`
+    /// function wrapper, defined in `bibtypst-styles.typ`.
+    /// 
+    /// -> function    
     format-quotes: nn(it => ["#it"]),
+
     volume-number-separator: ".",
     bibeidpunct: ",",
     bibpagespunct: ",",
@@ -615,6 +678,7 @@
     /// as if they do not contain values for these fields, even if the Bibtex file
     /// defines them. Instead of an array, you can also pass `none` to indicate that
     /// no fields should be suppressed.
+    /// -> array | none
     suppress-fields: none
   ) = {
     
