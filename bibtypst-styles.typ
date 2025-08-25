@@ -821,8 +821,53 @@
 
 
 
+#let label-parts-alphabetic(reference) = {
+  let extradate = if "extradate" in reference.fields {
+    numbering("a", reference.fields.extradate + 1)
+  } else {
+    ""
+  }
 
-#let format-citation-alphabetic() = {
+  (reference.label, extradate)
+}
+
+#let format-citation-alphabetic(maxalphanames: 3, labelalpha: 3, labelalphaothers: "+") = {
+  let formatter(reference-dict, form) = {
+    // keys of reference-dict: key, index, reference, last-names, year
+    let fform = if form == auto { auto } else { form(none) } // str or auto
+    let (reference-label, extradate) = label-parts-alphabetic(reference-dict.reference)
+
+    if fform == "n" {
+      [#reference-label#extradate]
+    } else {
+      return [[#reference-label#extradate]]
+    }
+  }
+
+  let label-generator(reference, index) = {
+    // TODO - handle the case with no authors
+    
+    let abbreviation = if reference.lastnames.len() == 1 {
+      reference.lastnames.at(0).slice(0, labelalpha)
+    } else {
+      let first-letters = reference.lastnames.map(s => s.at(0)).join("")
+      if reference.lastnames.len() > maxalphanames {
+        first-letters.slice(0, maxalphanames) + labelalphaothers
+      } else {
+        first-letters
+      }
+    }
+
+    let lbl = strfmt("{}{:02}", abbreviation, calc.rem(paper-year(reference), 100))
+    (lbl, lbl)
+  }
+
+  let reference-label(index, reference) = {
+    let (reference-label, extradate) = label-parts-alphabetic(reference)
+    [[#reference-label#extradate]]
+  }
+
+  ("formatter": formatter, "label-generator": label-generator, "reference-label": reference-label)
 }
 
 #let format-citation-authoryear(

@@ -501,8 +501,8 @@
       key: reference.entry_key,
       index: index,
       reference: reference,
-      year: paper-year(reference),
-      label: reference.at("label", default: none)
+      // year: paper-year(reference),
+      // label: reference.at("label", default: none)
     )
 
     // store the data in "meta" in a metadata element, so it can later be access through the label

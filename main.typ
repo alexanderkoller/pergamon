@@ -19,11 +19,14 @@
 #let citen(lbl) = ref(lbl, supplement: it => "n")
 
 
-#let fcite = format-citation-authoryear() // format-parens: nn(it => [[#it]]))
+// #let fcite = format-citation-authoryear() // format-parens: nn(it => [[#it]]))
+#let fcite = format-citation-alphabetic()
 
 // #let fcite = format-citation-acl()
 #let fref = format-reference(
   // additional-fields: ("award",)
+  label: fcite.reference-label,
+  // label: (index, reference) => reference.at("label", default: ""),
   additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),
   suppress-fields: ("issn",),
   print-isbn: true,
@@ -118,7 +121,7 @@
   @multi1 @multi2
 
   #print-bibliography(format-reference: fref, sorting: sorting,
-    label-generator: fcite.label-generator
+    label-generator: fcite.label-generator,
     // label-generator: (reference, index) => {
     //   // this is just a quick & dirty approximation of what it would look like for authoryear
     //   let final-index = calc.min(2, reference.lastnames.len())
