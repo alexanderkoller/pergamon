@@ -821,19 +821,51 @@
 
 
 
-// Regrettably, the form has to be specified as either "auto"
-// (a default value) or as a constant function that returns a string.
-// This is because we get the form from a "ref" supplement, which can't
-// have type "string" (it has to be "content"). 
-#let format-citation-acl() = {
+
+#let format-citation-alphabetic() = {
+}
+
+#let format-citation-authoryear(
+  /// Wraps text in round brackets. The argument needs to be a function
+  /// that takes one argument (`str` or `content`) and returns `content`.
+  /// 
+  /// It is essential that if the argument is `none`, the function must
+  /// also return `none`. This can be achieved conveniently with the `nn`
+  /// function wrapper, defined in `bibtypst-styles.typ`.
+  /// 
+  /// -> function
+  format-parens: nn(it => [(#it)]),
+) = {
   let formatter(reference-dict, form) = {
-    // keys of reference-dict: key, index, reference, year
-
-    let parsed-authors = reference-dict.reference.lastnames
-    let year = str(reference-dict.year) // TODO - get rid of the extra year key
-
+    // access precomputed information that was stored in the label field
+    let (authors-str, year) = reference-dict.reference.at("label")
     if "extradate" in reference-dict.reference.fields {
       year += numbering("a", reference-dict.reference.fields.extradate + 1)
+    }
+
+    // Regrettably, the form has to be specified as either "auto"
+    // (a default value) or as a constant function that returns a string.
+    // This is because we get the form from a "ref" supplement, which can't
+    // have type "string" (it has to be "content"). 
+
+    let fform = if form == auto { auto } else { form(none) } // str or auto
+    if fform == "t" {
+      strfmt("{} {}", authors-str, format-parens(year))
+    } else if fform == "g" {
+      strfmt("{}'s {}", authors-str, format-parens(year))
+    } else if fform == "n" {
+      strfmt("{} {}", authors-str, year)
+    } else { // auto or "p"
+      format-parens(strfmt("{} {}", authors-str, year))
+    }
+  }
+
+  let label-generator(reference, index) = {
+    let parsed-authors = reference.lastnames
+    let year = str(reference.fields.year) // TODO - get rid of the extra year key
+
+    if "extradate" in reference.fields {
+      year += numbering("a", reference.fields.extradate + 1)
     }
 
     let authors-str = if parsed-authors.len() == 1 {
@@ -844,17 +876,11 @@
       parsed-authors.at(0) + " et al."
     }
 
-    let fform = if form == auto { auto } else { form(none) } // str or auto
+    let lbl = (authors-str, year)
+    let lbl-repr = strfmt("{} {}", authors-str, year)
 
-    if fform == "t" {
-      strfmt("{} ({})", authors-str, year)
-    } else if fform == "g" {
-      strfmt("{}'s ({})", authors-str, year)
-    } else if fform == "n" {
-      strfmt("{} {}", authors-str, year)
-    } else { // auto or "p"
-      strfmt("({} {})", authors-str, year)    
-    }
+    (lbl, lbl-repr)
   }
-  formatter
+
+  ("formatter": formatter, "label-generator": label-generator)
 }
