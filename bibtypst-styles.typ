@@ -572,8 +572,12 @@
     /// This is useful e.g. for use with the alphabetic and numeric citation style.
     /// By default, the function returns constant `none`, indicating that there
     /// should be no label.
+    /// 
+    /// This function typically comes from a predefined style (e.g.
+    /// authoryear, numeric, alphabetic), or you can define your own.
+    /// 
     /// -> function
-    label: (index, reference) => none,
+    reference-label: (index, reference) => none,
 
     /// Selectively highlights certain bibliography entries. The parameter
     /// is a function that is applied at the final stage of the rendering process,
@@ -731,6 +735,12 @@
     /// returned content will be printed directly. Instead of an array, you can also
     /// pass `none` to indicate that no additional fields need to be printed.
     /// 
+    /// For example, both of these will work:
+    /// ```
+    /// additional-fields: ("award",)
+    /// additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),)
+    /// ```
+    /// 
     /// -> function | none
     additional-fields: none,
 
@@ -806,7 +816,7 @@
       }
 
       // add label if requested
-      let lbl = label(index, reference)
+      let lbl = reference-label(index, reference)
       let highlighted = highlight(ret + ".", reference, index)
 
       if lbl == none {
@@ -821,6 +831,14 @@
 
 
 
+
+//////////////////////////////////////////////////////////////////////////
+//
+// Builtin citation styles:
+// alphabetic, numeric, authoryear
+// 
+////////////////////////////////////////////////////////////////////////////
+
 #let label-parts-alphabetic(reference) = {
   let extradate = if "extradate" in reference.fields {
     numbering("a", reference.fields.extradate + 1)
@@ -833,7 +851,6 @@
 
 #let format-citation-alphabetic(maxalphanames: 3, labelalpha: 3, labelalphaothers: "+") = {
   let formatter(reference-dict, form) = {
-    // keys of reference-dict: key, index, reference, last-names, year
     let fform = if form == auto { auto } else { form(none) } // str or auto
     let (reference-label, extradate) = label-parts-alphabetic(reference-dict.reference)
 
@@ -867,7 +884,7 @@
     [[#reference-label#extradate]]
   }
 
-  ("formatter": formatter, "label-generator": label-generator, "reference-label": reference-label)
+  ("format-citation": formatter, "label-generator": label-generator, "reference-label": reference-label)
 }
 
 #let format-citation-authoryear(
@@ -927,7 +944,7 @@
     (lbl, lbl-repr)
   }
 
-  ("formatter": formatter, "label-generator": label-generator, "reference-label": (index, reference) => none)
+  ("format-citation": formatter, "label-generator": label-generator, "reference-label": (index, reference) => none)
 }
 
 
@@ -951,5 +968,5 @@
     [[#reference.label]]
   }
 
-  ("formatter": formatter, "label-generator": label-generator, "reference-label": reference-label)
+  ("format-citation": formatter, "label-generator": label-generator, "reference-label": reference-label)
 }

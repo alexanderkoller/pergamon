@@ -19,61 +19,36 @@
 #let citen(lbl) = ref(lbl, supplement: it => "n")
 
 
-
+// Author-Year:
 // #let fcite = format-citation-authoryear() // format-parens: nn(it => [[#it]]))
-// #let fcite = format-citation-alphabetic()
-#let fcite = format-citation-numeric()
+
+// Alphabetic:
+#let fcite = format-citation-alphabetic()
+
+// Numeric:
+// #let fcite = format-citation-numeric()
 
 #let fref = format-reference(
+  reference-label: fcite.reference-label,
   // additional-fields: ("award",)
-  label: fcite.reference-label,
   additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),
-  suppress-fields: ("issn",),
-  print-isbn: true,
   highlight: (x, reference, index) => {
    if "highlight" in reference.fields.at("keywords", default: ()) {
       [#text(size: 8pt)[#emoji.star.box] #x]
-      // strong(x)
    } else {
       x
    }
 }
 )
-#let fadd = x => x
+
 #let sorting = "nyt"
-
-
-// #let fcite = format-citation-numeric()
-// #let fref = format-reference-numeric()
-// #let fadd = x => x
-// #let sorting = "nyt"
-
-
-// #let fcite = format-citation-alphabetic()
-// #let fref = format-reference-alphabetic() 
-// #let fadd = add-label-alphabetic()
-// #let sorting = "a"
-
-// #let fcite = format-citation-acl()
-// #let fref = format-reference-acl()
-// #let fadd = x => x
-// #let sorting = "nyt"
-
-// highlighting: x => [*#x*])
-// highlight: (x, reference, index) => {
-//    if "highlight" in reference.fields.at("keywords", default: ()) {
-//       strong(x)
-//    } else {
-//       x
-//    }
-// }
 
 
 #add-bib-resource(read("bibliography.bib"))
 #add-bib-resource(read("other.bib"))
 #add-bib-resource(read("physics.bib"))
 
-#refsection(format-citation: fcite.formatter)[
+#refsection(format-citation: fcite.format-citation)[
   // This show rule has to come inside the refsection, otherwise it is
   // overwritten by the show rule that is defined in refsection's source code.
   // It colors the citation links based on whether the reference is to a PI publication.
@@ -122,17 +97,6 @@
 
   #print-bibliography(format-reference: fref, sorting: sorting,
     label-generator: fcite.label-generator,
-    // label-generator: (reference, index) => {
-    //   // this is just a quick & dirty approximation of what it would look like for authoryear
-    //   let final-index = calc.min(2, reference.lastnames.len())
-    //   let names = reference.lastnames.slice(0, final-index)
-    //   if final-index < reference.lastnames.len() {
-    //     names += ("et al",) // in biblatex this is an option
-    //   }
-
-    //   ((names, reference.fields.year),
-    //   strfmt("{} {}", names, reference.fields.year))
-    // }
   )
 ]
 
