@@ -1,4 +1,5 @@
 #import "@preview/nth:1.0.1": *
+#import "@preview/oxifmt:0.2.1": strfmt
 #import "bib-util.typ": join-list, fd, ifdef
 #import "templating.typ": *
 
@@ -191,6 +192,11 @@
 
   "extradate": (value, reference, field, options, style) => {
     numbering("a", value+1)
+  },
+
+  "parsed-authors": (value, reference, field, options, style) => {
+    // TODO make configurable
+    value.map(d => strfmt("{} {}", d.given, d.family))
   },
 
   /*
