@@ -506,6 +506,9 @@ Below, we explain the arguments to the builtin reference style in detail
 #let style-docs = tidy.parse-module(read("src/bibtypst-styles.typ"))
 #tidy.show-module(style-docs, style: tidy.styles.default, show-outline: false)
 
+#let x = tidy.parse-module(read("src/bib-util.typ"))
+#tidy.show-module(x, style: tidy.styles.default, show-outline: false)
+
 
 
 = Limitations <sec:limitations>
