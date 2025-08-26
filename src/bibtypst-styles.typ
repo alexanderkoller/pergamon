@@ -828,7 +828,7 @@
       let highlighted = highlight(ret + ".", reference, index)
 
       if lbl == none {
-        (highlighted,)
+        ([#highlighted],)
       } else {
         (lbl, highlighted)
       }
@@ -916,12 +916,6 @@
     // if "extradate" in reference-dict.reference.fields {
     //   year += numbering("a", reference-dict.reference.fields.extradate + 1)
     // }
-
-    // Regrettably, the form has to be specified as either "auto"
-    // (a default value) or as a constant function that returns a string.
-    // This is because we get the form from a "ref" supplement, which can't
-    // have type "string" (it has to be "content"). 
-
     let fform = if form == auto { auto } else { form(none) } // str or auto
     if fform == "t" {
       // can't concatenate with strfmt because format-parens(year) is not a string

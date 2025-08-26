@@ -332,20 +332,90 @@ reference dictionary. When the reference labeler and the citation formatter are 
 will still be available, allowing you to precompute any information you find useful.
 
 
-= Styling #bibtypst
+= Advanced usage 
 
 == Styling the bibliography
 
-sorting 
+A #bibtypst bibliography is displayed as a #link("https://typst.app/docs/reference/layout/grid/")[grid],
+with one row per bibliography entry. The grid has one or two columns, depending on whether a first column 
+is needed to display a label or not.
 
-grids 
+You can style this grid by passing a dictionary in the `grid-style` argument of `print-bibliography`.
+The values in this dictionary will be used to overwrite the default values. 
+
+== Sorting the bibliography
+
+You can furthermore control the order in which references are presented in the bibliography.
+To this end, you can pass a sorting string in the `sorting` argument of `print-bibliography`.
+See the documentation of this argument in @sec:package-doc for details.
 
 == Styling the citations
 <sec:styling-citations>
 
-TODO: show ref 
+Citations in #bibtypst are `ref` elements, and can be styled using show rules. However, it is 
+not entirely trivial to distinguish a `ref` element that represents a #bibtypst citation from 
+any other `ref` element (referring e.g. to a section or a figure).
 
-TODO: conditional coloring of references -- use to explain `if-citation`
+You can use the `if-citation` function to make this distinction. The following piece of code
+typesets all #bibtypst citations in blue:
+
+#zebraw(lang: false,
+```typ
+  #show ref: it => if-citation(it, value => {
+    show link: set text(fill: blue)
+    it
+  }})
+```)
+
+We have to style `link` because #bibtypst rewrites citation refs into link elements.
+
+The `value` argument contains metadata about the citation; `value.reference` is the
+reference dictionary. You can use this information to style citations conditionally.
+For instance, in order to typeset all citations to my own papers in green and all other
+citations in blue, I could write:
+
+#zebraw(lang: false,
+```typ
+#show ref: it => if-citation(it, value => {
+  if "Koller" in family-names(value.reference.fields.parsed-author) {
+    show link: set text(fill: green)
+    it
+  } else {
+    show link: set text(fill: blue)
+    it
+}})
+ ```)
+
+
+== Showing the entire bibliography
+
+It is sometimes convenient to display the entire bibliography, and not just those 
+references that were actually cited in the current refsection. You can instruct
+`print-bibliography` to do this using the `show-all` argument:
+
+#zebraw(lang: false,
+```typ
+#print-bibliography(
+  format-reference: format-reference(),
+  show-all: true
+)
+```)
+
+To obtain finer control over the bibliography entries that are shown, you can 
+use the `filtering` argument. This function receives a refrence dictionary as 
+its argument and returns `true` if this reference should be included in the bibliography
+and `false` otherwise. For instance, the following call shows all journal articles
+and nothing else:
+
+#zebraw(lang: false,
+```typ
+
+#print-bibliography(
+  format-reference: format-reference(),
+  show-all: true,
+  filtering: reference => reference.entry_type == "article"
+)
+```)
 
 
 = Package documentation

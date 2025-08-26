@@ -59,8 +59,6 @@
       it
     }
   })
-  // TTTT
-
   
   #set par(justify: true)
 

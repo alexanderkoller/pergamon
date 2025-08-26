@@ -37,21 +37,12 @@
   })
 }
 
-// Checks whether "it" is a reference (type `ref`) to an item in the bibliography.
-// If yes, it retrieves the metadata for that bib item and calls `citation-content`
-// on it; citation-content: dictionary => content.
-// Otherwise, it evaluates `other-content` on the ref item itself; by default,
-// it simply returns the ref item unchanged.
-//
-// We recognize references to items in the bibliography by the fact
-// that they point to a "metadata" element with a dictionary value that
-// contains "kind = reference-data". This dictionary value is passed as the
-// argument to `citation-content`.
+
 
 /// Helper function that conditionally renders a reference to a bibliography entry.
 /// The first argument is assumed to be a Typst #link("https://typst.app/docs/reference/model/ref/")[ref]
 /// element, obtained e.g. as the argument of a show rule. If this `ref` is a citation
-/// pointing to a bibliography entry managed by Bibtypst, the function passes the metadata
+/// pointing to a bibliography entry managed by Pergamon, the function passes the metadata
 /// of this bib entry to the `citation-content` function and returns the content this
 /// function generated. Otherwise, the `ref` is passed to `other-content` for further processing.
 /// 
@@ -61,7 +52,7 @@
 /// 
 /// ```typ
 /// #show ref: it => if-citation(it, value => {
-///    if "Koller" in value.reference.lastnames {
+///    if "Koller" in family-names(value.reference.fields.parsed-author) {
 ///      show link: set text(fill: green)
 ///      it
 ///    } else {
@@ -76,12 +67,12 @@
     /// -> ref
     it, 
 
-    /// A function that maps the metadata associated with a Bibtypst reference to
-    /// a piece of content. The metadata is a dictionary with keys (reference, index,
-    /// key, year, label); `reference` is a reference dictionary (see @sec:reference),
-    /// `key` and `year` are those fields from the reference for easy access, `index`
-    /// is the position in the bibliography, and `label` is the label that was generated
-    /// by the add-label function that was passed to @print-bibliography.
+    /// A function that maps the metadata associated with a Pergamon reference to
+    /// a piece of content. The metadata is a dictionary with keys `reference`, `index`, and
+    /// `key`. `reference` is a reference dictionary (see @sec:reference),
+    /// `key` is the key of the bib entry, and `index`
+    /// is the position in the bibliography.
+    /// 
     /// -> function
     citation-content, 
 
@@ -93,6 +84,11 @@
   ) = {
     let el = it.element
     let cite-key = str(it.target)
+
+    // We recognize references to items in the bibliography by the fact
+    // that they point to a "metadata" element with a dictionary value that
+    // contains "kind = reference-data". This dictionary value is passed as the
+    // argument to `citation-content`.
 
     if el != none and el.func() == metadata {
       let target = query(it.target).first()
