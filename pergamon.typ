@@ -409,13 +409,43 @@ and nothing else:
 
 #zebraw(lang: false,
 ```typ
-
 #print-bibliography(
   format-reference: format-reference(),
   show-all: true,
   filtering: reference => reference.entry_type == "article"
 )
 ```)
+
+== Highlighting references
+
+The builtin `format-reference` function accepts a parameter `highlight`, which you 
+can use to highlight individual references in the bibliography. The
+`highlight` function takes a `rendered-reference` as argument; this is a piece of content 
+representing the entire rendered bibliography entry, just before it is printed.
+It also receives the corresponding reference dictionary and the position in the bibliography.
+
+Let's say that you use the `keywords` field in your Bibtex entries to contain the keyword `highlight`
+if you want to highlight the paper. You can then selectively highlight references like this:
+
+#zebraw(lang: false,
+```typ
+#let f-r = format-reference(
+  highlight: (rendered, reference, index) => {
+   if "highlight" in reference.fields.at("keywords", default: ()) {
+      [#text(size: 8pt)[#emoji.star.box] #rendered]
+   } else {
+      rendered
+}})
+```)
+
+This will place a marker before each reference with the "highlight" keyword, and will leave 
+all other references unchanged.
+
+#figure(
+  box(stroke: 1pt)[#image("doc-materials/highlighting.png", width: 100%)],
+  placement: top,
+  caption: [Highlighting a reference.]
+) <fig:highlighting>
 
 
 = Package documentation

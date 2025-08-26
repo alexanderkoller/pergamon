@@ -28,7 +28,7 @@
   name-format: "{given} {family}",
   reference-label: fcite.reference-label,
   // additional-fields: ("award",)
-  additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),
+  // additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),
   highlight: (x, reference, index) => {
    if "highlight" in reference.fields.at("keywords", default: ()) {
       [#text(size: 8pt)[#emoji.star.box] #x]
