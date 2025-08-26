@@ -641,17 +641,17 @@
     /// -> str
     eval-mode: "markup",
 
-    /// When typesetting lists (e.g. author names), #bibtypst will use this
+    /// When typesetting lists (e.g. author names), Bibtypst will use this
     /// delimiter to combine list items before the last one.
     /// -> str
     list-middle-delim: ", ",
 
-    /// When typesetting lists (e.g. author names), #bibtypst will use this
+    /// When typesetting lists (e.g. author names), Bibtypst will use this
     /// delimiter to combine the items of lists of length two.
     /// -> str
     list-end-delim-two: " and ",
 
-    /// When typesetting lists (e.g. author names), #bibtypst will use this
+    /// When typesetting lists (e.g. author names), Bibtypst will use this
     /// delimiter in lists of length three of more to combine the final
     /// item in the list with the rest.
     /// -> str

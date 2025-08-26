@@ -227,7 +227,12 @@ TODO: conditional coloring of references -- use to explain `if-citation`
 
 #v(1em)
 #let docs = tidy.parse-module(read("bibtypst.typ"))
-#tidy.show-module(docs, style: tidy.styles.default, show-outline: false)
+#tidy.show-module(
+  docs, 
+  style: tidy.styles.default, 
+  show-outline: false, 
+  // scope: (:) // (bibtypst: "X")
+)
 
 == Reference dictionaries
 <sec:reference>

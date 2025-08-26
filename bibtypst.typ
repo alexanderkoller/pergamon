@@ -341,7 +341,7 @@
     title: "References",
 
     /// Bibtex fields that contain names and should be parsed as such. For each X in this list,
-    /// #bibtypst will enrich the reference with a field "parsed-X" that contains a list of
+    /// Bibtypst will enrich the reference with a field "parsed-X" that contains a list of
     /// dictionaries of name parts, such as ("family": "Smith", "given": "John").
     name-fields: ("author", "editor", "translator")
   ) = context {
