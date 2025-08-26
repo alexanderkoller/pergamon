@@ -6,11 +6,11 @@
   for i in range(1, names.len()) {
     if type(names.at(i)) != dictionary { // no idea how it would be a dictionary
       if names.len() == 2 {
-        ret = ret + options.namelist-end-delim-two + names.at(i)
+        ret = ret + options.list-end-delim-two + names.at(i)
       } else if i == names.len()-1 {
-        ret = ret + options.namelist-end-delim-many + names.at(i)
+        ret = ret + options.list-end-delim-many + names.at(i)
       } else {
-        ret = ret + options.namelist-middle-delim + names.at(i)
+        ret = ret + options.list-middle-delim + names.at(i)
       }
     }
   }

@@ -641,15 +641,21 @@
     /// -> str
     eval-mode: "markup",
 
-    namelist-middle-delim: ", ",
-    namelist-end-delim-two: " and ",
-    namelist-end-delim-many: ", and ",
-
-    /// String that is used to combine the final author in an author list
-    /// with the previous authors.
+    /// When typesetting lists (e.g. author names), #bibtypst will use this
+    /// delimiter to combine list items before the last one.
     /// -> str
-    final-list-delim: list => if list.len() > 2 { ", and" } else { " and " },
+    list-middle-delim: ", ",
 
+    /// When typesetting lists (e.g. author names), #bibtypst will use this
+    /// delimiter to combine the items of lists of length two.
+    /// -> str
+    list-end-delim-two: " and ",
+
+    /// When typesetting lists (e.g. author names), #bibtypst will use this
+    /// delimiter in lists of length three of more to combine the final
+    /// item in the list with the rest.
+    /// -> str
+    list-end-delim-many: ", and ",
 
     /// String that is used to combine the name of an author with the author
     /// type, e.g. "Smith, editor".
@@ -762,12 +768,10 @@
         use-author: use-author,
         use-translator: use-translator,
         use-editor: use-editor,
-        // multi-list-delim: multi-list-delim,
-        final-list-delim: final-list-delim,
         author-type-delim: author-type-delim,
-        namelist-middle-delim: namelist-middle-delim,
-        namelist-end-delim-two: namelist-end-delim-two,
-        namelist-end-delim-many: namelist-end-delim-many,
+        list-middle-delim: list-middle-delim,
+        list-end-delim-two: list-end-delim-two,
+        list-end-delim-many: list-end-delim-many,
         subtitlepunct: subtitlepunct,
         format-journaltitle: format-journaltitle,
         format-issuetitle: format-issuetitle,
@@ -925,7 +929,6 @@
   }
 
   let label-generator(index, reference) = {
-    // let parsed-authors = reference.lastnames
     let parsed-authors = family-names(reference.fields.parsed-author)
     let year = str(reference.fields.year)
 
