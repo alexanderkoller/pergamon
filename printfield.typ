@@ -1,6 +1,6 @@
 #import "@preview/nth:1.0.1": *
 #import "@preview/oxifmt:0.2.1": strfmt
-#import "bib-util.typ": join-list, fd, ifdef
+#import "bib-util.typ": join-list, fd, ifdef, concatenate-authors
 #import "templating.typ": *
 
 
@@ -194,9 +194,11 @@
     numbering("a", value+1)
   },
 
-  "parsed-authors": (value, reference, field, options, style) => {
+  "parsed-author": (value, reference, field, options, style) => {
     // TODO make configurable
-    value.map(d => strfmt("{} {}", d.given, d.family))
+    // [VALUE |#value|]
+    concatenate-authors(value.map(d => strfmt("{} {}", d.given, d.family)))
+    // value.map(d => strfmt("{} {}", d.given, d.family)).join(" & ")
   },
 
   /*

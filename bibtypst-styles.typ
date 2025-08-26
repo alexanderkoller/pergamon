@@ -38,7 +38,8 @@
 #let authors-with-year(reference, options) = {
   spaces(
     // TODO - make configurable
-    reference.authors, // TODO - was \printnames{author}
+    printfield(reference, "parsed-author", options),
+    // reference.authors, // TODO - was \printnames{author}
     ifen(options.print-date-after-authors, () => (options.format-parens)(date(reference, options)))
   )
 }

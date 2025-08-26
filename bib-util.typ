@@ -17,6 +17,28 @@
 }
 
 
+// concatenate an array of authors into "A, B, and C"
+// TODO - unify with join-list
+#let concatenate-authors(authors) = {
+  let ret = authors.at(0)
+
+  for i in range(1, authors.len()) {
+    if type(authors.at(i)) != dictionary { // no idea how it would be a dictionary
+      if authors.len() == 2 {
+        ret = ret + " and " + authors.at(i)
+      } else if i == authors.len()-1 {
+        ret = ret + ", and " + authors.at(i)
+      } else {
+        ret = ret + ", " + authors.at(i)
+      }
+    }
+  }
+
+  ret
+}
+
+
+
 // Map "modern" Biblatex field names to legacy field names as they
 // might appear in the bib file. Should be complete, as per biblatex.def
 #let field-aliases = (

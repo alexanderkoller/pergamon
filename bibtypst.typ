@@ -5,62 +5,6 @@
 #import "names.typ": parse-names, parse-reference-names
 
 
-
-///////// 
-///////// Internal helper methods
-///////// 
-
-
-// concatenate an array of authors into "A, B, and C"
-#let concatenate-authors(authors) = {
-  let ret = authors.at(0)
-
-  for i in range(1, authors.len()) {
-    if type(authors.at(i)) != dictionary { // no idea how it would be a dictionary
-      if authors.len() == 2 {
-        ret = ret + " and " + authors.at(i)
-      } else if i == authors.len()-1 {
-        ret = ret + ", and " + authors.at(i)
-      } else {
-        ret = ret + ", " + authors.at(i)
-      }
-    }
-  }
-
-  ret
-}
-
-
-// parse author names and add fields with first-last and last-first author names to the reference
-#let fix-authors(reference) = {
-  let parsed-names = parse-names(reference, "author") // parse-author-names(reference)
-  let lastname-first-authors = ()
-  let firstname-first-authors = ()
-  let lastnames = ()
-
-  for d in parsed-names {
-    let last = d.family
-    let first = d.given
-    lastname-first-authors.push(strfmt("{}, {}", last, first))
-    firstname-first-authors.push(strfmt("{} {}", first, last))
-    lastnames.push(last)
-  }
-
-  // reference.insert("parsed-author-names", parsed-names) // ((first, last), (first, last), ...)
-  // reference.insert("lastname-first-authors", lastname-first-authors.join(" ")) // for sorting
-  reference.insert("authors", concatenate-authors(firstname-first-authors))
-  // reference.insert("lastnames", lastnames) // (last, last, last, ...) - to construct citations
-
-  reference
-}
-
-
-
-///////// 
-///////// Public functions
-///////// 
-
-
 #let reference-collection = state("reference-collection", (:))
 #let bibliography = state("bibliography", (:))
 
@@ -415,7 +359,7 @@
 
   if show-all {
     for reference in bib.values() {
-      let ref = parse-reference-names(fix-authors(reference), name-fields) // TTTT TODO remove fix-authors
+      let ref = parse-reference-names(reference, name-fields)
       bibl-unsorted.push(ref)
     }
   } else {
@@ -424,8 +368,8 @@
       let key = str(lbl)
 
       if key in bib { // skip references to labels that are not bib keys
-        let bib-entry = fix-authors(bib.at(key))
-        bib-entry = parse-reference-names(bib-entry, name-fields) // TTTT TODO remove fix-authors
+        let bib-entry = bib.at(key)
+        bib-entry = parse-reference-names(bib-entry, name-fields)
         bibl-unsorted.push(bib-entry)
         // [#bib-entry]
       }
