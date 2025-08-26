@@ -889,7 +889,8 @@
   /// function wrapper, defined in `bibtypst-styles.typ`.
   /// 
   /// -> function
-  format-parens: nn(it => [(#it)]),
+  format-parens: nn(it => "(" + it + ")"),
+  // nn(it => [(#it)])
 ) = {
   let formatter(reference-dict, form) = {
     // access precomputed information that was stored in the label field
@@ -918,7 +919,7 @@
   let label-generator(index, reference) = {
     // let parsed-authors = reference.lastnames
     let parsed-authors = family-names(reference.fields.parsed-author)
-    let year = str(reference.fields.year) // TODO - get rid of the extra year key
+    let year = str(reference.fields.year)
 
     if "extradate" in reference.fields {
       year += numbering("a", reference.fields.extradate + 1)

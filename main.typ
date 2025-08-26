@@ -21,10 +21,10 @@
 
 
 // Author-Year:
-// #let fcite = format-citation-authoryear() // format-parens: nn(it => [[#it]]))
+#let fcite = format-citation-authoryear() // format-parens: nn(it => [[#it]]))
 
 // Alphabetic:
-#let fcite = format-citation-alphabetic()
+// #let fcite = format-citation-alphabetic()
 
 // Numeric:
 // #let fcite = format-citation-numeric()
