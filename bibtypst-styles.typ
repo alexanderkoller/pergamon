@@ -906,8 +906,7 @@
   /// function wrapper, defined in `bibtypst-styles.typ`.
   /// 
   /// -> function
-  format-parens: nn(it => "(" + it + ")"),
-  // nn(it => [(#it)])
+  format-parens: nn(it => [(#it)])
 ) = {
   let formatter(reference-dict, form) = {
     // access precomputed information that was stored in the label field
@@ -923,9 +922,10 @@
 
     let fform = if form == auto { auto } else { form(none) } // str or auto
     if fform == "t" {
-      strfmt("{} {}", authors-str, format-parens(year))
+      // can't concatenate with strfmt because format-parens(year) is not a string
+      spaces(authors-str, format-parens(year))
     } else if fform == "g" {
-      strfmt("{}'s {}", authors-str, format-parens(year))
+      spaces(authors-str + "'s", format-parens(year))
     } else if fform == "n" {
       strfmt("{} {}", authors-str, year)
     } else { // auto or "p"
