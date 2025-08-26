@@ -8,33 +8,33 @@
 ///////// 
 
 
-// make title a hyperlink if DOI or URL are defined
-// OBSOLETE once we commit to bibtypst-styles.typ
-#let url-title(reference, eval-mode: none) = {
-  let title = if eval-mode == none { reference.fields.title.trim() } else { eval(reference.fields.title.trim(), mode: eval-mode) }
-  if "doi" in reference.fields {
-    link("https://doi.org/" + reference.fields.doi)[#title]
-  } else if "url" in reference.fields {
-    link(reference.fields.url)[#title]
-  } else {
-    title
-  }
-}
+// // make title a hyperlink if DOI or URL are defined
+// // OBSOLETE once we commit to bibtypst-styles.typ
+// #let url-title(reference, eval-mode: none) = {
+//   let title = if eval-mode == none { reference.fields.title.trim() } else { eval(reference.fields.title.trim(), mode: eval-mode) }
+//   if "doi" in reference.fields {
+//     link("https://doi.org/" + reference.fields.doi)[#title]
+//   } else if "url" in reference.fields {
+//     link(reference.fields.url)[#title]
+//   } else {
+//     title
+//   }
+// }
 
 
 
-#let paper-type(reference) = reference.entry_type
+// #let paper-type(reference) = reference.entry_type
 
-#let paper-authors(reference) = if "authors" in reference { 
-  reference.authors 
-} else if "author" in reference.fields {
-  let parsed-authors = fix-authors(reference)
-  parsed-authors.authors
-} else {
-  "NO AUTHORS"
-}
+// #let paper-authors(reference) = if "authors" in reference { 
+//   reference.authors 
+// } else if "author" in reference.fields {
+//   let parsed-authors = fix-authors(reference)
+//   parsed-authors.authors
+// } else {
+//   "NO AUTHORS"
+// }
 
-#let paper-year(reference) = int(reference.fields.year)
+// #let paper-year(reference) = int(reference.fields.year)
 
 
 // #let highlight(reference, formatted, highlighting) = {
@@ -47,26 +47,26 @@
 
 
 // returns a list of author names, in the form ((first, last), (first, last), ...)
-#let parse-author-names(reference) = {
-  let ret = ()
+// #let parse-author-names(reference) = {
+//   let ret = ()
 
-  for raw_author in reference.fields.author.split(regex("\s+and\s+")) {
-    let match = raw_author.match(regex("(.*)\s*,\s*(.*)"))
-    let first = ""
-    let last = ""
+//   for raw_author in reference.fields.author.split(regex("\s+and\s+")) {
+//     let match = raw_author.match(regex("(.*)\s*,\s*(.*)"))
+//     let first = ""
+//     let last = ""
 
-    if match != none {
-      (first, last) = (match.captures.at(1), match.captures.at(0))
-    } else {
-      match = raw_author.match(regex("(.+)\s+(\S+)"))
-      (first, last) = (match.captures.at(0), match.captures.at(1))
-    }
+//     if match != none {
+//       (first, last) = (match.captures.at(1), match.captures.at(0))
+//     } else {
+//       match = raw_author.match(regex("(.+)\s+(\S+)"))
+//       (first, last) = (match.captures.at(0), match.captures.at(1))
+//     }
 
-    ret.push((first, last))
-  }
+//     ret.push((first, last))
+//   }
 
-  return ret
-}
+//   return ret
+// }
 
 
 ///////// 
@@ -93,15 +93,18 @@
   ret
 }
 
+#import "names.typ": parse-names
 
 // parse author names and add fields with first-last and last-first author names to the reference
 #let fix-authors(reference) = {
-  let parsed-names = parse-author-names(reference)
+  let parsed-names = parse-names(reference, "author") // parse-author-names(reference)
   let lastname-first-authors = ()
   let firstname-first-authors = ()
   let lastnames = ()
 
-  for (first, last) in parsed-names {
+  for d in parsed-names {
+    let last = d.family
+    let first = d.given
     lastname-first-authors.push(strfmt("{}, {}", last, first))
     firstname-first-authors.push(strfmt("{} {}", first, last))
     lastnames.push(last)
