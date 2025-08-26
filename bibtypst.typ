@@ -46,8 +46,8 @@
     lastnames.push(last)
   }
 
-  reference.insert("parsed-author-names", parsed-names) // ((first, last), (first, last), ...)
-  reference.insert("lastname-first-authors", lastname-first-authors.join(" ")) // for sorting
+  // reference.insert("parsed-author-names", parsed-names) // ((first, last), (first, last), ...)
+  // reference.insert("lastname-first-authors", lastname-first-authors.join(" ")) // for sorting
   reference.insert("authors", concatenate-authors(firstname-first-authors))
   // reference.insert("lastnames", lastnames) // (last, last, last, ...) - to construct citations
 
@@ -232,7 +232,8 @@
       }
     } else if sort-key == "n" {
       // author name
-      reference => reference.lastname-first-authors
+      // reference => reference.lastname-first-authors
+      reference => reference.fields.sortstr-author
     } else if sort-key == "t" {
       // paper title
       reference => reference.fields.title.trim()

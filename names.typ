@@ -30,7 +30,11 @@
   for field in name-fields {
     if field in reference.fields {
       let parsed-names = parse-names(reference, field)
+      let lastname-first = parsed-names.map(it => it.family + "," + it.given).join(" ")
+
       reference.fields.insert("parsed-" + field, parsed-names)
+      reference.fields.insert("sortstr-" + field, lastname-first)
+      // sortstr fields are needed to perform efficient sorting on the "n" key
     } else {
       reference.fields.insert("parsed-" + field, none)
     }
