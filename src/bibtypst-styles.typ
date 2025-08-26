@@ -624,7 +624,7 @@
     /// normal behavior of BibLaTeX and place the date towards the end of the
     /// reference.
     /// -> bool
-    print-date-after-authors: true,
+    print-date-after-authors: false,
 
     /// When Bibtypst renders a reference, the title is processed by Typst's
     /// #link("https://typst.app/docs/reference/foundations/eval/")[eval] function.
@@ -708,7 +708,7 @@
     /// You can use `{g}` and `{f}` for the first letters of the given and family
     /// name, respectively.
     /// -> str
-    name-format: "{family}, {given}",
+    name-format: "{given} {family}",
 
     /// Separator symbol for "volume" and "number" fields, e.g. in `@article`s.
     /// -> str
@@ -897,6 +897,8 @@
   ("format-citation": formatter, "label-generator": label-generator, "reference-label": reference-label)
 }
 
+/// Formats citations in the _authoryear_ style (see @fig:example-authoryear
+/// for an example).
 #let format-citation-authoryear(
   /// Wraps text in round brackets. The argument needs to be a function
   /// that takes one argument (`str` or `content`) and returns `content`.

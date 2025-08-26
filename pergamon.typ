@@ -148,8 +148,7 @@ and then we will sketch how to define your own custom styles.
 == Builtin reference style
 <sec:builtin-reference>
 
-The builtin reference style is defined by the `format-reference` function in `bibtypst-styles.typ`.
-#todo[Figure out how to access it in the released package.] This reference style replicates the
+The builtin reference style is defined by the `format-reference` function. This reference style replicates the
 builtin reference style of #biblatex, with some limitations that are described in @sec:limitations.
 
 The builtin reference style can currently render the following #biblatex entry types:
@@ -202,11 +201,135 @@ than #biblatex, which is built on top of LaTeX, whose macros are much less flexi
 
 == Builtin citation styles
 
-#todo[explain numeric, alphabetic, authoryear with examples]
+#bibtypst comes with three builtin citation styles: _alphabetic_, _numeric_, and _authoryear_.
+These replicate the #biblatex styles of the same names (see e.g. the #link("https://www.overleaf.com/learn/latex/Biblatex_bibliography_styles")[examples on Overleaf]).
 
-#todo[explain citation forms, like `n`]
+Like in Typst's regular bibliography mechanism, you can write `@key` to insert a citation to the
+bib entry with the entry-key `key` into your document. The exact string that is inserted depends on 
+the citation style you use. Note that unlike in regular Typst, `@key` does not resolve to the #link("https://typst.app/docs/reference/model/cite/")[cite] function in #bibtypst, but to the #link("https://typst.app/docs/reference/model/ref/")[ref] function.
+This is because `cite` can only be used with a standard Typst #link("https://typst.app/docs/reference/model/bibliography/")[bibliography].
+This should not make a big difference to you in practice, but it matters when you want to style
+citations; see @sec:styling-citations for details. 
+
+
+
+
+Whenever you write `@key`, #bibtypst replaces this command with a citation to the reference generated
+by `format-reference`. Note that unlike in the regular Typst bibliography mechanism, `@key` is not a
+`cite` command, but a `ref` command. 
+
+The difference between the three builtin citation styles is illustrated in @fig:example-output (numeric), @fig:example-alphabetic (alphabetic), and @fig:example-authoryear (authoryear). _Numeric_ and _alphabetic_ both create a label for each bibliography entry;
+in the case of _numeric_, the label is the position in the bibliography, and in the case of _alphabetic_, it is a unique string consisting of the first characters of the author names and the year. In both cases, these labels are displayed next to the references and also used as the string to which `@key` expands. By contrast, _authoryear_ does not display any labels next to the references; it expands `@key` to a string consisting of the last names of the authors and the year.
+
+Some of the citation styles have options that will let you control the appearance of the citations in detail.
+These are documented in @sec:package:builtin-reference. For instance, to enclose the year in the _authoryear_ style
+in square brackets rather than round ones, you can replace line 4 in the above example with
+
+#zebraw(lang: false,
+```typ
+#let style = format-citation-authoryear(format-parens: nn(it => [(#it)]))
+```
+)
+
+#figure(
+  box(stroke: 1pt)[#image("doc-materials/example-alphabetic.png", width: 100%)],
+  placement: top,
+  caption: [Bibliography with the `alphabetic` citation style.]
+) <fig:example-alphabetic>
+
+
+#figure(
+  box(stroke: 1pt)[#image("doc-materials/example-authoryear.png", width: 100%)],
+  placement: top,
+  caption: [Bibliography with the `authoryear` citation style.]
+) <fig:example-authoryear>
+
+
+=== Citation forms
+
+Each citation style offers you different _citation forms_ for presenting your citation.
+These are documented in @fig:citation-forms. Citation forms are selected using 
+the `supplement` argument to the `ref` function:
+
+#zebraw(lang: false,
+```typ
+#let citet(lbl) = ref(lbl, supplement: it => "t")
+#citet(<bender20:_climb_nlu>)
+```
+)
+
+Observe that you have to cannot simply pass `"t"` as the supplement; it has to be a one-parameter
+function that returns `"t"`. This is a regrettable consequence of the fact that `ref` supplements 
+can be `auto`, functions, and content, but not strings. If you do not specify a citation form (`ref(<key>)` or `@key`), the `auto` citation forms will be used.
+
+Note that the `n` citation form has special value for combining multiple citations. Unlike the
+builtin Typst `cite` function, #bibtypst is currently not able to aggregate multiple citations into 
+a single string (e.g. `@key1 @key2` into "(Author, 2020; Person, 2021)"; see #link("https://github.com/alexanderkoller/bibtypst/issues/11")[issue \#11]). You can approximate this by using citations of form `n` and surrounding 
+them with brackets and semicolons manually.
+
+
+#figure(
+  table(columns: 4,
+    align: left + horizon,
+    // column-gutter: 1em,
+    inset: (x: 1em, y: 0.7em),
+    // stroke: none,
+    fill: (_, y) => if calc.odd(y) { rgb("EAF2F5") },
+
+    [], [*authoryear*], [*alphabetic*], [*numeric*],
+    [`auto`], [(Bender and Koller 2020)], [[BK20]], [[1]],
+    [p], [(Bender and Koller 2020)], [--], [--],
+    [t], [Bender and Koller (2020)], [--], [--],
+    [g], [Bender and Koller's (2020)], [--], [--],
+    [n], [Bender and Koller 2020], [BK20], [1]
+  ),
+  placement: top,
+  caption: [Citation forms.]
+) <fig:citation-forms>
+
 
 == Implementing custom styles 
+
+Instead of using the builtin styles, you can also define your own #bibtypst style
+-- either a reference style or a citation style or both. 
+
+Implementing a reference style amounts to defining a Typst function that can be passed 
+as the `format-reference` argument to `print-bibliography`. Such a function receives 
+arguments `(index, reference, eval-mode)` containing the zero-based position of the 
+reference in the bibliography; a reference dictionary; and the mode in which `eval` should
+evaluate the paper titles. A call to your function should return some `content`, which
+will be displayed in the bibliography.
+
+Reference dictionaries are a central data structure of #bibtypst. They represent the information 
+contained in a single bibliography entry and are explained in detail in @sec:reference.
+
+Implementing a citation style is a little more involved, because a citation style consists of three different
+functions:
+
+- The _label generator_ is passed as an argument to `print-bibliography`. It is a function that receives
+  a reference dictionary and the bibliography position as arguments and is expected to return an array of 
+  length two. Its first element is the bib entry's _label_; it is stored under the `label` field of the
+  reference dictionary and can contain any information that your style finds useful. The second element 
+  is a string summarizing the contents of the label. It is used to recognize when two bib entries have the 
+  same label and therefore need an "extradate" to make it unique, e.g. the letter "a" in a citation string like
+  "Smith et al. (2025a)". It is up to your style to ensure that entries with the same label also have the same
+  string summary.
+
+- The _reference labeler_ is passed as an argument to `format-reference`. It receives a reference 
+  dictionary and the bibliography position as arguments and returns content. If this content is not `none`,
+  it will be typeset as the first column in the bibliography, next to the reference itself. Of the builtin
+  citation styles, the reference labeler of `authoryear` always returns `none` (indicating a one-column
+  bibliography layout), and the other two return their respective labels in square brackets. #bibtypst assumes
+  that the reference labeler of a citation style either always returns `none` or never returns `none`,
+  making for a consistent number of columns.
+
+- The _citation formatter_ is passed as an argument to `refsection`. It receives a reference dictionary
+  and a citation form (see above) as arguments and returns content. This function generates the actual citation 
+  that is typeset into the document.
+
+Note that the label information that the label generator produces will be stored in the `label` field of the 
+reference dictionary. When the reference labeler and the citation formatter are called, the `label` information 
+will still be available, allowing you to precompute any information you find useful.
 
 
 = Styling #bibtypst
@@ -218,6 +341,9 @@ sorting
 grids 
 
 == Styling the citations
+<sec:styling-citations>
+
+TODO: show ref 
 
 TODO: conditional coloring of references -- use to explain `if-citation`
 
@@ -239,7 +365,7 @@ TODO: conditional coloring of references -- use to explain `if-citation`
 
 (explain them here)
 
-== The builtin reference style
+== The builtin styles
 <sec:package:builtin-reference>
 
 Below, we explain the arguments to the builtin reference style in detail
