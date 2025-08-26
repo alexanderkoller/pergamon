@@ -16,7 +16,7 @@
 
 
 // Author-Year:
-#let fcite = format-citation-authoryear() // format-parens: nn(it => [[#it]]))
+#let fcite = format-citation-authoryear()
 
 // Alphabetic:
 // #let fcite = format-citation-alphabetic()

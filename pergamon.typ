@@ -226,7 +226,7 @@ TODO: conditional coloring of references -- use to explain `if-citation`
 <sec:package-doc>
 
 #v(1em)
-#let docs = tidy.parse-module(read("bibtypst.typ"))
+#let docs = tidy.parse-module(read("src/bibtypst.typ"))
 #tidy.show-module(
   docs, 
   style: tidy.styles.default, 
@@ -245,8 +245,9 @@ TODO: conditional coloring of references -- use to explain `if-citation`
 Below, we explain the arguments to the builtin reference style in detail
 (see @sec:builtin-reference for the big picture).
 
-#let style-docs = tidy.parse-module(read("bibtypst-styles.typ"))
+#let style-docs = tidy.parse-module(read("src/bibtypst-styles.typ"))
 #tidy.show-module(style-docs, style: tidy.styles.default, show-outline: false)
+
 
 
 = Limitations <sec:limitations>

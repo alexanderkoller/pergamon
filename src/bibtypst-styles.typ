@@ -911,9 +911,9 @@
   let formatter(reference-dict, form) = {
     // access precomputed information that was stored in the label field
     let (authors-str, year) = reference-dict.reference.at("label")
-    if "extradate" in reference-dict.reference.fields {
-      year += numbering("a", reference-dict.reference.fields.extradate + 1)
-    }
+    // if "extradate" in reference-dict.reference.fields {
+    //   year += numbering("a", reference-dict.reference.fields.extradate + 1)
+    // }
 
     // Regrettably, the form has to be specified as either "auto"
     // (a default value) or as a constant function that returns a string.
