@@ -37,7 +37,6 @@
 
 #let authors-with-year(reference, options) = {
   spaces(
-    // TODO - make configurable
     printfield(reference, "parsed-author", options),
     // reference.authors, // TODO - was \printnames{author}
     ifen(options.print-date-after-authors, () => (options.format-parens)(date(reference, options)))
@@ -55,9 +54,8 @@
 // biblatex.def editor+others
 #let editor-others(reference, options) = {
   if options.use-editor and fd(reference, "editor", options) != none {
-    // TODO - parse and re-concatenate editors like we do with authors
     // TODO - choose between bibstring.editor and bibstring.editors depending on length of editor list
-    [#printfield(reference, "editor", options), #options.bibstring.editor]
+    [#printfield(reference, "parsed-editor", options), #options.bibstring.editor]
   } else {
     none
   }
@@ -66,9 +64,8 @@
 // biblatex.def translator+others
 #let translator-others(reference, options) = {
   if options.use-translator and fd(reference, "translator", options) != none {
-    // TODO - parse and re-concatenate editors like we do with authors
     // TODO - choose between bibstring.editor and bibstring.editors depending on length of editor list
-    [#printfield(reference, "translator", options), #options.bibstring.translator]
+    [#printfield(reference, "parsed-translator", options), #options.bibstring.translator]
   } else {
     none
   }
@@ -168,7 +165,7 @@
 
 // biblatex.def bytranslator+others
 #let bytranslator-others(reference, options) = {
-  let translator = fd(reference, "translator", options)
+  let translator = printfield(reference, "parsed-translator", options)
 
   periods(
     // TODO bibstring.bytranslator should be expanded as in bytranslator+othersstrg
@@ -179,8 +176,7 @@
 
 // biblatex.def byeditor+others
 #let byeditor-others(reference, options) = {
-  let editor = fd(reference, "editor", options)
-  // TODO: parse editor names and recombine as for authors
+  let editor = printfield(reference, "editor", options)
 
   periods(
     // TODO bibstring.byeditor should be expanded as in byeditor+othersstrg

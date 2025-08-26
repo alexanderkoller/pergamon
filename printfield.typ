@@ -58,7 +58,7 @@
 
 // Prints a list of author names. Names are formatted and concatenated
 // as specified in the options. `name-parts-array` is an array of name-parts dictionaries.
-#let print-author(name-parts-array, options) = {
+#let print-name(name-parts-array, options) = {
   concatenate-list(name-parts-array.map(d => format-name(d, format-str: options.name-format)), options)
 }
 
@@ -199,12 +199,22 @@
     numbering("a", value+1)
   },
 
-  "author": (value, reference, field, options, style) => {
-    printfield(reference, "parsed-author", options, style: style)
-  },
+  "author": "parsed-author",
 
   "parsed-author": (value, reference, field, options, style) => {
-    print-author(value, options)
+    print-name(value, options)
+  },
+
+  "editor": "parsed-editor",
+
+  "parsed-editor": (value, reference, field, options, style) => {
+    print-name(value, options)
+  },
+
+  "translator": "parsed-translator",
+  
+  "parsed-translator": (value, reference, field, options, style) => {
+    print-name(value, options)
   },
 
   "language": (value, reference, field, options, style) => {
@@ -240,7 +250,16 @@
     field = lower(field)
 
     if field in field-formats {
-      field-formats.at(field)(value, reference, field, options, style)
+      let format = field-formats.at(field)
+
+      // resolve format aliases, e.g. "editor" to "parsed-editor"
+      while type(format) == str {
+        field = format
+        format = field-formats.at(field)
+        value = fd(reference, field, options)
+      }
+
+      format(value, reference, field, options, style)
     } else {
       value
     }
