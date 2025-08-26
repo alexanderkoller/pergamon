@@ -3,7 +3,7 @@
 #import "bibstrings.typ": default-bibstring
 #import "printfield.typ": printfield
 #import "bib-util.typ": join-list, fd, ifdef, type-aliases, nn
-
+#import "names.typ": family-names
 
 
 
@@ -854,19 +854,21 @@
 
   let label-generator(index, reference) = {
     // TODO - handle the case with no authors
-    
-    let abbreviation = if reference.lastnames.len() == 1 {
-      reference.lastnames.at(0).slice(0, labelalpha)
+    let lastnames = family-names(reference.fields.parsed-author)
+
+    let abbreviation = if lastnames.len() == 1 {
+      lastnames.at(0).slice(0, labelalpha)
     } else {
-      let first-letters = reference.lastnames.map(s => s.at(0)).join("")
-      if reference.lastnames.len() > maxalphanames {
+      let first-letters = lastnames.map(s => s.at(0)).join("")
+      if lastnames.len() > maxalphanames {
         first-letters.slice(0, maxalphanames) + labelalphaothers
       } else {
         first-letters
       }
     }
 
-    let lbl = strfmt("{}{:02}", abbreviation, calc.rem(paper-year(reference), 100))
+    let year = fd(reference, "year", (:))
+    let lbl = strfmt("{}{:02}", abbreviation, year.slice(-2)) // calc.rem(paper-year(reference), 100))
     (lbl, lbl)
   }
 
@@ -914,7 +916,8 @@
   }
 
   let label-generator(index, reference) = {
-    let parsed-authors = reference.lastnames
+    // let parsed-authors = reference.lastnames
+    let parsed-authors = family-names(reference.fields.parsed-author)
     let year = str(reference.fields.year) // TODO - get rid of the extra year key
 
     if "extradate" in reference.fields {

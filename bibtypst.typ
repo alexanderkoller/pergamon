@@ -49,7 +49,7 @@
   reference.insert("parsed-author-names", parsed-names) // ((first, last), (first, last), ...)
   reference.insert("lastname-first-authors", lastname-first-authors.join(" ")) // for sorting
   reference.insert("authors", concatenate-authors(firstname-first-authors))
-  reference.insert("lastnames", lastnames) // (last, last, last, ...) - to construct citations
+  // reference.insert("lastnames", lastnames) // (last, last, last, ...) - to construct citations
 
   reference
 }

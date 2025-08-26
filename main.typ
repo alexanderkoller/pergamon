@@ -4,6 +4,7 @@
 // #import "bibtypst-numeric.typ": format-citation-numeric, format-reference-numeric
 // #import "bibtypst-alphabetic.typ": format-citation-alphabetic, format-reference-alphabetic, add-label-alphabetic
 #import "bibtypst-styles.typ": *
+#import "names.typ": family-names
 
 #let darkgreen = green.darken(20%)
 #let darkblue = blue.darken(20%)
@@ -23,10 +24,10 @@
 // #let fcite = format-citation-authoryear() // format-parens: nn(it => [[#it]]))
 
 // Alphabetic:
-// #let fcite = format-citation-alphabetic()
+#let fcite = format-citation-alphabetic()
 
 // Numeric:
-#let fcite = format-citation-numeric()
+// #let fcite = format-citation-numeric()
 
 #let fref = format-reference(
   reference-label: fcite.reference-label,
@@ -53,7 +54,7 @@
   // overwritten by the show rule that is defined in refsection's source code.
   // It colors the citation links based on whether the reference is to a PI publication.
   #show ref: it => if-citation(it, value => {
-    if "Koller" in value.reference.lastnames {
+    if "Koller" in family-names(value.reference.fields.parsed-author) {
       show link: set text(fill: darkgreen)
       it
     } else {
@@ -62,6 +63,7 @@
       it
     }
   })
+  // TTTT
 
   
   #set par(justify: true)
