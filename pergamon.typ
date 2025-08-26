@@ -448,17 +448,12 @@ all other references unchanged.
 ) <fig:highlighting>
 
 
-= Package documentation
+
+
+
+= Detailed documentation
 <sec:package-doc>
 
-#v(1em)
-#let docs = tidy.parse-module(read("src/bibtypst.typ"))
-#tidy.show-module(
-  docs, 
-  style: tidy.styles.default, 
-  show-outline: false, 
-  // scope: (:) // (bibtypst: "X")
-)
 
 == Reference dictionaries
 <sec:reference>
@@ -497,6 +492,20 @@ placement: top,
 caption: [Example of a reference dictionary.])
  <fig:reference-dict>
 
+
+
+== Main functions
+
+#v(1em)
+#let docs = tidy.parse-module(read("src/bibtypst.typ"), scope: ("bibtypst": "Pergamon"))
+#tidy.show-module(
+  docs, 
+  style: tidy.styles.default, 
+  show-outline: false, 
+  // scope: (:) // (bibtypst: "X")
+)
+
+
 == The builtin styles
 <sec:package:builtin-reference>
 
@@ -506,9 +515,19 @@ Below, we explain the arguments to the builtin reference style in detail
 #let style-docs = tidy.parse-module(read("src/bibtypst-styles.typ"))
 #tidy.show-module(style-docs, style: tidy.styles.default, show-outline: false)
 
+
+== Utility functions 
+
+The following functions may be helpful in the advanced usage and customization of #bibtypst.
+
 #let x = tidy.parse-module(read("src/bib-util.typ"))
 #tidy.show-module(x, style: tidy.styles.default, show-outline: false)
 
+#let x = tidy.parse-module(read("src/names.typ"))
+#tidy.show-module(x, style: tidy.styles.default, show-outline: false)
+
+#let x = tidy.parse-module(read("src/bibstrings.typ"))
+#tidy.show-module(x, style: tidy.styles.default, show-outline: false)
 
 
 = Limitations <sec:limitations>

@@ -7,8 +7,9 @@
 
 // TODO: also include the short bibstring and let the user choose
 
-// converted from english.lbx
+/// TODO explain this
 #let default-bibstring = (
+  // converted from english.lbx
   "bibliography": "Bibliography",
   "references": "References",
   "shorthands": "List of Abbreviations",

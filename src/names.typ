@@ -48,7 +48,7 @@
   return reference
 }
 
-// Extracts the list of family names from the list of name-part dictionaries.
+/// Extracts the list of family names from the list of name-part dictionaries.
 #let family-names(parsed-names) = {
   if parsed-names == none {
     none

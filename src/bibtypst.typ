@@ -108,11 +108,11 @@
 /// -> none
 #let refsection(
   /// A function that generates the citation string for a given #link(<sec:reference>)[reference].
-  /// This function will typically be defined in a Bibtypst style, to be
+  /// This function will typically be defined in a #bibtypst style, to be
   /// compatible with the `format-reference` function that is passed to
   /// @print-bibliography. Note that `format-citation` can return any content
   /// it wants, but it does not need to generate a hyperlink to the bibliography;
-  /// the citation string is automatically wrapped in a `link` by Bibtypst.
+  /// the citation string is automatically wrapped in a `link` by #bibtypst.
   /// -> function
   format-citation: (reference, form) => [CITATION], 
 
