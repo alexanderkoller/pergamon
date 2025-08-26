@@ -465,6 +465,38 @@ all other references unchanged.
 
 (explain them here)
 
+#figure(
+zebraw(lang: false,
+```
+(
+  entry_type: "inproceedings",
+  entry_key: "bender20:_climb_nlu",
+  fields: (
+    author: "Emily M. Bender and Alexander Koller",
+    award: "Best theme paper",
+    booktitle: "Proceedings of the 58th Annual Meeting of the Association
+                for Computational Linguistics (ACL)",
+    doi: "10.18653/v1/2020.acl-main.463",
+    keywords: "highlight",
+    title: "Climbing towards NLU: On Meaning, Form, and Understanding 
+            in the Age of Data",
+    year: "2020",
+    parsed-author: (
+      (given: "Emily M.", family: "Bender"),
+      (given: "Alexander", family: "Koller"),
+    ),
+    sortstr-author: "Bender,Emily M. Koller,Alexander",
+    parsed-editor: none,
+    parsed-translator: none,
+  ),
+  label: ("Bender and Koller", "2020"),
+  label-repr: "Bender and Koller 2020",
+)
+```),
+placement: top,
+caption: [Example of a reference dictionary.])
+ <fig:reference-dict>
+
 == The builtin styles
 <sec:package:builtin-reference>
 
