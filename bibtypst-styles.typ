@@ -2,7 +2,7 @@
 #import "templating.typ": *
 #import "bibstrings.typ": default-bibstring
 #import "printfield.typ": printfield
-#import "bib-util.typ": join-list, fd, ifdef, type-aliases, nn
+#import "bib-util.typ": fd, ifdef, type-aliases, nn, concatenate-list
 #import "names.typ": family-names
 
 
@@ -24,7 +24,7 @@
 }
 
 #let language(reference, options) = {
-  join-list(fd(reference, "language", options), options) // TODO: parse language field
+  printfield(reference, "language", options)
 }
 
 
@@ -641,6 +641,10 @@
     /// -> str
     eval-mode: "markup",
 
+    namelist-middle-delim: ", ",
+    namelist-end-delim-two: " and ",
+    namelist-end-delim-many: ", and ",
+
     /// String that is used to combine the final author in an author list
     /// with the previous authors.
     /// -> str
@@ -761,6 +765,9 @@
         // multi-list-delim: multi-list-delim,
         final-list-delim: final-list-delim,
         author-type-delim: author-type-delim,
+        namelist-middle-delim: namelist-middle-delim,
+        namelist-end-delim-two: namelist-end-delim-two,
+        namelist-end-delim-many: namelist-end-delim-many,
         subtitlepunct: subtitlepunct,
         format-journaltitle: format-journaltitle,
         format-issuetitle: format-issuetitle,

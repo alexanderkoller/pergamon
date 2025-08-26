@@ -43,6 +43,7 @@
   return reference
 }
 
+// Extracts the list of family names from the list of name-part dictionaries.
 #let family-names(parsed-names) = {
   if parsed-names == none {
     none
@@ -50,54 +51,3 @@
     parsed-names.map( it => it.at("family", default: none) )
   }
 }
-
-// Concatenate an array of names ("A", "B", "C") into "A, B, and C".
-// TODO - make configurable with final-list-delim
-// TODO - this is the same as join-list in bib-util, skipping it
-// #let concatenate-namelist(authors) = {
-//   let ret = authors.at(0)
-
-//   for i in range(1, authors.len()) {
-//     if type(authors.at(i)) != dictionary { // no idea how it would be a dictionary
-//       if authors.len() == 2 {
-//         ret = ret + " and " + authors.at(i)
-//       } else if i == authors.len()-1 {
-//         ret = ret + ", and " + authors.at(i)
-//       } else {
-//         ret = ret + ", " + authors.at(i)
-//       }
-//     }
-//   }
-
-//   ret
-// }
-
-
-// // parse author names and add fields with first-last and last-first author names to the reference
-// #let fix-authors(reference) = {
-//   let parsed-names = parse-author-names(reference)
-//   let lastname-first-authors = ()
-//   let firstname-first-authors = ()
-//   let lastnames = ()
-
-//   for (first, last) in parsed-names {
-//     lastname-first-authors.push(strfmt("{}, {}", last, first))
-//     firstname-first-authors.push(strfmt("{} {}", first, last))
-//     lastnames.push(last)
-//   }
-
-//   // unused
-//   reference.insert("parsed-author-names", parsed-names) // ((first, last), (first, last), ...)
-
-//   // used in "n" sorting
-//   reference.insert("lastname-first-authors", lastname-first-authors.join(" ")) // for sorting
-
-//   // used in authors-with-year
-//   reference.insert("authors", concatenate-authors(firstname-first-authors))
-
-//   // used quite broadly, but could probably replace uses with parsed-author-names + utility function
-//   // - should this be an array of dictionaries of name parts?
-//   reference.insert("lastnames", lastnames) // (last, last, last, ...) - to construct citations
-
-//   reference
-// }

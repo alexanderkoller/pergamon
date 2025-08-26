@@ -1,6 +1,6 @@
 #import "@preview/nth:1.0.1": *
 #import "@preview/oxifmt:0.2.1": strfmt
-#import "bib-util.typ": join-list, fd, ifdef, concatenate-authors
+#import "bib-util.typ": fd, ifdef, concatenate-list
 #import "templating.typ": *
 
 
@@ -197,10 +197,18 @@
   "parsed-author": (value, reference, field, options, style) => {
     // TODO make configurable
     // [VALUE |#value|]
-    concatenate-authors(value.map(d => strfmt("{} {}", d.given, d.family)))
+    concatenate-list(value.map(d => strfmt("{} {}", d.given, d.family)), options)
     // value.map(d => strfmt("{} {}", d.given, d.family)).join(" & ")
   },
 
+  "language": (value, reference, field, options, style) => {
+    if value == none {
+      none
+    } else {
+      let language-list = value.split(regex("\s+and\s+"))
+      concatenate-list(language-list, options) + " XXX"
+    }
+  }
   /*
   TODO currently unsupported:
 

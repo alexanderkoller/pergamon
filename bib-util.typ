@@ -1,42 +1,22 @@
 
-#let join-list(list, options) = {
-  if list == none or list.len() == 0 {
-    none
-  } else if list.len() == 1 {
-    list.at(0)
-  } else {
-    let ret = list.at(0)
-    for i in range(1, list.len()) {
-        if i == list.len() - 1 {
-          ret += (options.final-list-delim)(list)
-        }
-        ret += list.at(i)
-    }
-    return ret
-  }
-}
+// Concatenate an array of strings ("A", "B", "C") into "A, B, and C".
+#let concatenate-list(names, options) = {
+  let ret = names.at(0)
 
-
-// concatenate an array of authors into "A, B, and C"
-// TODO - unify with join-list
-#let concatenate-authors(authors) = {
-  let ret = authors.at(0)
-
-  for i in range(1, authors.len()) {
-    if type(authors.at(i)) != dictionary { // no idea how it would be a dictionary
-      if authors.len() == 2 {
-        ret = ret + " and " + authors.at(i)
-      } else if i == authors.len()-1 {
-        ret = ret + ", and " + authors.at(i)
+  for i in range(1, names.len()) {
+    if type(names.at(i)) != dictionary { // no idea how it would be a dictionary
+      if names.len() == 2 {
+        ret = ret + options.namelist-end-delim-two + names.at(i)
+      } else if i == names.len()-1 {
+        ret = ret + options.namelist-end-delim-many + names.at(i)
       } else {
-        ret = ret + ", " + authors.at(i)
+        ret = ret + options.namelist-middle-delim + names.at(i)
       }
     }
   }
 
   ret
 }
-
 
 
 // Map "modern" Biblatex field names to legacy field names as they
