@@ -27,15 +27,14 @@
 // Parses the name lists for the given name-fields. Returns a reference dictionary
 // that has been enriched with "parsed-X" fields, for all X in name-fields.
 #let parse-reference-names(reference, name-fields) = {
-  // for field in name-fields {
-  //   if field in reference.fields {
-  //     let parsed-names = parse-names(reference, field)
-  //     reference.fields.insert("parsed-" + field, parsed-names)
-  //   } else {
-  //     reference.fields.insert("parsed-" + field, none)
-  //   }
-  // }
-  // UUUU
+  for field in name-fields {
+    if field in reference.fields {
+      let parsed-names = parse-names(reference, field)
+      reference.fields.insert("parsed-" + field, parsed-names)
+    } else {
+      reference.fields.insert("parsed-" + field, none)
+    }
+  }
 
   return reference
 }

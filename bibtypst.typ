@@ -2,71 +2,8 @@
 #import "@preview/oxifmt:0.2.1": strfmt
 #import "@preview/citegeist:0.1.0": load-bibliography
 #import "bib-util.typ": collect-deduplicate
+#import "names.typ": parse-names, parse-reference-names
 
-///////// 
-///////// Helper methods for developing Bibtypst styles
-///////// 
-
-
-// // make title a hyperlink if DOI or URL are defined
-// // OBSOLETE once we commit to bibtypst-styles.typ
-// #let url-title(reference, eval-mode: none) = {
-//   let title = if eval-mode == none { reference.fields.title.trim() } else { eval(reference.fields.title.trim(), mode: eval-mode) }
-//   if "doi" in reference.fields {
-//     link("https://doi.org/" + reference.fields.doi)[#title]
-//   } else if "url" in reference.fields {
-//     link(reference.fields.url)[#title]
-//   } else {
-//     title
-//   }
-// }
-
-
-
-// #let paper-type(reference) = reference.entry_type
-
-// #let paper-authors(reference) = if "authors" in reference { 
-//   reference.authors 
-// } else if "author" in reference.fields {
-//   let parsed-authors = fix-authors(reference)
-//   parsed-authors.authors
-// } else {
-//   "NO AUTHORS"
-// }
-
-// #let paper-year(reference) = int(reference.fields.year)
-
-
-// #let highlight(reference, formatted, highlighting) = {
-//   if "keywords" in reference.fields and reference.fields.keywords.contains("highlight") {
-//     highlighting(formatted)
-//   } else {
-//     formatted
-//   }
-// }
-
-
-// returns a list of author names, in the form ((first, last), (first, last), ...)
-// #let parse-author-names(reference) = {
-//   let ret = ()
-
-//   for raw_author in reference.fields.author.split(regex("\s+and\s+")) {
-//     let match = raw_author.match(regex("(.*)\s*,\s*(.*)"))
-//     let first = ""
-//     let last = ""
-
-//     if match != none {
-//       (first, last) = (match.captures.at(1), match.captures.at(0))
-//     } else {
-//       match = raw_author.match(regex("(.+)\s+(\S+)"))
-//       (first, last) = (match.captures.at(0), match.captures.at(1))
-//     }
-
-//     ret.push((first, last))
-//   }
-
-//   return ret
-// }
 
 
 ///////// 
@@ -93,7 +30,6 @@
   ret
 }
 
-#import "names.typ": parse-names
 
 // parse author names and add fields with first-last and last-first author names to the reference
 #let fix-authors(reference) = {
@@ -457,7 +393,12 @@
     /// Pass `none` to suppress the bibliography title.
     /// 
     /// -> str | none
-    title: "References"
+    title: "References",
+
+    /// Bibtex fields that contain names and should be parsed as such. For each X in this list,
+    /// #bibtypst will enrich the reference with a field "parsed-X" that contains a list of
+    /// dictionaries of name parts, such as ("family": "Smith", "given": "John").
+    name-fields: ("author", "editor", "translator")
   ) = context {
 
   let bib = bibliography.get()
@@ -473,7 +414,8 @@
 
   if show-all {
     for reference in bib.values() {
-      bibl-unsorted.push(fix-authors(reference))
+      let ref = parse-reference-names(fix-authors(reference), name-fields) // TTTT TODO remove fix-authors
+      bibl-unsorted.push(ref)
     }
   } else {
     let cited-keys = reference-collection.final().keys()
@@ -482,7 +424,9 @@
 
       if key in bib { // skip references to labels that are not bib keys
         let bib-entry = fix-authors(bib.at(key))
+        bib-entry = parse-reference-names(bib-entry, name-fields) // TTTT TODO remove fix-authors
         bibl-unsorted.push(bib-entry)
+        // [#bib-entry]
       }
     }
   }
