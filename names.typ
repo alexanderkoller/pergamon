@@ -1,8 +1,13 @@
 
 
 
+// Functions for parsing and formatting names.
+// The central data structure of this file is a "name-parts dictionary",
+// whose keys are the parts of a name (family, given, ...).
+
+
 // Parses the specified author list in the reference and returns a list of parsed authors.
-// A parsed author is a dictionary of name parts: (family: ..., given: ...).
+// Each parsed author is represented as a name-parts dictionary.
 #let parse-names(reference, author-field) = {
   let ret = ()
 
@@ -51,3 +56,14 @@
     parsed-names.map( it => it.at("family", default: none) )
   }
 }
+
+// Spells out a name-parts dictionary 
+#let format-name(name-parts-dict, format-str: "{family}, {given}") = {
+  let ret = format-str
+  for (key, value) in name-parts-dict.pairs() {
+    ret = ret.replace("{" + key + "}", value)
+    ret = ret.replace("{" + key.at(0) + "}", value.at(0))
+  }
+  return ret
+}
+

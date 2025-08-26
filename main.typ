@@ -4,7 +4,15 @@
 // #import "bibtypst-numeric.typ": format-citation-numeric, format-reference-numeric
 // #import "bibtypst-alphabetic.typ": format-citation-alphabetic, format-reference-alphabetic, add-label-alphabetic
 #import "bibtypst-styles.typ": *
-#import "names.typ": family-names
+#import "names.typ": family-names, format-name
+
+
+// #let author = (
+//   "given": "Alexander",
+//   "family": "Koller"
+// )
+
+// #format-name(author)
 
 #let darkgreen = green.darken(20%)
 #let darkblue = blue.darken(20%)
@@ -30,6 +38,7 @@
 // #let fcite = format-citation-numeric()
 
 #let fref = format-reference(
+  name-format: "{given} {family}",
   reference-label: fcite.reference-label,
   // additional-fields: ("award",)
   additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),

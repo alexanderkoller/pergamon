@@ -706,6 +706,14 @@
     /// -> function    
     format-quotes: nn(it => ["#it"]),
 
+    /// The format in which names (of authors, editors, etc.) are printed.
+    /// This is an arbitrary string which may contain the placeholders `{given}`
+    /// and `{family}`; these will be replaced by the person's actual name parts.
+    /// You can use `{g}` and `{f}` for the first letters of the given and family
+    /// name, respectively.
+    /// -> str
+    name-format: "{family}, {given}",
+
     /// Separator symbol for "volume" and "number" fields, e.g. in `@article`s.
     /// -> str
     volume-number-separator: ".",
@@ -778,6 +786,7 @@
         format-parens: format-parens,
         format-brackets: format-brackets,
         format-quotes: format-quotes,
+        name-format: name-format,
         bibeidpunct: bibeidpunct,
         bibpagespunct: bibpagespunct,
         print-isbn: print-isbn,

@@ -2,7 +2,7 @@
 #import "@preview/oxifmt:0.2.1": strfmt
 #import "bib-util.typ": fd, ifdef, concatenate-list
 #import "templating.typ": *
-
+#import "names.typ": format-name
 
 #let matches-completely(s, re) = {
   let result = s.match(re)
@@ -56,8 +56,13 @@
   }
 }
 
-#let field-formats = (
+// Prints a list of author names. Names are formatted and concatenated
+// as specified in the options. `name-parts-array` is an array of name-parts dictionaries.
+#let print-author(name-parts-array, options) = {
+  concatenate-list(name-parts-array.map(d => format-name(d, format-str: options.name-format)), options)
+}
 
+#let field-formats = (
   // Used in the bibliography and bibliography lists
 
   "doi": (value, reference, field, options, style) => {
@@ -194,11 +199,12 @@
     numbering("a", value+1)
   },
 
+  "author": (value, reference, field, options, style) => {
+    printfield(reference, "parsed-author", options, style: style)
+  },
+
   "parsed-author": (value, reference, field, options, style) => {
-    // TODO make configurable
-    // [VALUE |#value|]
-    concatenate-list(value.map(d => strfmt("{} {}", d.given, d.family)), options)
-    // value.map(d => strfmt("{} {}", d.given, d.family)).join(" & ")
+    print-author(value, options)
   },
 
   "language": (value, reference, field, options, style) => {
