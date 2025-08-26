@@ -9,7 +9,7 @@ then
 fi
 
 
-RELEASE_DIR=release/preview/bibtypst/$VERSION
+RELEASE_DIR=release/preview/pergamon/$VERSION
 
 
 # Put together release
@@ -17,7 +17,8 @@ RELEASE_DIR=release/preview/bibtypst/$VERSION
 rm -rf $RELEASE_DIR
 mkdir -p $RELEASE_DIR
 
-cp bibtypst.typ $RELEASE_DIR/lib.typ
+cp lib.typ $RELEASE_DIR/lib.typ
+cp -r src $RELEASE_DIR
 cp README.md $RELEASE_DIR/
 cp LICENSE $RELEASE_DIR/
 

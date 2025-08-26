@@ -1,5 +1,8 @@
 
-#import "lib.typ": *
+
+// same as main.typ, but with a @local import
+#import "@local/pergamon:0.0.1": *
+
 
 #let darkgreen = green.darken(20%)
 #let darkblue = blue.darken(20%)
