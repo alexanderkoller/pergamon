@@ -196,10 +196,6 @@
   let lbl = combine(key, xrefsection-id)
   let format-citation = current-citation-formatter.get()
 
-  // [RSID |#refsection-id.get()|]
-
-  // this has to be executed unconditionally, because the ref target
-  // only changes into a reference once it is cited
   reference-collection.update( dict => {
     dict.insert(lbl, "1")
     return dict
@@ -311,7 +307,7 @@
 ///
 /// -> none
 #let print-bibliography( 
-    refsection-id: none,  // TODO get rid of this
+    // refsection-id: none,  // TODO get rid of this
 
     /// A function that renders the reference for inclusion in the
     /// printed bibliography. This function will typically be defined
@@ -421,6 +417,7 @@
   ) = context {
 
   let bib = bibliography.get()
+  let refsection-id-here = refsection-id.get()
 
   // construct sorting function if necessary
   let sorting-function = if type(sorting) == str { construct-sorting(sorting) } else { sorting }
@@ -441,7 +438,7 @@
     // let cited-keys = ("bender20:_climb_nlu", "knuth1990") // XXXX
     let cited-keys = reference-collection.get().keys()
     for lbl in cited-keys {
-      let key = split(str(lbl), refsection-id)
+      let key = split(str(lbl), refsection-id-here)
 
       if key in bib { // skip references to labels that are not bib keys
         let bib-entry = bib.at(key)
@@ -471,7 +468,7 @@
     )
 
     // store the data in "meta" in a metadata element, so it can later be access through the label
-    let lbl = combine(reference.entry_key, refsection-id) // if refsection-id == none { reference.entry_key } else { reference.entry_key + "-" + refsection-id }
+    let lbl = combine(reference.entry_key, refsection-id-here)
     let cell0 = [(#lbl)#metadata(meta)#label(lbl)#formatted-reference.at(0)]
     cells.push(cell0)
 

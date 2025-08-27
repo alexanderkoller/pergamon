@@ -17,6 +17,7 @@
 #refsection(format-citation: fcite.format-citation)[
 
   #pcite("bender20:_climb_nlu")
+  #pcite("generalized-2025")
   // @bender20:_climb_nlu
     #print-bibliography(format-reference: fref, label-generator: fcite.label-generator,
   )
@@ -28,9 +29,16 @@
 
   #pcite("knuth1990")
   // @knuth1990
-#print-bibliography(refsection-id: "hallo", format-reference: fref, label-generator: fcite.label-generator)
+#print-bibliography(format-reference: fref, label-generator: fcite.label-generator)
+// refsection-id: "hallo", 
 ]
 
 // #refsection(id: "third")[
 //   Another refsection
 // ]
+
+
+#refsection(id: "drei", format-citation: fcite.format-citation)[ 
+  #pcite("ehop-2025") #pcite("yao2025language")
+  #print-bibliography(format-reference: fref, label-generator: fcite.label-generator)
+]
