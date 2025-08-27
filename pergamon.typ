@@ -10,6 +10,7 @@
 // #show raw: set block(fill: luma(230), inset: 6pt, width: 100%)
 
 #let todo(x) = text(fill: red, [(#x)])
+#let issue(id) = link("https://github.com/alexanderkoller/bibtypst/issues/" + str(id))[issue \##id]
 
 #let date = custom-date-format(datetime.today(), "DD Month YYYY", "en")
 #let version = toml("typst.toml").package.version
@@ -156,12 +157,14 @@ The builtin reference style can currently render the following #biblatex entry t
 - `@article`
 - `@book`
 - `@incollection`
-- `@misc`
 - `@inproceedings`
+- `@misc`
 - `@thesis`
 
 These are explained in more detail in Section 2.1.1 of the #link("https://ctan.org/pkg/biblatex")[#biblatex documentation].
 Bibtex entries of a different type are typeset as a references in a dummy style which displays the entry type and Bibtex key.
+The aim is to eventually support all #biblatex styles; see #issue(1) to track the progress, and feel free to submit pull requests
+implementing them.
 
 
 #figure(
@@ -264,7 +267,8 @@ can be `auto`, functions, and content, but not strings. If you do not specify a 
 
 Note that the `n` citation form has special value for combining multiple citations. Unlike the
 builtin Typst `cite` function, #bibtypst is currently not able to aggregate multiple citations into 
-a single string (e.g. `@key1 @key2` into "(Author, 2020; Person, 2021)"; see #link("https://github.com/alexanderkoller/bibtypst/issues/11")[issue \#11]). You can approximate this by using citations of form `n` and surrounding 
+a single string (e.g. `@key1 @key2` into "(Author, 2020; Person, 2021)"; see
+#issue(11). You can approximate this by using citations of form `n` and surrounding 
 them with brackets and semicolons manually.
 
 
