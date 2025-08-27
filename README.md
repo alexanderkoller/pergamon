@@ -48,8 +48,7 @@ The following piece of code typesets a bibliography using Pergamon.
 
   #print-bibliography(
        format-reference: format-reference(reference-label: style.reference-label), 
-       label-generator: style.label-generator,
-       sorting: "nyt")
+       label-generator: style.label-generator)
 ]
   ```
 
