@@ -75,8 +75,8 @@
 /// 
 /// -> content
 #let if-citation(
-    /// A Typst `ref` element.
-    /// -> ref
+    /// A Typst `link` element.
+    /// -> link
     it, 
 
     /// A function that maps the metadata associated with a Pergamon reference to
@@ -94,25 +94,20 @@
     /// -> function
     other-content: x => x
   ) = {
-    let el = it.element
-    let cite-key = str(it.target)
+    let lbl-name = str(it.dest)
+    let targets = query(label(lbl-name))
 
-    // We recognize references to items in the bibliography by the fact
-    // that they point to a "metadata" element with a dictionary value that
-    // contains "kind = reference-data". This dictionary value is passed as the
-    // argument to `citation-content`.
-
-    if el != none and el.func() == metadata {
-      let target = query(it.target).first()
-      if type(target.value) == dictionary and "kind" in target.value and target.value.kind == "reference-data" {
-        citation-content(target.value)
+    if targets != none and targets.len() > 0 {
+      let meta = targets.first() // reference metadata
+      if type(meta.value) == dictionary and meta.value.at("kind", default: none) == "reference-data" {
+        citation-content(meta.value)
       } else {
         other-content(it)
       }
     } else {
       other-content(it)
     }
-}
+  }
 
 /// Defines a section of the document that shares a bibliography.
 /// You need to load a bibliography with the `add-bibliography` function

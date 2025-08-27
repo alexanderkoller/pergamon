@@ -9,19 +9,39 @@
 )
 
 
+    
+
 #show link: set text(fill: blue)
+
+#show link: it => if-citation(it, value => {
+  if "Koller" in family-names(value.reference.fields.parsed-author) {
+    show link: set text(fill: green)
+    set text(fill: green)
+    it
+  } else {
+    show link: set text(fill: red)
+    set text(fill: red)
+    it
+  }
+})
+
 
 #add-bib-resource(read("bibs/bibliography.bib"))
 
 
 #refsection(format-citation: fcite.format-citation)[
   = First refsection
+
+  #link("www.google.de")[website]
+
   #cite("bender20:_climb_nlu")
   #cite("generalized-2025")
   // @bender20:_climb_nlu
+  #pagebreak()
     #print-bibliography(format-reference: fref, label-generator: fcite.label-generator,
   )
 ]
+
 
 
 #refsection[ 
