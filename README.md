@@ -1,4 +1,4 @@
-# Pergamon: Biblatex-style bibliographies for Typst
+# Pergamon: BibLaTeX-style bibliographies for Typst
 
 Pergamon is a package for typesetting bibliographies in Typst.
 It is inspired by [BibLaTeX](https://ctan.org/pkg/biblatex), in that 
@@ -23,7 +23,7 @@ the builtin system. I have implemented those parts of Pergamon that I need for m
 but I would welcome your pull request to make it more feature-complete.
 
 - Pergamon currently supports only bibliographies in Bibtex format, not the Hayagriva YAML format. 
-- Only a handful of styles are supported at this point, in contrast to the large number of available CSL styles. Pergamon comes with implementations of the #biblatex styles `numeric`, `alphabetic`, and `authoryear`.
+- Only a handful of styles are supported at this point, in contrast to the large number of available CSL styles. Pergamon comes with implementations of the BibLaTeX styles `numeric`, `alphabetic`, and `authoryear`.
 - Pergamon still requires a lot of testing and tweaking.
 
 [Pergamon](https://en.wikipedia.org/wiki/Pergamon) was an ancient Greek city state in Asia Minor.
@@ -55,6 +55,8 @@ The following piece of code typesets a bibliography using Pergamon.
 It generates citations and a bibliography that look like this:
 
 <img src="https://github.com/alexanderkoller/pergamon/blob/main/doc-materials/example-output.png" style='border:1px solid #000000' />
+
+## Documentation
 
 Please see the [Pergamon guide](https://github.com/alexanderkoller/pergamon/blob/main/pergamon.pdf) for more details.
 
