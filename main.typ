@@ -9,11 +9,6 @@
 #set heading(numbering: "1.1")
 
 
-#let citep(lbl) = ref(lbl, supplement: it => "p")
-#let citet(lbl) = ref(lbl, supplement: it => "t")
-#let citeg(lbl) = ref(lbl, supplement: it => "g")
-#let citen(lbl) = ref(lbl, supplement: it => "n")
-
 
 // Author-Year:
 #let fcite = format-citation-authoryear()
@@ -49,12 +44,11 @@
   // This show rule has to come inside the refsection, otherwise it is
   // overwritten by the show rule that is defined in refsection's source code.
   // It colors the citation links based on whether the reference is to a PI publication.
-  #show ref: it => if-citation(it, value => {
+  #show link: it => if-citation(it, value => {
     if "Koller" in family-names(value.reference.fields.parsed-author) {
-      show link: set text(fill: darkgreen)
+      set text(fill: darkgreen)
       it
     } else {
-      show link: set text(fill: darkblue)
       set text(fill: darkblue)
       it
     }
@@ -67,33 +61,38 @@
 
   = Another section
 
-  citet: !#citet(<modelizer-24>)!
+  citet: !#citet("modelizer-24")!
 
-  citep: #citep(<bender20:_climb_nlu>)
+  citep: #citep("bender20:_climb_nlu")
 
-  citeg: #citeg(<kandra-bsc-25>)
+  citeg: #citeg("kandra-bsc-25")
 
-  citen: #citen(<yang2025goescrosslinguisticstudyimpossible>)
+  citen: #citen("yang2025goescrosslinguisticstudyimpossible")
 
-  #citen(<yang2025goescrosslinguisticstudyimpossible>)\; #citen(<yang2025goescrosslinguisticstudyimpossible>)
+  #citen("yang2025goescrosslinguisticstudyimpossible")\; #citen("yang2025goescrosslinguisticstudyimpossible")
 
-  @sec:intro
+  #cite("sec:intro")
 
 
-  @kandra-bsc-25
+  #cite("kandra-bsc-25")
 
-  @bender20:_climb_nlu
+  #cite("bender20:_climb_nlu")
 
-  @irtg-sgraph-15
+  #cite("irtg-sgraph-15")
 
-  @wu-etal-2024-reasoning @knuth1990 @yao2025language @hershcovichItMeaningThat2021
-  @abgrallMeasurementsppmKpm2016 @kuhlmann2003tiny @fake-mastersthesis
+  #cite("wu-etal-2024-reasoning") #cite("knuth1990") #cite("yao2025language") #cite("hershcovichItMeaningThat2021")
+  #cite("abgrallMeasurementsppmKpm2016") #cite("kuhlmann2003tiny") #cite("fake-mastersthesis")
 
-  @multi1 @multi2
+  #cite("multi1") #cite("multi2")
 
   #print-bibliography(format-reference: fref, sorting: sorting,
     label-generator: fcite.label-generator,
   )
 ]
 
+#refsection(id: "hallo")[ lkjdf ]
+
+#refsection[
+  Another refsection
+]
 

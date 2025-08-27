@@ -257,14 +257,12 @@ the `supplement` argument to the `ref` function:
 
 #zebraw(lang: false,
 ```typ
-#let citet(lbl) = ref(lbl, supplement: it => "t")
+#let citet(lbl) = ref(lbl, supplement: "t")
 #citet(<bender20:_climb_nlu>)
 ```
 )
 
-Observe that you have to cannot simply pass `"t"` as the supplement; it has to be a one-parameter
-function that returns `"t"`. This is a regrettable consequence of the fact that `ref` supplements 
-can be `auto`, functions, and content, but not strings. If you do not specify a citation form (`ref(<key>)` or `@key`), the `auto` citation forms will be used.
+If you do not specify a citation form (`ref(<key>)` or `@key`), the `auto` citation forms will be used.
 
 Note that the `n` citation form has special value for combining multiple citations. Unlike the
 builtin Typst `cite` function, #bibtypst is currently not able to aggregate multiple citations into 
@@ -454,6 +452,8 @@ all other references unchanged.
 
 
 
+#show heading.where(level: 3): set text(fill: blue)
+// #show heading.where(level: 3): set block(above: 10em)
 
 
 = Detailed documentation
@@ -501,10 +501,16 @@ caption: [Example of a reference dictionary.])
 
 == Main functions
 
+#let scope = (
+  "bibtypst": "Pergamon",
+  "zebraw": zebraw
+)
+
 #v(1em)
-#let docs = tidy.parse-module(read("src/bibtypst.typ"), scope: ("bibtypst": "Pergamon"))
+#let docs = tidy.parse-module(read("src/bibtypst.typ"), scope: scope)
 #tidy.show-module(
   docs, 
+  break-param-descriptions: true,
   style: tidy.styles.default, 
   show-outline: false, 
   // scope: (:) // (bibtypst: "X")
@@ -518,7 +524,7 @@ Below, we explain the arguments to the builtin reference style in detail
 (see @sec:builtin-reference for the big picture).
 
 #let style-docs = tidy.parse-module(read("src/bibtypst-styles.typ"))
-#tidy.show-module(style-docs, style: tidy.styles.default, show-outline: false)
+#tidy.show-module(style-docs, style: tidy.styles.default, show-outline: false, break-param-descriptions: true)
 
 
 == Utility functions 
