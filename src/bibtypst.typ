@@ -50,6 +50,7 @@
 /// A typical example is the following show rule, which colors references to my own publications
 /// green and all others blue.
 /// 
+/// #zebraw(lang: false,
 /// ```typ
 /// #show ref: it => if-citation(it, value => {
 ///    if "Koller" in family-names(value.reference.fields.parsed-author) {
@@ -59,7 +60,7 @@
 ///      show link: set text(fill: blue)
 ///      it
 ///  }})
-/// ```
+/// ```)
 /// 
 /// -> content
 #let if-citation(

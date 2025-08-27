@@ -454,6 +454,8 @@ all other references unchanged.
 
 
 
+#show heading.where(level: 3): set text(fill: blue)
+// #show heading.where(level: 3): set block(above: 10em)
 
 
 = Detailed documentation
@@ -501,10 +503,16 @@ caption: [Example of a reference dictionary.])
 
 == Main functions
 
+#let scope = (
+  "bibtypst": "Pergamon",
+  "zebraw": zebraw
+)
+
 #v(1em)
-#let docs = tidy.parse-module(read("src/bibtypst.typ"), scope: ("bibtypst": "Pergamon"))
+#let docs = tidy.parse-module(read("src/bibtypst.typ"), scope: scope)
 #tidy.show-module(
   docs, 
+  break-param-descriptions: true,
   style: tidy.styles.default, 
   show-outline: false, 
   // scope: (:) // (bibtypst: "X")
@@ -518,7 +526,7 @@ Below, we explain the arguments to the builtin reference style in detail
 (see @sec:builtin-reference for the big picture).
 
 #let style-docs = tidy.parse-module(read("src/bibtypst-styles.typ"))
-#tidy.show-module(style-docs, style: tidy.styles.default, show-outline: false)
+#tidy.show-module(style-docs, style: tidy.styles.default, show-outline: false, break-param-descriptions: true)
 
 
 == Utility functions 
