@@ -53,7 +53,7 @@ The following piece of code typesets a bibliography using Pergamon.
 
 It generates citations and a bibliography that look like this:
 
-<img src="https://github.com/alexanderkoller/pergamon/blob/main/doc-materials/example-output.png" border="1" />
+<img src="https://github.com/alexanderkoller/pergamon/blob/main/doc-materials/example-output.png" style='border:1px solid #000000' />
 
 Please see the [Pergamon guide](https://github.com/alexanderkoller/pergamon/blob/main/pergamon.pdf) for more details.
 
