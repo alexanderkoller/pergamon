@@ -15,7 +15,7 @@
 
 
 #refsection(format-citation: fcite.format-citation)[
-
+  = First refsection
   #pcite("bender20:_climb_nlu")
   #pcite("generalized-2025")
   // @bender20:_climb_nlu
@@ -25,7 +25,7 @@
 
 
 #refsection(id: "hallo", format-citation: fcite.format-citation)[ 
-  = Second 
+  = Second refsection
 
   #pcite("knuth1990")
   // @knuth1990
@@ -39,6 +39,7 @@
 
 
 #refsection(id: "drei", format-citation: fcite.format-citation)[ 
+  = Third refsection
   #pcite("ehop-2025") #pcite("yao2025language")
   #print-bibliography(format-reference: fref, label-generator: fcite.label-generator)
 ]
