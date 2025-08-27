@@ -9,8 +9,9 @@
 #set par(justify: true)
 // #show raw: set block(fill: luma(230), inset: 6pt, width: 100%)
 
-#let todo(x) = text(fill: red, [(#x)])
+#let todo(x) = text(fill: red, [*(#x)*])
 #let issue(id) = link("https://github.com/alexanderkoller/pergamon/issues/" + str(id))[issue \##id]
+
 
 #let date = custom-date-format(datetime.today(), "DD Month YYYY", "en")
 #let version = toml("typst.toml").package.version
@@ -18,6 +19,11 @@
 #let bibtypst = "Pergamon"
 #let biblatex = "BibLaTeX"
 
+#let scope = (
+  "bibtypst": bibtypst,
+  "zebraw": zebraw,
+  "todo": todo
+)
 
 #align(center)[
   #text(size: 24pt)[*#bibtypst*]\
@@ -329,6 +335,10 @@ will still be available, allowing you to precompute any information you find use
 
 = Advanced usage 
 
+== Multiple refsections
+
+#todo[write this]
+
 == Styling the bibliography
 
 A #bibtypst bibliography is displayed as a #link("https://typst.app/docs/reference/layout/grid/")[grid],
@@ -489,12 +499,6 @@ caption: [Example of a reference dictionary.])
 
 
 == Main functions
-
-#let scope = (
-  "bibtypst": "Pergamon",
-  "zebraw": zebraw,
-  "todo": it => text(fill:red)[*(#it)*]
-)
 
 #v(1em)
 #let docs = tidy.parse-module(read("src/bibtypst.typ"), scope: scope)
