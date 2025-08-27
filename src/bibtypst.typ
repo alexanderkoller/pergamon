@@ -189,7 +189,7 @@
   let lbl = combine(key, xrefsection-id)
   let format-citation = current-citation-formatter.get()
 
-  // Collect keys that are cite in this refsection
+  // Collect keys that are cited in this refsection
   reference-collection.update( dict => {
     dict.insert(lbl, "1")
     return dict
@@ -200,7 +200,7 @@
   if targets.len() == 0 {
     // on first pass, the label does not exist yet
     [XXX] 
-  } else {
+  } else if "value" in targets.first().fields() { // not sure why I need this
     // on second pass, we can generate the real citation
     let value = targets.first().value
     let citation-str = format-citation(value, form)
@@ -208,7 +208,21 @@
   }
 }
 
+/// Creates a citation with the form `"t"`, e.g. "Smith et al. (2020)".
+/// See `cite` for details.
+#let citet(key) = cite(key, form: "t")
 
+/// Creates a citation with the form `"p"`, e.g. "(Smith et al. 2020)".
+/// See `cite` for details.
+#let citep(key) = cite(key, form: "p")
+
+/// Creates a citation with the form `"g"`, e.g. "Smith et al.'s (2020)".
+/// See `cite` for details.
+#let citeg(key) = cite(key, form: "g")
+
+/// Creates a citation with the form `"n"`, e.g. "Smith et al. 2020".
+/// See `cite` for details.
+#let citen(key) = cite(key, form: "n")
 
 
 
