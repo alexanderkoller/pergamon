@@ -65,35 +65,40 @@
   = Introduction <sec:intro>
   #lorem(100)
 
-  = Another section
+  // = Another section
 
-  citet: !#citet(<modelizer-24>)!
+  // citet: !#citet(<modelizer-24>)!
 
-  citep: #citep(<bender20:_climb_nlu>)
+  // citep: #citep(<bender20:_climb_nlu>)
 
-  citeg: #citeg(<kandra-bsc-25>)
+  // citeg: #citeg(<kandra-bsc-25>)
 
-  citen: #citen(<yang2025goescrosslinguisticstudyimpossible>)
+  // citen: #citen(<yang2025goescrosslinguisticstudyimpossible>)
 
-  #citen(<yang2025goescrosslinguisticstudyimpossible>)\; #citen(<yang2025goescrosslinguisticstudyimpossible>)
+  // #citen(<yang2025goescrosslinguisticstudyimpossible>)\; #citen(<yang2025goescrosslinguisticstudyimpossible>)
 
-  @sec:intro
+  // @sec:intro
 
 
-  @kandra-bsc-25
+  // @kandra-bsc-25
 
-  @bender20:_climb_nlu
+  // @bender20:_climb_nlu
 
-  @irtg-sgraph-15
+  // @irtg-sgraph-15
 
-  @wu-etal-2024-reasoning @knuth1990 @yao2025language @hershcovichItMeaningThat2021
-  @abgrallMeasurementsppmKpm2016 @kuhlmann2003tiny @fake-mastersthesis
+  // @wu-etal-2024-reasoning @knuth1990 @yao2025language @hershcovichItMeaningThat2021
+  // @abgrallMeasurementsppmKpm2016 @kuhlmann2003tiny @fake-mastersthesis
 
-  @multi1 @multi2
+  // @multi1 @multi2
 
-  #print-bibliography(format-reference: fref, sorting: sorting,
-    label-generator: fcite.label-generator,
-  )
+  // #print-bibliography(format-reference: fref, sorting: sorting,
+  //   label-generator: fcite.label-generator,
+  // )
 ]
 
+#refsection(id: "hallo")[ lkjdf ]
+
+#refsection[
+  Another refsection
+]
 

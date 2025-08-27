@@ -7,7 +7,8 @@
 
 #let reference-collection = state("reference-collection", (:))
 #let bibliography = state("bibliography", (:))
-
+#let refsection-id = state("refsection-id", none)
+#let refsection-counter = state("refsection-counter", 0)
 
 /// Parses Bibtex references and makes them available to Bibtypst.
 /// Due to architectural limitations in Typst, Bibtypst cannot read 
@@ -117,6 +118,9 @@
   /// -> function
   format-citation: (reference, form) => [CITATION], 
 
+  /// TODO
+  id: none,
+
   /// The section of the document that is to be wrapped in this `refsection`.
   /// -> content
   doc) = {
@@ -124,12 +128,27 @@
   // reset the keys that are cited in this section
   reference-collection.update((:))
 
+  [!Refsection counter is  #context { refsection-counter.get() }! ]
+
   // check that we have a bibliography loaded
   context {
     if bibliography.get() == none {
       panic("Add a bibliography before starting a refsection.")
     }
+
+    // determine the refsection ID
+    if id != none {
+      refsection-id.update(id)
+    } else {
+      let id = refsection-counter.get()
+      if id > 0 {
+        refsection-id.update("ref" + str(id))
+      } // else leave it at none, for the first refsection in the document
+    }
   }
+
+  [!Refsection ID is  #context { refsection-id.get() }! ]
+
 
   show ref: it => {
     // let el = it.element
@@ -148,6 +167,9 @@
       link(it.target)[#citation-str]
     })
   }
+
+  // count up the refsection ID
+  refsection-counter.update(counter => counter + 1)
 
   doc
 }
