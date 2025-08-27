@@ -12,9 +12,9 @@ Pergamon has a number of advantages over the builtin Typst bibliographies:
 
 - Pergamon styles are simply pieces of Typst code and can be easily configured or modified.
 - The document can be easily split into different `refsection`s, each of which can have its own bibliography
-  (similar to [Alexandria]("https://typst.app/universe/package/alexandria/")).
+  (similar to [Alexandria](https://typst.app/universe/package/alexandria/)).
 - Bibliographies can be filtered, and bibliography entries programmatically highlighted, which is useful e.g. for CVs.
-- References retain nonstandard Bibtex fields ([unlike in Hayagriva]("https://github.com/typst/hayagriva/issues/240")),
+- References retain nonstandard Bibtex fields ([unlike in Hayagriva](https://github.com/typst/hayagriva/issues/240)),
   making it e.g. possible to split bibliographies based on keywords.
 
 At the same time, Pergamon is very new and has a number of important limitations compared to
@@ -25,7 +25,7 @@ but I would welcome your pull request to make it more feature-complete.
 - Only a handful of styles are supported at this point, in contrast to the large number of available CSL styles. Pergamon comes with implementations of the #biblatex styles `numeric`, `alphabetic`, and `authoryear`.
 - Pergamon still requires a lot of testing and tweaking.
 
-[Pergamon]("https://en.wikipedia.org/wiki/Pergamon") was an ancient Greek city state in Asia Minor.
+[Pergamon](https://en.wikipedia.org/wiki/Pergamon) was an ancient Greek city state in Asia Minor.
 Its library was second only to the Library of Alexandria around 200 BC.
 
 
