@@ -7,8 +7,8 @@
 
 #let reference-collection = state("reference-collection", (:))
 #let bibliography = state("bibliography", (:))
-#let refsection-id = state("refsection-id", none)
-#let refsection-counter = state("refsection-counter", 0)
+// #let refsection-id = state("refsection-id", none)
+// #let refsection-counter = state("refsection-counter", 0)
 
 /// Parses Bibtex references and makes them available to Bibtypst.
 /// Due to architectural limitations in Typst, Bibtypst cannot read 
@@ -36,6 +36,14 @@
 
     old-bib
   })
+}
+
+#let combine(key, refsection-id) = {
+  if refsection-id == none { key } else { refsection-id + "-" + key }
+}
+
+#let split(key, refsection-id) = {
+  if refsection-id == none { key } else { key.slice(refsection-id.len() + 1) }
 }
 
 
@@ -128,7 +136,7 @@
   // reset the keys that are cited in this section
   reference-collection.update((:))
 
-  [!Refsection counter is  #context { refsection-counter.get() }! ]
+  // [!Refsection counter is  #context { refsection-counter.get() }! ]
 
   // check that we have a bibliography loaded
   context {
@@ -137,39 +145,41 @@
     }
 
     // determine the refsection ID
-    if id != none {
-      refsection-id.update(id)
-    } else {
-      let id = refsection-counter.get()
-      if id > 0 {
-        refsection-id.update("ref" + str(id))
-      } // else leave it at none, for the first refsection in the document
-    }
+    // if id != none {
+    //   refsection-id.update(id)
+    // } else {
+    //   let id = refsection-counter.get()
+    //   if id > 0 {
+    //     refsection-id.update("ref" + str(id))
+    //   } // else leave it at none, for the first refsection in the document
+    // }
   }
 
-  [!Refsection ID is  #context { refsection-id.get() }! ]
+  // [!Refsection ID is  #context { refsection-id.get() }! ]
 
 
-  show ref: it => {
-    // let el = it.element
-    let cite-key = str(it.target)
+  // show ref: it => {
+  //   // let el = it.element
+  //   let cite-key = str(it.target)
 
-    // this has to be executed unconditionally, because the ref target
-    // only changes into a reference once it is cited
-    reference-collection.update( dict => {
-     dict.insert(cite-key, "1")
-     return dict
-    })
+  //   // this has to be executed unconditionally, because the ref target
+  //   // only changes into a reference once it is cited
+  //   reference-collection.update( dict => {
+  //    dict.insert(cite-key, "1")
+  //    return dict
+  //   })
 
-    // Format references that are really citations.
-    if-citation(it, value => {
-      let citation-str = format-citation(value, it.supplement)
-      link(it.target)[#citation-str]
-    })
-  }
+  //   context { [RC after update: |#reference-collection.get()|]}
+
+  //   // Format references that are really citations.
+  //   if-citation(it, value => {
+  //     let citation-str = format-citation(value, it.supplement)
+  //     link(it.target)[#citation-str]
+  //   })
+  // }
 
   // count up the refsection ID
-  refsection-counter.update(counter => counter + 1)
+  // refsection-counter.update(counter => counter + 1)
 
   doc
 }
@@ -258,6 +268,8 @@
 ///
 /// -> none
 #let print-bibliography( 
+    refsection-id: none,  // TODO get rid of this
+
     /// A function that renders the reference for inclusion in the
     /// printed bibliography. This function will typically be defined
     /// in a Bibtypst style, to be compatible with the `format-citation`
@@ -382,15 +394,20 @@
       bibl-unsorted.push(ref)
     }
   } else {
-    let cited-keys = reference-collection.final().keys()
+    // [RC at printbib: #reference-collection.get().keys()]
+    // let cited-keys = ("bender20:_climb_nlu", "knuth1990") // XXXX
+    let cited-keys = reference-collection.get().keys()
     for lbl in cited-keys {
-      let key = str(lbl)
+      let key = split(str(lbl), refsection-id)
+      // TODO strip off ID
+    // TODO auseinandernehmen
+
+
 
       if key in bib { // skip references to labels that are not bib keys
         let bib-entry = bib.at(key)
         bib-entry = parse-reference-names(bib-entry, name-fields)
         bibl-unsorted.push(bib-entry)
-        // [#bib-entry]
       }
     }
   }
@@ -412,12 +429,11 @@
       key: reference.entry_key,
       index: index,
       reference: reference,
-      // year: paper-year(reference),
-      // label: reference.at("label", default: none)
     )
 
     // store the data in "meta" in a metadata element, so it can later be access through the label
-    let cell0 = [#metadata(meta)#label(reference.entry_key)#formatted-reference.at(0)]
+    let lbl = combine(reference.entry_key, refsection-id) // if refsection-id == none { reference.entry_key } else { reference.entry_key + "-" + refsection-id }
+    let cell0 = [(#lbl)#metadata(meta)#label(lbl)#formatted-reference.at(0)]
     cells.push(cell0)
 
     // add all the other cells, if any
