@@ -39,14 +39,15 @@ The following piece of code typesets a bibliography using Pergamon.
 #import "@preview/pergamon:0.1.0": *
 
 #let style = format-citation-numeric()
+
 #add-bib-resource(read("bibliography.bib"))
+
 #refsection(format-citation: style.format-citation)[
   ... some text here ...
   @bender20:_climb_nlu
 
   #print-bibliography(
-       format-reference: 
-             format-reference(reference-label: style.reference-label), 
+       format-reference: format-reference(reference-label: style.reference-label), 
        label-generator: style.label-generator,
        sorting: "nyt")
 ]
