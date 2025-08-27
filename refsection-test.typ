@@ -16,7 +16,7 @@
 
 #refsection(format-citation: fcite.format-citation)[
 
-  #pcite("bender20:_climb_nlu", none)
+  #pcite("bender20:_climb_nlu")
   // @bender20:_climb_nlu
     #print-bibliography(format-reference: fref, label-generator: fcite.label-generator,
   )
@@ -26,7 +26,7 @@
 #refsection(id: "hallo", format-citation: fcite.format-citation)[ 
   = Second 
 
-  #pcite("knuth1990", "hallo")
+  #pcite("knuth1990")
   // @knuth1990
 #print-bibliography(refsection-id: "hallo", format-reference: fref, label-generator: fcite.label-generator)
 ]

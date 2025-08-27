@@ -9,7 +9,7 @@
 #let bibliography = state("bibliography", (:))
 #let current-citation-formatter = state("format-citation", none)
 
-// #let refsection-id = state("refsection-id", none)
+#let refsection-id = state("refsection-id", none)
 // #let refsection-counter = state("refsection-counter", 0)
 
 /// Parses Bibtex references and makes them available to Bibtypst.
@@ -147,6 +147,8 @@
       panic("Add a bibliography before starting a refsection.")
     }
 
+    refsection-id.update(id)
+
     // determine the refsection ID
     // if id != none {
     //   refsection-id.update(id)
@@ -189,9 +191,12 @@
 
 
 
-#let pcite(key, refsection-id) = context {
-  let lbl = combine(key, refsection-id)
+#let pcite(key) = context {
+  let xrefsection-id = refsection-id.get()
+  let lbl = combine(key, xrefsection-id)
   let format-citation = current-citation-formatter.get()
+
+  // [RSID |#refsection-id.get()|]
 
   // this has to be executed unconditionally, because the ref target
   // only changes into a reference once it is cited
