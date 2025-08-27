@@ -10,7 +10,7 @@
 // #show raw: set block(fill: luma(230), inset: 6pt, width: 100%)
 
 #let todo(x) = text(fill: red, [(#x)])
-#let issue(id) = link("https://github.com/alexanderkoller/bibtypst/issues/" + str(id))[issue \##id]
+#let issue(id) = link("https://github.com/alexanderkoller/pergamon/issues/" + str(id))[issue \##id]
 
 #let date = custom-date-format(datetime.today(), "DD Month YYYY", "en")
 #let version = toml("typst.toml").package.version
@@ -23,7 +23,7 @@
   #text(size: 24pt)[*#bibtypst*]\
   #v(0em)
   #biblatex\-inspired bibliography management for Typst\
-  https://github.com/alexanderkoller/bibtypst
+  https://github.com/alexanderkoller/pergamon
   #v(0.5em)
   v#version, #date\
   #link("https://www.coli.uni-saarland.de/~koller/")[Alexander Koller]
@@ -71,8 +71,7 @@ The following piece of code typesets a bibliography using #bibtypst.
 
 #zebraw(lang: false,
   ```typ
-#import "bibtypst.typ": add-bib-resource, refsection, print-bibliography
-#import "bibtypst-styles.typ": format-citation-numeric, format-reference
+#import "@preview/pergamon:0.1.0": *
 
 #let style = format-citation-numeric()
 #add-bib-resource(read("bibliography.bib"))

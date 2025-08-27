@@ -41,9 +41,9 @@
 #let sorting = "nyt"
 
 
-#add-bib-resource(read("bibliography.bib"))
-#add-bib-resource(read("other.bib"))
-#add-bib-resource(read("physics.bib"))
+#add-bib-resource(read("bibs/bibliography.bib"))
+#add-bib-resource(read("bibs/other.bib"))
+#add-bib-resource(read("bibs/physics.bib"))
 
 #refsection(format-citation: fcite.format-citation)[
   // This show rule has to come inside the refsection, otherwise it is
