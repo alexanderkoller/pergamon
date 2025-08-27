@@ -13,6 +13,7 @@ Pergamon has a number of advantages over the builtin Typst bibliographies:
 - Pergamon styles are simply pieces of Typst code and can be easily configured or modified.
 - The document can be easily split into different `refsection`s, each of which can have its own bibliography
   (similar to [Alexandria](https://typst.app/universe/package/alexandria/)).
+- Paper titles can be automatically made into hyperlinks - as in [blinky](https://typst.app/universe/package/blinky/), but much more flexibly and correctly.
 - Bibliographies can be filtered, and bibliography entries programmatically highlighted, which is useful e.g. for CVs.
 - References retain nonstandard Bibtex fields ([unlike in Hayagriva](https://github.com/typst/hayagriva/issues/240)),
   making it e.g. possible to split bibliographies based on keywords.
