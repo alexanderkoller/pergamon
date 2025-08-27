@@ -16,18 +16,18 @@
 
 #refsection(format-citation: fcite.format-citation)[
   = First refsection
-  #pcite("bender20:_climb_nlu")
-  #pcite("generalized-2025")
+  #cite("bender20:_climb_nlu")
+  #cite("generalized-2025")
   // @bender20:_climb_nlu
     #print-bibliography(format-reference: fref, label-generator: fcite.label-generator,
   )
 ]
 
 
-#refsection(id: "hallo", format-citation: fcite.format-citation)[ 
+#refsection(id: "hallo")[ 
   = Second refsection
 
-  #pcite("knuth1990")
+  #cite("knuth1990")
   // @knuth1990
 #print-bibliography(format-reference: fref, label-generator: fcite.label-generator)
 // refsection-id: "hallo", 
@@ -40,6 +40,6 @@
 
 #refsection(id: "drei", format-citation: fcite.format-citation)[ 
   = Third refsection
-  #pcite("ehop-2025") #pcite("yao2025language")
+  #cite("ehop-2025") #cite("yao2025language", form: it => "t")
   #print-bibliography(format-reference: fref, label-generator: fcite.label-generator)
 ]
