@@ -1,7 +1,7 @@
 # Pergamon: Biblatex-style bibliographies for Typst
 
 Pergamon is a package for typesetting bibliographies in Typst.
-It is inspired by #link("https://ctan.org/pkg/biblatex")[BibLaTeX], in that 
+It is inspired by [BibLaTeX]("https://ctan.org/pkg/biblatex"), in that 
 the way in which it typesets bibliographies can be easily customized
 through Typst code. Like Typst's regular bibliography management model,
 Pergamon can be configured to use different styles for typesetting
@@ -12,9 +12,9 @@ Pergamon has a number of advantages over the builtin Typst bibliographies:
 
 - Pergamon styles are simply pieces of Typst code and can be easily configured or modified.
 - The document can be easily split into different `refsection`s, each of which can have its own bibliography
-  (similar to #link("https://typst.app/universe/package/alexandria/")[Alexandria]).
+  (similar to [Alexandria]("https://typst.app/universe/package/alexandria/")).
 - Bibliographies can be filtered, and bibliography entries programmatically highlighted, which is useful e.g. for CVs.
-- References retain nonstandard Bibtex fields (#link("https://github.com/typst/hayagriva/issues/240")[unlike in Hayagriva]),
+- References retain nonstandard Bibtex fields ([unlike in Hayagriva]("https://github.com/typst/hayagriva/issues/240")),
   making it e.g. possible to split bibliographies based on keywords.
 
 At the same time, Pergamon is very new and has a number of important limitations compared to
