@@ -7,6 +7,8 @@
 
 #let reference-collection = state("reference-collection", (:))
 #let bibliography = state("bibliography", (:))
+#let current-citation-formatter = state("format-citation", none)
+
 // #let refsection-id = state("refsection-id", none)
 // #let refsection-counter = state("refsection-counter", 0)
 
@@ -135,6 +137,7 @@
 
   // reset the keys that are cited in this section
   reference-collection.update((:))
+  current-citation-formatter.update(it => format-citation)
 
   // [!Refsection counter is  #context { refsection-counter.get() }! ]
 
@@ -183,6 +186,41 @@
 
   doc
 }
+
+
+
+#let pcite(key, refsection-id) = context {
+  let lbl = combine(key, refsection-id)
+  let format-citation = current-citation-formatter.get()
+
+  // this has to be executed unconditionally, because the ref target
+  // only changes into a reference once it is cited
+  reference-collection.update( dict => {
+    dict.insert(lbl, "1")
+    return dict
+  })
+
+  // context { [RC after update: |#reference-collection.get()|]}
+
+  // Format references that are really citations.
+  let targets = query(label(lbl))
+
+  if targets.len() == 0 {
+    // on first pass, the label does not exist yet
+    [XXX] 
+  } else {
+    // on second pass, we can generate the real reference
+    let value = targets.first().value
+    let citation-str = format-citation(value, auto)
+    link(label(lbl))[#citation-str]
+  }
+  // [#citation-str]
+}
+
+
+
+
+
 
 #let construct-sorting(sorting-string) = {
   let i = 0
@@ -399,10 +437,6 @@
     let cited-keys = reference-collection.get().keys()
     for lbl in cited-keys {
       let key = split(str(lbl), refsection-id)
-      // TODO strip off ID
-    // TODO auseinandernehmen
-
-
 
       if key in bib { // skip references to labels that are not bib keys
         let bib-entry = bib.at(key)
