@@ -10,7 +10,7 @@
 #let current-citation-formatter = state("format-citation", (reference, form) => [CITATION], )
 
 #let refsection-id = state("refsection-id", none)
-// #let refsection-counter = state("refsection-counter", 0)
+#let refsection-counter = state("refsection-counter", 0)
 
 /// Parses Bibtex references and makes them available to Bibtypst.
 /// Due to architectural limitations in Typst, Bibtypst cannot read 
@@ -115,7 +115,7 @@
 }
 
 /// Defines a section of the document that shares a bibliography.
-/// You need to load a bibliography with the "add-bibliography" function
+/// You need to load a bibliography with the `add-bibliography` function
 /// in a place that is earlier than the refsection in rendering order.
 /// -> none
 #let refsection(
@@ -133,7 +133,14 @@
   /// -> function | none
   format-citation: none,
 
-  /// TODO
+  /// A unique identifier for this refsection. Each refsection needs its own unique
+  /// id, which distinguishes it from all the other refsections. You can either specify
+  /// an explicit identifier here, or you can pass `none` to indicate that Pergamon
+  /// should assign an identifier automatically. In this case, the first refsection
+  /// in the document receives the identifier `none`, and the subsequent refsections
+  /// will be named `ref1`, `ref2`, and so on.
+  /// 
+  /// -> str | none
   id: none,
 
   /// The section of the document that is to be wrapped in this `refsection`.
@@ -156,20 +163,21 @@
       panic("Add a bibliography before starting a refsection.")
     }
 
-    refsection-id.update(id)
-
     // determine the refsection ID
-    // if id != none {
-    //   refsection-id.update(id)
-    // } else {
-    //   let id = refsection-counter.get()
-    //   if id > 0 {
-    //     refsection-id.update("ref" + str(id))
-    //   } // else leave it at none, for the first refsection in the document
-    // }
+    if id != none {
+      refsection-id.update(id)
+    } else {
+      let id = refsection-counter.get()
+      if id > 0 {
+        refsection-id.update("ref" + str(id))
+      } // else leave it at none, for the first refsection in the document
+    }
+
+    // refsection-id.update(id)
+
   }
 
-  // [!Refsection ID is  #context { refsection-id.get() }! ]
+  // text(fill:red)[!Refsection ID is  #context { refsection-id.get() }! ]
 
 
   // show ref: it => {
@@ -193,7 +201,7 @@
   // }
 
   // count up the refsection ID
-  // refsection-counter.update(counter => counter + 1)
+  refsection-counter.update(counter => counter + 1)
 
   doc
 }
@@ -321,8 +329,6 @@
 ///
 /// -> none
 #let print-bibliography( 
-    // refsection-id: none,  // TODO get rid of this
-
     /// A function that renders the reference for inclusion in the
     /// printed bibliography. This function will typically be defined
     /// in a Bibtypst style, to be compatible with the `format-citation`

@@ -24,7 +24,7 @@
 ]
 
 
-#refsection(id: "hallo")[ 
+#refsection[ 
   = Second refsection
 
   #cite("knuth1990")
@@ -38,7 +38,7 @@
 // ]
 
 
-#refsection(id: "drei", format-citation: fcite.format-citation)[ 
+#refsection(format-citation: fcite.format-citation)[ 
   = Third refsection
   #cite("ehop-2025") #cite("yao2025language", form: it => "t")
   #print-bibliography(format-reference: fref, label-generator: fcite.label-generator)
