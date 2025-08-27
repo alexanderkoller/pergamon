@@ -857,6 +857,7 @@
   (reference.label, extradate)
 }
 
+/// #todo[DOCUMENT ME]
 #let format-citation-alphabetic(maxalphanames: 3, labelalpha: 3, labelalphaothers: "+") = {
   let formatter(reference-dict, form) = {
     let (reference-label, extradate) = label-parts-alphabetic(reference-dict.reference)
@@ -953,7 +954,7 @@
   ("format-citation": formatter, "label-generator": label-generator, "reference-label": (index, reference) => none)
 }
 
-
+/// #todo[DOCUMENT ME]
 #let format-citation-numeric() = {
   let formatter(reference-dict, form) = {
     let lbl = reference-dict.reference.label

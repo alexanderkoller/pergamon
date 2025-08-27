@@ -7,7 +7,7 @@
 
 // TODO: also include the short bibstring and let the user choose
 
-/// TODO explain this
+/// #todo[TODO explain this]
 #let default-bibstring = (
   // converted from english.lbx
   "bibliography": "Bibliography",

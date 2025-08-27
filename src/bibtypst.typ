@@ -111,7 +111,7 @@
   }
 
 /// Defines a section of the document that shares a bibliography.
-/// You need to load a bibliography with the `add-bibliography` function
+/// You need to load a bibliography with the @add-bib-resource function
 /// in a place that is earlier than the refsection in rendering order.
 /// -> none
 #let refsection(
@@ -135,6 +135,12 @@
   /// should assign an identifier automatically. In this case, the first refsection
   /// in the document receives the identifier `none`, and the subsequent refsections
   /// will be named `ref1`, `ref2`, and so on.
+  /// 
+  /// All references and citations within a refsection with identifier X will be prefixed
+  /// by `X-`; so for instance, the citation `cite("knuth1990")` in the refsection `ref1`
+  /// will silently introduce and reference a label `ref1-knuth1990`. You do not have to
+  /// worry about this when writing your document, but perhaps this information will help
+  /// you understand error messages.
   /// 
   /// -> str | none
   id: none,
@@ -181,8 +187,13 @@
 /// Create a citation to the bibliography entry with the given key.
 /// The `cite` function keeps track of what `refsection` we are in and
 /// uses that refsection's `format-citation` argument to typeset the
-/// citation. You can pass a `form` for finer control over the citation string,
-/// depending on what your citation style supports.
+/// citation. 
+/// 
+/// You can pass a `form` for finer control over the citation string,
+/// depending on what your citation style supports (see @sec:styling-citations). If you do not specify
+/// the `form`, its default value of `auto` will generate a default form
+/// that depends on the citation style.
+/// 
 /// -> content
 #let cite(key, form: auto) = context {
   let xrefsection-id = refsection-id.get()
@@ -209,19 +220,19 @@
 }
 
 /// Creates a citation with the form `"t"`, e.g. "Smith et al. (2020)".
-/// See `cite` for details.
+/// See @cite for details.
 #let citet(key) = cite(key, form: "t")
 
 /// Creates a citation with the form `"p"`, e.g. "(Smith et al. 2020)".
-/// See `cite` for details.
+/// See @cite for details.
 #let citep(key) = cite(key, form: "p")
 
 /// Creates a citation with the form `"g"`, e.g. "Smith et al.'s (2020)".
-/// See `cite` for details.
+/// See @cite for details.
 #let citeg(key) = cite(key, form: "g")
 
 /// Creates a citation with the form `"n"`, e.g. "Smith et al. 2020".
-/// See `cite` for details.
+/// See @cite for details.
 #let citen(key) = cite(key, form: "n")
 
 

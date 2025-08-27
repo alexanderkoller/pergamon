@@ -44,7 +44,7 @@ The following piece of code typesets a bibliography using Pergamon.
 
 #refsection(format-citation: style.format-citation)[
   ... some text here ...
-  @bender20:_climb_nlu
+  #cite("bender20:_climb_nlu")
 
   #print-bibliography(
        format-reference: format-reference(reference-label: style.reference-label), 
