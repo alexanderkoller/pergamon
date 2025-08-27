@@ -1,7 +1,7 @@
 # Pergamon: Biblatex-style bibliographies for Typst
 
 Pergamon is a package for typesetting bibliographies in Typst.
-It is inspired by [BibLaTeX]("https://ctan.org/pkg/biblatex"), in that 
+It is inspired by [BibLaTeX](https://ctan.org/pkg/biblatex), in that 
 the way in which it typesets bibliographies can be easily customized
 through Typst code. Like Typst's regular bibliography management model,
 Pergamon can be configured to use different styles for typesetting
