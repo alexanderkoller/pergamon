@@ -859,10 +859,9 @@
 
 #let format-citation-alphabetic(maxalphanames: 3, labelalpha: 3, labelalphaothers: "+") = {
   let formatter(reference-dict, form) = {
-    let fform = if form == auto { auto } else { form(none) } // str or auto
     let (reference-label, extradate) = label-parts-alphabetic(reference-dict.reference)
 
-    if fform == "n" {
+    if form == "n" {
       [#reference-label#extradate]
     } else {
       return [[#reference-label#extradate]]
@@ -916,13 +915,13 @@
     // if "extradate" in reference-dict.reference.fields {
     //   year += numbering("a", reference-dict.reference.fields.extradate + 1)
     // }
-    let fform = if form == auto { auto } else { form(none) } // str or auto
-    if fform == "t" {
+    // let fform = if form == auto { auto } else { form(none) } // str or auto
+    if form == "t" {
       // can't concatenate with strfmt because format-parens(year) is not a string
       spaces(authors-str, format-parens(year))
-    } else if fform == "g" {
+    } else if form == "g" {
       spaces(authors-str + "'s", format-parens(year))
-    } else if fform == "n" {
+    } else if form == "n" {
       strfmt("{} {}", authors-str, year)
     } else { // auto or "p"
       format-parens(strfmt("{} {}", authors-str, year))
@@ -957,10 +956,9 @@
 
 #let format-citation-numeric() = {
   let formatter(reference-dict, form) = {
-    let fform = if form == auto { auto } else { form(none) } // str or auto
     let lbl = reference-dict.reference.label
 
-    if fform == "n" {
+    if form == "n" {
       [#{reference-dict.index+1}]
     } else {
       return [[#{reference-dict.index+1}]]

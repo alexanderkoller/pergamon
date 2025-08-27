@@ -60,6 +60,6 @@
 
 #refsection(format-citation: fcite.format-citation)[ 
   = Third refsection
-  #cite("ehop-2025") #cite("yao2025language", form: it => "t")
+  #cite("ehop-2025") #cite("yao2025language", form: "n")
   #print-bibliography(format-reference: fref, label-generator: fcite.label-generator)
 ]

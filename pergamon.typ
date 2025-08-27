@@ -257,14 +257,12 @@ the `supplement` argument to the `ref` function:
 
 #zebraw(lang: false,
 ```typ
-#let citet(lbl) = ref(lbl, supplement: it => "t")
+#let citet(lbl) = ref(lbl, supplement: "t")
 #citet(<bender20:_climb_nlu>)
 ```
 )
 
-Observe that you have to cannot simply pass `"t"` as the supplement; it has to be a one-parameter
-function that returns `"t"`. This is a regrettable consequence of the fact that `ref` supplements 
-can be `auto`, functions, and content, but not strings. If you do not specify a citation form (`ref(<key>)` or `@key`), the `auto` citation forms will be used.
+If you do not specify a citation form (`ref(<key>)` or `@key`), the `auto` citation forms will be used.
 
 Note that the `n` citation form has special value for combining multiple citations. Unlike the
 builtin Typst `cite` function, #bibtypst is currently not able to aggregate multiple citations into 
