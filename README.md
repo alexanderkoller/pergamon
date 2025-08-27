@@ -18,7 +18,8 @@ Pergamon has a number of advantages over the builtin Typst bibliographies:
   making it e.g. possible to split bibliographies based on keywords.
 
 At the same time, Pergamon is very new and has a number of important limitations compared to
-the builtin system.
+the builtin system. I have implemented those parts of Pergamon that I need for my own writing,
+but I would welcome your pull request to make it more feature-complete.
 
 - Pergamon currently supports only bibliographies in Bibtex format, not the Hayagriva YAML format. 
 - Only a handful of styles are supported at this point, in contrast to the large number of available CSL styles. Pergamon comes with implementations of the #biblatex styles `numeric`, `alphabetic`, and `authoryear`.
@@ -31,7 +32,7 @@ Its library was second only to the Library of Alexandria around 200 BC.
 
 ## Example
 
-The following piece of code typesets a bibliography using #bibtypst.
+The following piece of code typesets a bibliography using Pergamon.
 
   ```typ
 #import "@preview/pergamon:0.1.0": *
@@ -52,4 +53,7 @@ The following piece of code typesets a bibliography using #bibtypst.
 
 It generates citations and a bibliography that look like this:
 
-<img src="https://github.com/alexanderkoller/pergamon/blob/main/doc-materials/example-output.png"/>
+<img src="https://github.com/alexanderkoller/pergamon/blob/main/doc-materials/example-output.png" border="1" />
+
+Please see the [Pergamon guide](https://github.com/alexanderkoller/pergamon/blob/main/pergamon.pdf) for more details.
+
