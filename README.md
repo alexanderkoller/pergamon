@@ -1,8 +1,55 @@
-# Pergamon: Biblatex-style bibliography management for Typst
+# Pergamon: Biblatex-style bibliographies for Typst
+
+Pergamon is a package for typesetting bibliographies in Typst.
+It is inspired by #link("https://ctan.org/pkg/biblatex")[BibLaTeX], in that 
+the way in which it typesets bibliographies can be easily customized
+through Typst code. Like Typst's regular bibliography management model,
+Pergamon can be configured to use different styles for typesetting
+references and citations; unlike it, these styles are all defined through
+Typst code, rather than CSL.
+
+Pergamon has a number of advantages over the builtin Typst bibliographies:
+
+- Pergamon styles are simply pieces of Typst code and can be easily configured or modified.
+- The document can be easily split into different `refsection`s, each of which can have its own bibliography
+  (similar to #link("https://typst.app/universe/package/alexandria/")[Alexandria]).
+- Bibliographies can be filtered, and bibliography entries programmatically highlighted, which is useful e.g. for CVs.
+- References retain nonstandard Bibtex fields (#link("https://github.com/typst/hayagriva/issues/240")[unlike in Hayagriva]),
+  making it e.g. possible to split bibliographies based on keywords.
+
+At the same time, Pergamon is very new and has a number of important limitations compared to
+the builtin system.
+
+- Pergamon currently supports only bibliographies in Bibtex format, not the Hayagriva YAML format. 
+- Only a handful of styles are supported at this point, in contrast to the large number of available CSL styles. Pergamon comes with implementations of the #biblatex styles `numeric`, `alphabetic`, and `authoryear`.
+- Pergamon still requires a lot of testing and tweaking.
+
+[Pergamon]("https://en.wikipedia.org/wiki/Pergamon") was an ancient Greek city state in Asia Minor.
+Its library was second only to the Library of Alexandria around 200 BC.
 
 
 
+## Example
 
-This package allows you to define refsections. It circumvents the normal CSL mechanism for rendering bibliographies in Typst; instead, you simply write some Typst code to format the bibliography.
+The following piece of code typesets a bibliography using #bibtypst.
 
-This fundamentally works, but is work in progress.
+  ```typ
+#import "@preview/pergamon:0.1.0": *
+
+#let style = format-citation-numeric()
+#add-bib-resource(read("bibliography.bib"))
+#refsection(format-citation: style.format-citation)[
+  ... some text here ...
+  @bender20:_climb_nlu
+
+  #print-bibliography(
+       format-reference: 
+             format-reference(reference-label: style.reference-label), 
+       label-generator: style.label-generator,
+       sorting: "nyt")
+]
+  ```
+
+It generates citations and a bibliography that look like this:
+
+<img src="https://github.com/alexanderkoller/pergamon/blob/main/doc-materials/example-output.png"/>
