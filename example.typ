@@ -50,7 +50,7 @@
 #let fref = format-reference(
   reference-label: style.reference-label,
 
-  // Try out different formats, e.g. "{family}, {given}" and "{g}. {family}":
+  // Try out different name formats, e.g. "{family}, {given}" and "{g}. {family}":
   // name-format: "{family}, {given}",
   
   // Try rendering additional fields, either as strings or as functions:
@@ -67,7 +67,7 @@
   // }
 )
 
-// These show rule typeset references to my own papers in green
+// These show rules typeset references to my own papers in green
 // and all other links in blue.
 #show link: set text(fill: blue) // for links that are not citations
 #show link: it => if-citation(it, value => {
