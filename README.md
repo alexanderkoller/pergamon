@@ -6,7 +6,10 @@ the way in which it typesets bibliographies can be easily customized
 through Typst code. Like Typst's regular bibliography management model,
 Pergamon can be configured to use different styles for typesetting
 references and citations; unlike it, these styles are all defined through
-Typst code, rather than CSL. Pergamon is documented in the [user guide](https://github.com/alexanderkoller/pergamon/blob/main/pergamon.pdf).
+Typst code, rather than CSL. 
+
+Pergamon is documented in the [user guide](https://github.com/alexanderkoller/pergamon/blob/main/pergamon.pdf).
+See a somewhat complex example: [Typst](https://github.com/alexanderkoller/pergamon/blob/main/example.typ), [PDF](https://github.com/alexanderkoller/pergamon/blob/main/example.pdf).
 
 Pergamon has a number of advantages over the builtin Typst bibliographies:
 
@@ -56,7 +59,7 @@ It generates citations and a bibliography that look like this:
 
 <img src="https://github.com/alexanderkoller/pergamon/blob/main/doc-materials/example-output.png" style='border:1px solid #000000' />
 
-You can try out [this example](https://github.com/alexanderkoller/pergamon/blob/main/example.typ) yourself;
+You can try out [a more complex example](https://github.com/alexanderkoller/pergamon/blob/main/example.typ) yourself;
 here's [the PDF it generates](https://github.com/alexanderkoller/pergamon/blob/main/example.pdf).
 
 ## Documentation
