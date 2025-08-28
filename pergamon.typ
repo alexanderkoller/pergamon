@@ -426,7 +426,7 @@ references that were actually cited in the current refsection. You can instruct
 ```)
 
 To obtain finer control over the bibliography entries that are shown, you can 
-use the `filtering` argument. This function receives a #link(<sec:reference>)[reference dictionary] as 
+use the `filter` argument. This function receives a #link(<sec:reference>)[reference dictionary] as 
 its argument and returns `true` if this reference should be included in the bibliography
 and `false` otherwise. For instance, the following call shows all journal articles
 and nothing else:
@@ -436,7 +436,7 @@ and nothing else:
 #print-bibliography(
   format-reference: format-reference(),
   show-all: true,
-  filtering: reference => reference.entry_type == "article"
+  filter: reference => reference.entry_type == "article"
 )
 ```)
 

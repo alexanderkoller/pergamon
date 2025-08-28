@@ -397,7 +397,7 @@
     /// for which the function returned `true`.
     /// -> function
     /// 
-    filtering: reference => true,
+    filter: reference => true,
 
     /// A dictionary for styling the #link("https://typst.app/docs/reference/layout/grid/")[grid]
     /// in which the bibliography is laid out. By default, the grid is laid out with `row-gutter: 1.2em` and
@@ -461,7 +461,7 @@
     }
   }
 
-  bibl-unsorted = bibl-unsorted.filter(filtering)
+  bibl-unsorted = bibl-unsorted.filter(filter)
   let sorted = label-sort-deduplicate(bibl-unsorted, label-generator, sorting-function)
   let formatted-references = sorted.enumerate().map(it => format-reference(it.at(0), it.at(1), eval-mode))  // -> array(array(content))
   let num-columns = if formatted-references.len() == 0 { 0 } else { formatted-references.at(0).len() }
