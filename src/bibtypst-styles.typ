@@ -553,25 +553,42 @@
   "thesis": driver-thesis
 )
 
-/// Generates a reference formatter using the specified options.
-/// References are formatted essentially as in the standard BibLaTeX.
+
+/// The standard reference style. It is modeled after the standard
+/// bibliography style of #biblatex.
+///
+/// A call to `format-reference` takes a number of options as argument
+/// and returns a function that will take
+/// arguments `index`, `reference`, and `eval-mode` and return a rendered reference.
+/// This function is suitable as an argument to the `format-reference` parameter
+/// of `print-bibliography`, and will control how the references in this
+/// bibliography are rendered. See the documentation of `print-bibliography`
+/// for a more detailed specification of the `format-reference` function in general.
+/// 
+/// Most of the options of `format-reference` have sensible default values.
+/// The one exception is the mandatory named argument `reference-label`,
+/// which you obtain from your citation style.
 #let format-reference(
-    /// Generates a label to be printed in the first column of the bibliography.
-    /// This is useful e.g. for use with the alphabetic and numeric citation style.
-    /// By default, the function returns constant `none`, indicating that there
-    /// should be no label.
+    /// The reference labeler that should be used for this bibliography;
+    /// see @sec:custom-styles for a detailed explanation.
     /// 
-    /// This function typically comes from a predefined style (e.g.
-    /// authoryear, numeric, alphabetic), or you can define your own.
+    /// The reference labeler typically comes from a citation style (e.g.
+    /// _authoryear_, _numeric_, _alphabetic_).
+    /// 
+    /// Unlike the other parameters of `format-reference`, you _must_ pass
+    /// a meaningful argument for this parameter. If you leave it at the default
+    /// value of `none`, Typst will not even show you a proper error message;
+    /// it will just say "warning: layout did not converge within 5 attempts".
     /// 
     /// -> function
-    reference-label: (index, reference) => none,
+    reference-label: none,
 
     /// Selectively highlights certain bibliography entries. The parameter
     /// is a function that is applied at the final stage of the rendering process,
     /// where the whole rest of the entry has already been rendered. This is
     /// an opportunity to e.g. mark certain entries in the bibliography by
-    /// boldfacing them or prepending them with a marker symbol.
+    /// boldfacing them or prepending them with a marker symbol. See
+    /// @sec:highlighting for an example.
     /// 
     /// The highlighting function accepts arguments `rendered-reference`
     /// (`str` or `content` representing the reference as it is printed),
@@ -677,7 +694,7 @@
     /// 
     /// It is essential that if the argument is `none`, the function must
     /// also return `none`. This can be achieved conveniently with the `nn`
-    /// function wrapper, defined in `bibtypst-styles.typ`.
+    /// function wrapper, see @sec:package:utility.
     /// 
     /// -> function
     format-parens: nn(it => [(#it)]),
@@ -687,7 +704,7 @@
     /// 
     /// It is essential that if the argument is `none`, the function must
     /// also return `none`. This can be achieved conveniently with the `nn`
-    /// function wrapper, defined in `bibtypst-styles.typ`.
+    /// function wrapper, see @sec:package:utility.
     /// 
     /// -> function    
     format-brackets: nn(it => [[#it]]),
@@ -697,7 +714,7 @@
     /// 
     /// It is essential that if the argument is `none`, the function must
     /// also return `none`. This can be achieved conveniently with the `nn`
-    /// function wrapper, defined in `bibtypst-styles.typ`.
+    /// function wrapper, see @sec:package:utility.
     /// 
     /// -> function    
     format-quotes: nn(it => ["#it"]),
@@ -736,7 +753,8 @@
 
     /// An array of additional fields which will be printed at the end of each
     /// bibliography entry. Fields can be specified either as a string, in which case
-    /// the field with that name is printed using `printfield`; or they can be
+    /// the field with that name is printed using the reference style's normal rules.
+    /// Alternatively, they can be
     /// specified as a function `(reference, options) -> content`, in which case the
     /// returned content will be printed directly. Instead of an array, you can also
     /// pass `none` to indicate that no additional fields need to be printed.
@@ -744,10 +762,12 @@
     /// For example, both of these will work:
     /// ```
     /// additional-fields: ("award",)
-    /// additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),)
+    /// 
+    /// additional-fields: ((reference, options) => 
+    ///    ifdef(reference, "award", (:), award => [*#award*]),)
     /// ```
     /// 
-    /// -> function | none
+    /// -> array | none
     additional-fields: none,
 
     /// An array of field names that should not be printed. References are treated
@@ -759,6 +779,12 @@
   ) = {
     
     let formatter(index, reference, eval-mode) = {
+      // Unfortunately, this still causes "layout did not converge" errors, rather
+      // than just printing the error message.
+      if reference-label == none {
+        panic("Please specify a reference-label argument for format-reference.")
+      }
+
       let suppressed-fields = (:)
       if suppress-fields != none {
         for field in suppress-fields {
@@ -857,8 +883,42 @@
   (reference.label, extradate)
 }
 
-/// #todo[DOCUMENT ME]
-#let format-citation-alphabetic(maxalphanames: 3, labelalpha: 3, labelalphaothers: "+") = {
+/// The _alphabetic_ citation style renders citations in a form like "[BK20]". The citation string
+/// consists of a sequence of the first letters of the authors' family names. 
+/// See @fig:example-alphabetic for an example.
+/// 
+/// If there are
+/// too many authors, the symbol "+" is appended to the citation string to indicate
+/// "et al.", e.g. "[YDZ+25]". What constitutes "too many" is controlled by the `maxalphanames` parameter.
+/// 
+/// If there is only one author, the first few characters of the author name are displayed instead,
+/// as in "[Knu90]". The number of characters is controlled by the `labelalpha` parameter.
+/// 
+/// If more than one reference would receive the same citation string under this policy,
+/// the style appends an "extradate" character. For example, if two papers would receive
+/// the label "[BDF+20]", then the first one (in the sorting order of the bibliography)
+/// will be replaced by "[BDF+20a]" and the second one by "[BDF+20b]".
+/// 
+/// The function `format-citation-alphabetic` returns a dictionary with keys
+/// `format-citation`, `label-generator`, and `reference-label`. You can use the values
+/// under these keys as arguments to `refsection`, `print-bibliography`, and `format-reference`,
+/// respectively.
+#let format-citation-alphabetic(
+    /// The maximum number of authors that will be printed in a citation string.
+    /// If the actual number of authors exceeds this value, the symbol specified under
+    /// `labelalphaothers` below will be appended to indicate "et al".
+    /// -> int
+    maxalphanames: 3, 
+
+    /// The maximum number of characters that will be printed for single-authored papers.
+    /// -> int
+    labelalpha: 3, 
+
+    /// The "et al" character that is appended if the number of authors exceeds the
+    /// value of the `maxalphanames` parameter.
+    /// -> str
+    labelalphaothers: "+"
+  ) = {
   let formatter(reference-dict, form) = {
     let (reference-label, extradate) = label-parts-alphabetic(reference-dict.reference)
 
@@ -897,35 +957,58 @@
   ("format-citation": formatter, "label-generator": label-generator, "reference-label": reference-label)
 }
 
-/// Formats citations in the _authoryear_ style (see @fig:example-authoryear
-/// for an example).
+
+
+/// The _authoryear_ citation style renders citations in a form like "(Bender and Koller 2020)".
+/// The citation string consists of a sequence of the authors' family names.
+/// See @fig:example-authoryear
+/// for an example.
+/// 
+/// If a paper has more than two authors, only the first author will be printed,
+/// together with the symbol "et al.".
+/// 
+/// If more than one reference would receive the same citation string under this policy,
+/// the style appends an "extradate" character. For example, if two papers would receive
+/// the label "(Yao et al. 2025)", then the first one (in the sorting order of the bibliography)
+/// will be replaced by "(Yao et al. 2025a)" and the second one by "(Yao et al. 2025b)".
+/// 
+/// The _authoryear_ citation style supports a particularly rich selection of citation forms
+/// (see @fig:citation-forms).
+/// 
+/// The function `format-citation-authoryear` returns a dictionary with keys
+/// `format-citation`, `label-generator`, and `reference-label`. You can use the values
+/// under these keys as arguments to `refsection`, `print-bibliography`, and `format-reference`,
+/// respectively.
 #let format-citation-authoryear(
-  /// Wraps text in round brackets. The argument needs to be a function
+  /// Wraps text in brackets. The argument needs to be a function
   /// that takes one argument (`str` or `content`) and returns `content`.
   /// 
   /// It is essential that if the argument is `none`, the function must
   /// also return `none`. This can be achieved conveniently with the `nn`
-  /// function wrapper, defined in `bibtypst-styles.typ`.
+  /// function wrapper, see @sec:package:utility.
   /// 
   /// -> function
-  format-parens: nn(it => [(#it)])
+  format-parens: nn(it => [(#it)]),
+
+  /// The string that separates the author and year in the `p` citation form.
+  /// -> str
+  author-year-separator: " "
 ) = {
   let formatter(reference-dict, form) = {
     // access precomputed information that was stored in the label field
     let (authors-str, year) = reference-dict.reference.at("label")
-    // if "extradate" in reference-dict.reference.fields {
-    //   year += numbering("a", reference-dict.reference.fields.extradate + 1)
-    // }
-    // let fform = if form == auto { auto } else { form(none) } // str or auto
+
     if form == "t" {
       // can't concatenate with strfmt because format-parens(year) is not a string
-      spaces(authors-str, format-parens(year))
+      [#authors-str #format-parens(year)]
+      // spaces(authors-str, format-parens(year))
     } else if form == "g" {
-      spaces(authors-str + "'s", format-parens(year))
+      [#authors-str\'s #format-parens(year)]
+      // spaces(authors-str + "'s", format-parens(year))
     } else if form == "n" {
       strfmt("{} {}", authors-str, year)
     } else { // auto or "p"
-      format-parens(strfmt("{} {}", authors-str, year))
+      format-parens(strfmt("{}{}{}", authors-str, author-year-separator, year))
     }
   }
 
@@ -954,7 +1037,15 @@
   ("format-citation": formatter, "label-generator": label-generator, "reference-label": (index, reference) => none)
 }
 
-/// #todo[DOCUMENT ME]
+/// The _numeric_ citation style renders citations in a form like "[1]".
+/// The citation string is the position of the reference in the bibliography.
+/// See @fig:example-output
+/// for an example.
+/// 
+/// The function `format-citation-numeric` returns a dictionary with keys
+/// `format-citation`, `label-generator`, and `reference-label`. You can use the values
+/// under these keys as arguments to `refsection`, `print-bibliography`, and `format-reference`,
+/// respectively.
 #let format-citation-numeric() = {
   let formatter(reference-dict, form) = {
     let lbl = reference-dict.reference.label

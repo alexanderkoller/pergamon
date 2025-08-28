@@ -296,6 +296,7 @@ just call `cite` with the respective citation form.
 
 
 == Implementing custom styles 
+<sec:custom-styles>
 
 Instead of using the builtin styles, you can also define your own #bibtypst style
 -- either a reference style or a citation style or both. 
@@ -460,6 +461,7 @@ and nothing else:
 ```)
 
 == Highlighting references
+<sec:highlighting>
 
 The builtin `format-reference` function accepts a parameter `highlight`, which you 
 can use to highlight individual references in the bibliography. The
@@ -493,7 +495,7 @@ all other references unchanged.
 
 
 #show heading.where(level: 3): it => {
-  set text(fill: blue)
+  set text(fill: darkblue)
   block({
     place(dx: -1.5em)[>>]
     it
@@ -590,14 +592,15 @@ These are functions implementing the base functionality of #bibtypst, such as `c
 == The builtin styles
 <sec:package:builtin-reference>
 
-Below, we explain the arguments to the builtin reference style in detail
-(see @sec:builtin-reference for the big picture).
+Here we explain the builtin reference and citation styles.
+#v(1em)
 
 #let style-docs = tidy.parse-module(read("src/bibtypst-styles.typ"), scope: scope)
 #tidy.show-module(style-docs, style: tidy.styles.default, show-outline: false, break-param-descriptions: true)
 
 
 == Utility functions 
+<sec:package:utility>
 
 The following functions may be helpful in the advanced usage and customization of #bibtypst.
 
