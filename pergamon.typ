@@ -42,6 +42,9 @@
 
 
 #show heading: set block(above: 2em, below: 1em)
+
+#outline(depth: 2)
+
 #show heading.where(level: 1): set heading(numbering: "1.1")
 #show heading.where(level: 2): set heading(numbering: "1.1")
 
@@ -61,8 +64,8 @@ Typst code, rather than CSL.
 - #bibtypst styles are simply pieces of Typst code and can be easily configured or modified.
 - The document can be easily split into different `refsection`s, each of which can have its own bibliography
   (similar to #link("https://typst.app/universe/package/alexandria/")[Alexandria]). Unlike in Alexandria,
-  you do not have to manually specify bibliography prefixes for each section.
-- Paper titles can be automatically made into hyperlinks - as in #link("https://typst.app/universe/package/blinky/")[blinky], but much more flexibly and correctly.  
+  you do not have to manually add bibliography prefixes to your citations.
+- Paper titles can be automatically made into hyperlinks -- as in #link("https://typst.app/universe/package/blinky/")[blinky], but much more flexibly and correctly.  
 - Bibliographies can be filtered, and bibliography entries programmatically highlighted, which is useful e.g. for CVs.
 - References retain nonstandard #bibtex fields (#link("https://github.com/typst/hayagriva/issues/240")[unlike in Hayagriva]),
   making it e.g. possible to split bibliographies based on keywords.

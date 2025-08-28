@@ -7,7 +7,22 @@
 
 // TODO: also include the short bibstring and let the user choose
 
-/// #todo[TODO explain this]
+
+/// The default bibstring table. A bibstring table maps a number of language-independent
+/// identifiers to the strings that will be printed in the bibliography (see the
+/// `bibstring` parameter of `format-reference`).
+/// Modifying the
+/// bibstring table can be useful if you want to localize your bibliography to a language
+/// other than English, or if your bibliographic conventions differ from those of
+/// the standard #biblatex style. For instance, to keep the reference style from
+/// printing "In:" with a trailing colon, you could use a bibstring table in which
+/// the "in" key maps to "In" rather than "In:".
+/// 
+/// This default bibstring table is a verbatim copy of the standard English bibstring
+/// table in #biblatex. It contains only the "long" versions of these entries; so
+/// references will be typeset to print e.g. "Jones, editor", rather than "Jones, ed.".
+/// You can find this table in the file #link("https://github.com/alexanderkoller/pergamon/blob/main/src/bibstrings.typ")[bibstrings.typ]
+/// and modify it to your needs.
 #let default-bibstring = (
   // converted from english.lbx
   "bibliography": "Bibliography",

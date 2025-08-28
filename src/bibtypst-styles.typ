@@ -636,14 +636,14 @@
     /// -> bool
     use-editor: true,
 
-    /// If `true`, Bibtypst will print the date right after the authors, e.g.
-    /// 'Smith (2020). "A cool paper".' If `false`, Bibtypst will follow the
-    /// normal behavior of BibLaTeX and place the date towards the end of the
+    /// If `true`, #bibtypst will print the date right after the authors, e.g.
+    /// 'Smith (2020). "A cool paper".' If `false`, #bibtypst will follow the
+    /// normal behavior of #biblatex and place the date towards the end of the
     /// reference.
     /// -> bool
     print-date-after-authors: false,
 
-    /// When Bibtypst renders a reference, the title is processed by Typst's
+    /// When #bibtypst renders a reference, the title is processed by Typst's
     /// #link("https://typst.app/docs/reference/foundations/eval/")[eval] function.
     /// The `eval-mode` argument you specify here is passed as the `mode` argument
     /// to `eval`. 
@@ -654,17 +654,17 @@
     /// -> str
     eval-mode: "markup",
 
-    /// When typesetting lists (e.g. author names), Bibtypst will use this
+    /// When typesetting lists (e.g. author names), #bibtypst will use this
     /// delimiter to combine list items before the last one.
     /// -> str
     list-middle-delim: ", ",
 
-    /// When typesetting lists (e.g. author names), Bibtypst will use this
+    /// When typesetting lists (e.g. author names), #bibtypst will use this
     /// delimiter to combine the items of lists of length two.
     /// -> str
     list-end-delim-two: " and ",
 
-    /// When typesetting lists (e.g. author names), Bibtypst will use this
+    /// When typesetting lists (e.g. author names), #bibtypst will use this
     /// delimiter in lists of length three of more to combine the final
     /// item in the list with the rest.
     /// -> str

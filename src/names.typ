@@ -49,6 +49,12 @@
 }
 
 /// Extracts the list of family names from the list of name-part dictionaries.
+/// For instance, the `parsed-author` entry of the example in @fig:reference-dict
+/// will be mapped to the array `("Bender", "Koller")`.
+/// 
+/// If `parsed-names` is `none`, the function returns `none`.
+/// 
+/// -> array | none
 #let family-names(parsed-names) = {
   if parsed-names == none {
     none

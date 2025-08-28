@@ -103,10 +103,10 @@
 }
 
 
-/// Wraps a function in `none`-handling code. `nn(func)`
-/// is a function that
+/// Wraps a function in `none`-handling code. 
+/// `nn(func)` is a function that
 /// behaves like `func` on arguments that are not `none`,
-/// and it returns `none` if the argument is `none`.
+/// but if the argument is `none`, it simply returns `none`.
 /// Only works for functions `func` that have a single argument.
 /// -> function
 #let nn(func) = {
