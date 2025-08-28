@@ -7,5 +7,5 @@ entrypoint = "lib.typ"
 authors = ["Alexander Koller <akoller@gmail.com>"]
 license = "MIT"
 description = "Biblatex-style reference management for Typst."
-repository = "https://github.com/alexanderkoller/bibtypst"
+repository = "https://github.com/alexanderkoller/pergamon"
 
