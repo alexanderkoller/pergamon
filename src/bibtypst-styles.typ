@@ -251,20 +251,26 @@
 
 // standard.bbx maintitle+title
 #let maintitle-title(reference, options) = {
-  let maintitle = fd(reference, "maintitle", options).trim()
-  let title = fd(reference, "title", options).trim()
-  let print-maintitle = (maintitle != title)
+  let maintitle = fd(reference, "maintitle", options)
+  let title = fd(reference, "title", options)
+  let print-maintitle = (maintitle != none) and (maintitle != title)
 
   let volume-prefix = if print-maintitle { epsilons(printfield(reference, "volume", options), printfield(reference, "part", options)) } else { none }
 
-  periods(
-    if print-maintitle {
+  let maintitle-str = if print-maintitle {
+    periods(
       periods(
         printfield(reference, "maintitle", options),
         printfield(reference, "mainsubtitle", options)
+      ),
+      epsilons(
+        printfield(reference, "volume", options), 
+        printfield(reference, "part", options),
       )
-    } else { none },
-    fjoin(":", volume-prefix, printfield(reference, "title", options))
+    )
+  } else { none }
+
+    fjoin(":", maintitle-str, printfield(reference, "title", options)
   )
 }
 
@@ -296,7 +302,7 @@
 
 #let volume-part-if-maintitle-undef(reference, options) = {
   if fd(reference, "maintitle", options) == none {
-    spaces(printfield(reference, "volume", options), printfield(reference, "part", options))
+    epsilons(printfield(reference, "volume", options), printfield(reference, "part", options))
   } else {
     none
   }
