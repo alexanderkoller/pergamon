@@ -45,13 +45,9 @@
   // overwritten by the show rule that is defined in refsection's source code.
   // It colors the citation links based on whether the reference is to a PI publication.
   #show link: it => if-citation(it, value => {
-    if "Koller" in family-names(value.reference.fields.parsed-author) {
-      set text(fill: darkgreen)
-      it
-    } else {
-      set text(fill: darkblue)
-      it
-    }
+    let color = if "Koller" in family-names(value.reference.fields.parsed-author) { darkgreen } else { darkblue }
+    set text(fill: color)
+    it
   })
   
   #set par(justify: true)

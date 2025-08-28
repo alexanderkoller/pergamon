@@ -6,7 +6,7 @@ the way in which it typesets bibliographies can be easily customized
 through Typst code. Like Typst's regular bibliography management model,
 Pergamon can be configured to use different styles for typesetting
 references and citations; unlike it, these styles are all defined through
-Typst code, rather than CSL.
+Typst code, rather than CSL. Pergamon is documented in the [user guide](https://github.com/alexanderkoller/pergamon/blob/main/pergamon.pdf).
 
 Pergamon has a number of advantages over the builtin Typst bibliographies:
 

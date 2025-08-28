@@ -56,7 +56,8 @@ Typst code, rather than CSL.
 
 - #bibtypst styles are simply pieces of Typst code and can be easily configured or modified.
 - The document can be easily split into different `refsection`s, each of which can have its own bibliography
-  (similar to #link("https://typst.app/universe/package/alexandria/")[Alexandria]).
+  (similar to #link("https://typst.app/universe/package/alexandria/")[Alexandria]). Unlike in Alexandria,
+  you do not have to manually specify bibliography prefixes for each section.
 - Paper titles can be automatically made into hyperlinks - as in #link("https://typst.app/universe/package/blinky/")[blinky], but much more flexibly and correctly.  
 - Bibliographies can be filtered, and bibliography entries programmatically highlighted, which is useful e.g. for CVs.
 - References retain nonstandard Bibtex fields (#link("https://github.com/typst/hayagriva/issues/240")[unlike in Hayagriva]),
@@ -335,9 +336,29 @@ will still be available, allowing you to precompute any information you find use
 
 = Advanced usage 
 
+#v(-1em)
 == Multiple refsections
 
-#todo[write this]
+A #bibtypst document consists of one or more `refsection`s. Each refsection is a segment of the document 
+that shares a bibliography: #bibtypst collects all citations within each refsection and prints them in the
+refsection's bibliography. This allows you to have multiple bibliographies per document, as in the well-known
+#link("https://typst.app/universe/package/alexandria/")[Alexandria] package.
+
+Every refsection in a document has a unique identifier that distinguishes it from the other refsections.
+These identifiers are prepended to the keys of the bibliography entries in every citation. You still write
+`#cite("key")` in your document, with the same key that you also use in your Bibtex file. #bibtypst handles 
+the prepending automatically in the background. The only situation where you will notice that the keys were 
+modified is when a citation is undefined; in this case, Typst will warn you that the reference `id-key`
+couldn't be resolved, rather than `key`.
+
+You can specify the refsection identifier yourself by passing it as the `id` argument to the `refsection`
+function. But typical usage will be to not specify an explicit `id` argument and let #bibtypst assign 
+a unique identifier automatically. In this case, the first refsection in the document will have the identifier 
+`none`, and the subsequent ones will be names `ref1`, `ref2`, and so on. When the identifier is `none`,
+#bibtypst simply uses the `key` itself as the label, rather than prepending it with an identifier string.
+For the frequent use case where the document has only one refsection, this will make error messages 
+easier to read.
+
 
 == Styling the bibliography
 
@@ -357,7 +378,8 @@ See the documentation of this argument in @sec:package-doc for details.
 == Styling the citations
 <sec:styling-citations>
 
-Citations in #bibtypst are `link` elements, and can be styled using show rules. However, it is 
+Citations in #bibtypst are #link("https://typst.app/docs/reference/model/link/")[link] elements, 
+and can be styled using show rules. However, it is 
 not entirely trivial to distinguish a `link` element that represents a #bibtypst citation from 
 any other `link` element (referring e.g. to a website). #bibtypst therefore provides a function 
  `if-citation` function which will make this distinction for you. The following piece of code
@@ -372,7 +394,7 @@ typesets all #bibtypst citations in blue:
 ```)
 
 The `value` argument contains metadata about the citation; `value.reference` is the
-reference dictionary. You can use this information to style citations conditionally.
+reference dictionary (see @sec:reference). You can use this information to style citations conditionally.
 For instance, in order to typeset all citations to my own papers in green and all other
 citations in blue, I could write:
 
@@ -404,7 +426,7 @@ references that were actually cited in the current refsection. You can instruct
 ```)
 
 To obtain finer control over the bibliography entries that are shown, you can 
-use the `filtering` argument. This function receives a refrence dictionary as 
+use the `filtering` argument. This function receives a #link(<sec:reference>)[reference dictionary] as 
 its argument and returns `true` if this reference should be included in the bibliography
 and `false` otherwise. For instance, the following call shows all journal articles
 and nothing else:
