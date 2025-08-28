@@ -56,6 +56,9 @@ It generates citations and a bibliography that look like this:
 
 <img src="https://github.com/alexanderkoller/pergamon/blob/main/doc-materials/example-output.png" style='border:1px solid #000000' />
 
+You can try out [this example](https://github.com/alexanderkoller/pergamon/blob/main/example.typ) yourself;
+here's [the PDF it generates](https://github.com/alexanderkoller/pergamon/blob/main/example.pdf).
+
 ## Documentation
 
 Please see the [Pergamon guide](https://github.com/alexanderkoller/pergamon/blob/main/pergamon.pdf) for more details.

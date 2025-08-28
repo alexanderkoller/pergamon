@@ -83,6 +83,8 @@ Its library was second only to the Library of Alexandria around 200 BC.
 = Example 
 
 The following piece of code typesets a bibliography using #bibtypst.
+(You can try out a more complex example yourself: download #link("https://github.com/alexanderkoller/pergamon/blob/main/example.typ")[example.typ from Github]\;
+see also #link("https://github.com/alexanderkoller/pergamon/blob/main/example.pdf")[the generated PDF].)
 
 #zebraw(lang: false,
   ```typ
