@@ -576,7 +576,7 @@
     /// The highlighting function accepts arguments `rendered-reference`
     /// (`str` or `content` representing the reference as it is printed),
     /// `index` (position of the reference in the bibliography), and
-    /// `reference` (the Bibtex reference dictionary). It returns `content`.
+    /// `reference` (the reference dictionary). It returns `content`.
     /// The default implementation simply returns the `rendered-reference`
     /// unmodified.
     /// 
@@ -751,7 +751,7 @@
     additional-fields: none,
 
     /// An array of field names that should not be printed. References are treated
-    /// as if they do not contain values for these fields, even if the Bibtex file
+    /// as if they do not contain values for these fields, even if the #bibtex file
     /// defines them. Instead of an array, you can also pass `none` to indicate that
     /// no fields should be suppressed.
     /// -> array | none
