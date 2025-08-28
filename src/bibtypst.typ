@@ -29,10 +29,10 @@
 #let add-bib-resource(
     /// A #bibtex string to be parsed.
     /// -> str
-    bibtex_string
+    bibtex-string
   ) = {
   bibliography.update(old-bib => {
-    for (key, value) in load-bibliography(bibtex_string).pairs() {
+    for (key, value) in load-bibliography(bibtex-string).pairs() {
       old-bib.insert(key, value)
     }
 

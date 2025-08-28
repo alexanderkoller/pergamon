@@ -1,7 +1,5 @@
 #! /bin/bash
 
-# TODO: MODIFY ME
-
 # Creates a new fork of the typst/packages repository on Github
 # and copies the package release into it. This script does all the work
 # in publishing a package to the Typst Universe, except for the actual
@@ -11,7 +9,7 @@
 #
 # Usage: ./scripts/create-github.sh <VERSION>
 
-PACKAGE=blinky
+PACKAGE=pergamon
 VERSION=$1
 
 if [ -z "$VERSION" ];
