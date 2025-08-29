@@ -67,36 +67,36 @@
   if index == none { none } else { xs.at(index) }
 }
 
-#let value = (
-  "authors": "Author and Author",
-  "url": "http://www.google.de",
-  "title": "My paper",
-  "booktitle": "Proceedings of XY",
-  "year": "2025",
-  "editor": "The Editor"
-)
+// #let value = (
+//   "authors": "Author and Author",
+//   "url": "http://www.google.de",
+//   "title": "My paper",
+//   "booktitle": "Proceedings of XY",
+//   "year": "2025",
+//   "editor": "The Editor"
+// )
 
-#let f(format-str) = {
-  let re = regex("\{([^\}]+)\}")
-  let error = "!!!FAIL!!!"
-  let ret = format-str.replace(re, match => {
-    let capt = match.captures.at(0)
-    value.at(capt, default: error)
-  })
+// #let f(format-str) = {
+//   let re = regex("\{([^\}]+)\}")
+//   let error = "!!!FAIL!!!"
+//   let ret = format-str.replace(re, match => {
+//     let capt = match.captures.at(0)
+//     value.at(capt, default: error)
+//   })
 
-  if ret.contains(error) { none } else { ret }
-} 
+//   if ret.contains(error) { none } else { ret }
+// } 
 
 
-#let formatted = periods(
-  f("{authors}"),
-  f("\"{title}\""),
-  commas(spaces("In:", f("_{booktitle}_")), f("{editor}, eds.")),
-  commas(f("{series}"), f("{volume}")),
-  commas(f("{publisher}"), f("{location}"), f("{year}"))
-)
+// #let formatted = periods(
+//   f("{authors}"),
+//   f("\"{title}\""),
+//   commas(spaces("In:", f("_{booktitle}_")), f("{editor}, eds.")),
+//   commas(f("{series}"), f("{volume}")),
+//   commas(f("{publisher}"), f("{location}"), f("{year}"))
+// )
 
-#eval(formatted, mode: "markup")
+// #eval(formatted, mode: "markup")
 
     /*
       periods(
