@@ -1,5 +1,5 @@
 #import "@preview/nth:1.0.1": *
-#import "@preview/oxifmt:0.2.1": strfmt
+#import "@preview/oxifmt:1.0.0": strfmt
 #import "bib-util.typ": fd, ifdef, concatenate-list
 #import "templating.typ": *
 #import "names.typ": format-name

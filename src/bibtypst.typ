@@ -1,5 +1,5 @@
 
-#import "@preview/oxifmt:0.2.1": strfmt
+#import "@preview/oxifmt:1.0.0": strfmt
 #import "@preview/citegeist:0.1.0": load-bibliography
 #import "bib-util.typ": collect-deduplicate
 #import "names.typ": parse-names, parse-reference-names
