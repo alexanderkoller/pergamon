@@ -26,11 +26,73 @@
 #let language(reference, options) = {
   printfield(reference, "language", options)
 }
+#let month-number-to-name(month-num, bibstring) = {
+  if month-num == none { return none }
 
+  let month-names = (
+    "01": "january",
+    "02": "february", 
+    "03": "march",
+    "04": "april",
+    "05": "may",
+    "06": "june",
+    "07": "july",
+    "08": "august",
+    "09": "september",
+    "10": "october",
+    "11": "november",
+    "12": "december",
+    // Serving months without zeros
+    "1": "january",
+    "2": "february",
+    "3": "march", 
+    "4": "april",
+    "5": "may",
+    "6": "june",
+    "7": "july",
+    "8": "august",
+    "9": "september"
+  )
+
+  let month-key = month-names.at(str(month-num), default: none)
+  if month-key != none {
+    bibstring.at(month-key, default: month-num)
+  } else {
+    month-num
+  }
+}
 
 #let date(reference, options) = {
+  let date-field = fd(reference, "date", options)
+
+  let formatted-date = if date-field != none {
+    let date-str = str(date-field)
+    if date-str.contains("-") {
+      let parts = date-str.split("-")
+      if parts.len() >= 3 {
+        // Format: day month year
+        let day = parts.at(2)
+        let month-name = month-number-to-name(parts.at(1), options.bibstring)
+        let year = parts.at(0)
+        strfmt("{} {} {}", day, month-name, year)
+      } else if parts.len() == 2 {
+        // Format: month year
+        let month-name = month-number-to-name(parts.at(1), options.bibstring)
+        let year = parts.at(0)
+        strfmt("{} {}", month-name, year)
+      } else {
+        parts.at(0) // only year
+      }
+    } else {
+      date-str
+    }
+  } else {
+    // Fallback to 'year' field
+    fd(reference, "year", options)
+  }
+
   epsilons(
-    fd(reference, "year", options), // TODO this is probably incomplete
+    formatted-date,
     printfield(reference, "extradate", options)
   )
 }
