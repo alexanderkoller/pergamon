@@ -351,7 +351,7 @@
   let ref = parse-reference-names(reference, name-fields)
 
   // definitely parse "date" field with fallback "year"
-  let parsed-date = parse-date(reference, "date", fallback-year-field: "year")
+  let parsed-date = parse-date(reference, "date", fallback-year-field: "year", fallback-month-field: "month")
   ref.fields.insert("parsed-date", parsed-date)
 
   // if other "Xdate" fields are defined, parse them too
@@ -513,7 +513,7 @@
       if key in bib { // skip references to labels that are not bib keys
         let bib-entry = bib.at(key)
         bib-entry = preprocess-reference(bib-entry, name-fields)
-        // [#bib-entry]
+        [#bib-entry]
         bibl-unsorted.push(bib-entry)
       }
     }

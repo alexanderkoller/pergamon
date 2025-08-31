@@ -1,6 +1,32 @@
 #import "bib-util.typ": fd, is-integer
 
-#let parse-date(reference, date-field, fallback-year-field: none) = {
+#let month-names = (
+    "january": 1,
+    "february": 2,
+    "march": 3,
+    "april": 4,
+    "may": 5,
+    "june": 6,
+    "july": 7,
+    "august": 8,
+    "september": 9,
+    "october": 10,
+    "november": 11,
+    "december": 12,
+    "jan": 1,
+    "feb": 2,
+    "mar": 3,
+    "apr": 4,
+    "jun": 6,
+    "jul": 7,
+    "aug": 8,
+    "sep": 9,
+    "oct": 10,
+    "nov": 11,
+    "dec": 12
+  )
+
+#let parse-date(reference, date-field, fallback-year-field: none, fallback-month-field: none) = {
   let options = (:) // these are print-reference options, and we are outside of print-reference
   let date-str = fd(reference, date-field, options)
   
@@ -45,7 +71,27 @@
     // no date field, fall back to year field
     let year-str = fd(reference, fallback-year-field, options)
     if year-str != none and is-integer(year-str) {
-      ("year": int(year-str.trim()))
+      let date-dict = ("year": int(year-str.trim()))
+
+      if fallback-month-field != none {
+        let month-str = fd(reference, fallback-month-field, options)
+        if month-str != none {
+          month-str = month-str.trim()
+
+          if is-integer(month-str) {
+            // integer months: insert directly
+            date-dict.insert("month", int(month-str.trim()))
+          } else {
+            // months that are defined in the month-names dict: resolve to int
+            // all other months: retain verbatim (thus "month" field can be type str)
+            let lower-month-str = lower(month-str)
+            let month-num = month-names.at(lower-month-str, default: month-str)
+            date-dict.insert("month", month-num)
+          }
+        }
+      }
+
+      date-dict
     } else {
       // unparseable year -> print as "n.d."
       none
