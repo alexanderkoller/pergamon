@@ -4,6 +4,7 @@
 #import "printfield.typ": printfield
 #import "bib-util.typ": fd, ifdef, type-aliases, nn, concatenate-list
 #import "names.typ": family-names
+#import "dates.typ": is-year-defined
 
 
 
@@ -1003,7 +1004,7 @@
 /// under these keys as arguments to `refsection`, `print-bibliography`, and `format-reference`,
 /// respectively.
 #let format-citation-authoryear(
-  /// Wraps text in brackets. The argument needs to be a function
+  /// Wraps text in round brackets. The argument needs to be a function
   /// that takes one argument (`str` or `content`) and returns `content`.
   /// 
   /// It is essential that if the argument is `none`, the function must
@@ -1012,6 +1013,16 @@
   /// 
   /// -> function
   format-parens: nn(it => [(#it)]),
+
+  /// Wraps text in square brackets. The argument needs to be a function
+  /// that takes one argument (`str` or `content`) and returns `content`.
+  /// 
+  /// It is essential that if the argument is `none`, the function must
+  /// also return `none`. This can be achieved conveniently with the `nn`
+  /// function wrapper, see @sec:package:utility.
+  /// 
+  /// -> function
+  format-brackets: nn(it => [[#it]]),
 
   /// The string that separates the author and year in the `p` citation form.
   /// -> str
@@ -1024,35 +1035,45 @@
   let formatter(reference-dict, form) = {
     // access precomputed information that was stored in the label field
     let (authors-str, year, extradate) = reference-dict.reference.at("label")
-
-    // TODO-DATE use extradate
+    let year-defined = is-year-defined(reference-dict.reference)
+    let extradate = if extradate == none {
+      // no extradate, so use empty string
+      ""
+    } else if year-defined {
+      // year is defined - no need to wrap extradate in brackets
+      extradate
+    } else if form in ("t", "g", "p", auto) {
+      // extradate is inside parentheses
+      format-brackets(extradate)
+    } else {
+      format-parens(extradate)
+    }
 
     if form == "t" {
       // can't concatenate with strfmt because format-parens(year) is not a string
-      [#authors-str #format-parens(year)]
-      // spaces(authors-str, format-parens(year))
+      [#authors-str #format-parens([#year#extradate])]
     } else if form == "g" {
       [#authors-str\'s #format-parens(year)]
-      // spaces(authors-str + "'s", format-parens(year))
     } else if form == "n" {
-      strfmt("{} {}", authors-str, year)
+      [#authors-str #year#extradate]
     } else { // auto or "p"
-      format-parens(strfmt("{}{}{}", authors-str, author-year-separator, year))
+      format-parens([#authors-str#author-year-separator#year#extradate])
     }
   }
 
   let label-generator(index, reference) = {
     let parsed-authors = family-names(reference.fields.parsed-author)
-    let (year-defined, year) = if reference.fields.parsed-date != none and "year" in reference.fields.parsed-date {
-      (true, str(reference.fields.parsed-date.year))
+    let year-defined = is-year-defined(reference)
+    let year = if reference.fields.parsed-date != none and "year" in reference.fields.parsed-date {
+      str(reference.fields.parsed-date.year)
     } else {
-      (false, "n.d.") // TODO localize this through bibstring
+      "n.d." // TODO localize this through bibstring
     }
 
     let extradate = if "extradate" in reference.fields {
       numbering("a", reference.fields.extradate + 1)
     } else {
-      ""
+      none
     }
 
     let authors-str = if parsed-authors.len() == 1 {

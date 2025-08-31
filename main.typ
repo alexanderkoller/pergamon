@@ -79,7 +79,7 @@
   #cite("wu-etal-2024-reasoning") #cite("knuth1990") #cite("yao2025language") #cite("hershcovichItMeaningThat2021")
   #cite("abgrallMeasurementsppmKpm2016") #cite("kuhlmann2003tiny") #cite("fake-mastersthesis")
 
-  #cite("multi1") #cite("multi2")
+  #cite("multi1") #citen("multi2")
 
   #print-bibliography(format-reference: fref, sorting: sorting,
     label-generator: fcite.label-generator,

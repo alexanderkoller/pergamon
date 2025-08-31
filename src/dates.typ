@@ -104,3 +104,8 @@
     (:)
   }
 }
+
+// Checks whether the year is defined in this reference dict.
+#let is-year-defined(reference) = {
+  reference.fields.parsed-date != none and "year" in reference.fields.parsed-date
+}
