@@ -513,7 +513,7 @@
       if key in bib { // skip references to labels that are not bib keys
         let bib-entry = bib.at(key)
         bib-entry = preprocess-reference(bib-entry, name-fields)
-        [#bib-entry]
+        // [#bib-entry]
         bibl-unsorted.push(bib-entry)
       }
     }
