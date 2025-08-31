@@ -925,6 +925,11 @@
     /// -> str
     labelalphaothers: "+"
   ) = {
+
+  // TODO: If date is undefined ("n.d."), Biblatex prints extradates in the citation as
+  // "[Mam+a]" and in the bibliography as "[Mam+a]".
+
+
   let formatter(reference-dict, form) = {
     let (reference-label, extradate) = label-parts-alphabetic(reference-dict.reference)
 
@@ -1000,6 +1005,10 @@
   /// -> str
   author-year-separator: " "
 ) = {
+
+  // TODO: If date is undefined ("n.d."), Biblatex prints extradates in the citation as
+  // "Mammadov et al. n.d.(a)" and in the bibliography as "Mammadov, Tural et al. (n.d.[a])".
+
   let formatter(reference-dict, form) = {
     // access precomputed information that was stored in the label field
     let (authors-str, year) = reference-dict.reference.at("label")

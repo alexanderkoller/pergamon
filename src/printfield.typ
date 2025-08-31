@@ -3,19 +3,7 @@
 #import "bib-util.typ": fd, ifdef, concatenate-list
 #import "templating.typ": *
 #import "names.typ": format-name
-
-#let matches-completely(s, re) = {
-  let result = s.match(re)
-
-  if result == none {
-    return false
-  } else {
-    [#result]
-    [#{result.start == 0 and result.end == s.len()}]
-  }
-}
-
-#let is-integer(s) = matches-completely(s, "\d+")
+#import "bib-util.typ": is-integer
 
 
 #let eprint(reference, options) = {

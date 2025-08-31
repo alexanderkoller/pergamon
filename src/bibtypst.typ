@@ -1,9 +1,8 @@
 
 #import "@preview/oxifmt:1.0.0": strfmt
 #import "@preview/citegeist:0.1.0": load-bibliography
-#import "bib-util.typ": collect-deduplicate
+#import "bib-util.typ": collect-deduplicate, is-integer, fd
 #import "names.typ": parse-names, parse-reference-names
-
 
 #let reference-collection = state("reference-collection", (:))
 #let bibliography = state("bibliography", (:))
@@ -347,6 +346,80 @@
   return sorted
 }
 
+#let parse-date(reference, date-field, fallback-year-field: none) = {
+  let options = (:) // these are print-reference options, and we are outside of print-reference
+  let date-str = fd(reference, date-field, options)
+  
+  // I would like to return dates as Typst datetime objects, but they require
+  // valid dates in which year, month, day are all specified; and Biblatex doesn't require this.
+
+  // TODO: permit date ranges
+  // TODO: permit approximate dates
+  // TODO: permit negative years
+
+  if date-str != none {
+    date-str = date-str.trim()
+
+    if date-str.contains("-") {
+      // parse as ISO8601-2 Extended Format, see Biblatex manual, §2.3.8
+      let parts = date-str.split("-")
+
+      if parts.len() >= 3 {
+        // Format: year-month-date
+        if is-integer(parts.at(0)) and is-integer(parts.at(1)) and is-integer(parts.at(2)) {
+          ("year": int(parts.at(0)), "month": int(parts.at(1)), "day": int(parts.at(2)))
+        } else {
+          // unparseable date
+          none
+        }
+      } else if parts.len() == 2 {
+        // Format: year-month
+         if is-integer(parts.at(0)) and is-integer(parts.at(1)) {          
+          ("year": int(parts.at(0)), "month": int(parts.at(1)))
+         } else {
+          none
+         }
+      } else if is-integer(parts.at(0)) {
+        // Format: year
+        ("year": int(parts.at(0)))
+      }
+    } else {
+      // unparsable date -> print as "n.d."
+      none
+    }
+  } else if fallback-year-field != none {
+    // no date field, fall back to year field
+    let year-str = fd(reference, fallback-year-field, options)
+    if year-str != none and is-integer(year-str) {
+      ("year": int(year-str.trim()))
+    } else {
+      // unparseable year -> print as "n.d."
+      none
+    }
+  } else {
+    // no date or year field specified -> print as "n.d."
+    none
+  }
+}
+
+#let preprocess-reference(reference, name-fields) = {
+  let ref = parse-reference-names(reference, name-fields)
+
+  // definitely parse "date" field with fallback "year"
+  let parsed-date = parse-date(reference, "date", fallback-year-field: "year")
+  ref.fields.insert("parsed-date", parsed-date)
+
+  // if other "Xdate" fields are defined, parse them too
+  for field-name in reference.fields.keys() {
+    if field-name.ends-with("date") and field-name != "date" {
+      let parsed-date = parse-date(reference, field-name)
+      ref.fields.insert("parsed-" + field-name, parsed-date)
+    }
+  }
+
+  ref
+}
+
 /// Prints the bibliography for the @refsection in which it is contained.
 /// This function cannot be used outside of a refsection.
 ///
@@ -484,19 +557,18 @@
 
   if show-all {
     for reference in bib.values() {
-      let ref = parse-reference-names(reference, name-fields)
+      let ref = preprocess-reference(reference, name-fields)
       bibl-unsorted.push(ref)
     }
   } else {
-    // [RC at printbib: #reference-collection.get().keys()]
-    // let cited-keys = ("bender20:_climb_nlu", "knuth1990") // XXXX
     let cited-keys = reference-collection.get().keys()
     for lbl in cited-keys {
       let key = split(str(lbl), refsection-id-here)
 
       if key in bib { // skip references to labels that are not bib keys
         let bib-entry = bib.at(key)
-        bib-entry = parse-reference-names(bib-entry, name-fields)
+        bib-entry = preprocess-reference(bib-entry, name-fields)
+        // [#bib-entry]
         bibl-unsorted.push(bib-entry)
       }
     }

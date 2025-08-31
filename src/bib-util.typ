@@ -1,4 +1,27 @@
 
+
+
+#let matches-completely(s, re) = {
+  let result = s.match(re)
+
+  if result == none {
+    return false
+  } else {
+    // [#result]
+    result.start == 0 and result.end == s.len()
+  }
+}
+
+
+// Checks whether a string can be converted into an int
+#let is-integer(s) = {
+  // s = s.trim()
+
+  // TODO: allow negative numbers at some point
+  matches-completely(s.trim(), regex("\d+"))
+}
+
+
 // Concatenate an array of strings ("A", "B", "C") into "A, B, and C".
 #let concatenate-list(names, options) = {
   let ret = names.at(0)
