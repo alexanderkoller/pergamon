@@ -281,10 +281,10 @@
       // year
       // TODO: currently we ignore the rest of the date if "d" specified, fix that
       if i+1 < sorting-string.len() and sorting-string.at(i+1) == "d" {
-        reference => -int(reference.fields.year)
+        reference => -reference.fields.parsed-date.year //   int(reference.fields.year)
         i += 1
       } else {
-        reference => int(reference.fields.year)
+        reference => reference.fields.parsed-date.year //  int(reference.fields.year
       }
     } else if sort-key == "n" {
       // author name

@@ -59,10 +59,10 @@
          } else {
           none
          }
-      } else if is-integer(parts.at(0)) {
-        // Format: year
-        ("year": int(parts.at(0)))
       }
+    } else if is-integer(date-str) {
+      // Format: year
+      ("year": int(date-str))
     } else {
       // unparsable date -> print as "n.d."
       none

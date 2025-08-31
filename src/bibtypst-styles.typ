@@ -30,7 +30,7 @@
 
 #let date(reference, options) = {
   epsilons(
-    fd(reference, "year", options), // TODO this is probably incomplete
+    printfield(reference, "parsed-date", options),
     printfield(reference, "extradate", options)
   )
 }
@@ -368,18 +368,34 @@
 //        {\usebibmacro{translator+others}}}}
 }
 
+// Panic if one of the specified fields is missing.
+// A field specification can either be the name of a field (str),
+// in which case that field must exist; or it can be an array of strings,
+// in which case one of the fields in the array must exist.
+// This is useful e.g. for the case ("date", "year") or ("author", "editor").
 #let require-fields(reference, options, ..fields) = {
-  for field in fields.pos() {
-    assert(fd(reference, field, options) != none, message: strfmt("Required field '{}' is missing in entry '{}'!", field, reference.entry_key))
+  for fieldspec in fields.pos() {
+    let fieldspec-present = if type(fieldspec) == array {
+      let one-is-present = false
+      for field in fieldspec {
+        if fd(reference, field, options) != none {
+          one-is-present = true
+        }
+      }
+      one-is-present
+    } else {
+      fd(reference, fieldspec, options) != none
+    }
+
+    if not fieldspec-present {
+      panic(strfmt("Required field '{}' is missing in entry '{}'!", fieldspec, reference.entry_key))
     }
   }
 }
 
 
 #let driver-article(reference, options) = {
-    // TODO - it's okay if either year or date is defined
-    // -> revamping dates and years is a major coherent work package that I should look at
-    require-fields(reference, options, "author", "title", "journaltitle", "year")
+    require-fields(reference, options, "author", "title", "journaltitle", ("date", "year"))
 
     // For now, I am mapping both \newunit and \newblock to periods.
     periods(
@@ -411,8 +427,7 @@
 
 
 #let driver-inproceedings(reference, options) = {
-  // TODO - it's okay if either year or date is defined
-  require-fields(reference, options, "author", "title", "booktitle", "year")
+  require-fields(reference, options, "author", "title", "booktitle", ("date", "year"))
 
   // LIMITATION: If the date (= year) is followed directly by the pages, Biblatex separates
   // them with a comma rather than a period. I think is works because the \setunit in chapter+pages
@@ -445,8 +460,7 @@
 
 
 #let driver-incollection(reference, options) = {
-  // TODO - it's okay if either year or date is defined
-  require-fields(reference, options, "author", "title", "editor", "booktitle", "year")
+  require-fields(reference, options, "author", "title", "editor", "booktitle", ("date", "year"))
 
   periods(
     author-translator-others(reference, options),
@@ -472,9 +486,8 @@
 
 
 #let driver-book(reference, options) = {
-  // TODO - it's okay if either year or date is defined
   // TODO - it's probably okay if there is an editor rather than an author
-  require-fields(reference, options, "author", "title", "year")
+  require-fields(reference, options, "author", "title", ("date", "year"))
 
   periods(
     author-editor-others-translator-others(reference, options),
@@ -499,8 +512,7 @@
 }
 
 #let driver-misc(reference, options) = {
-  // TODO - it's okay if either year or date is defined
-  require-fields(reference, options, "author", "title", "year")
+  require-fields(reference, options, "author", "title", ("date", "year"))
 
   periods(
     author-editor-others-translator-others(reference, options),
@@ -522,8 +534,7 @@
 
 
 #let driver-thesis(reference, options) = {
-  // TODO - it's okay if either year or date is defined
-  require-fields(reference, options, "author", "title", "type", "institution", "year")
+  require-fields(reference, options, "author", "title", "type", "institution", ("date", "year"))
 
   periods(
     author(reference, options),
@@ -1029,7 +1040,7 @@
 
   let label-generator(index, reference) = {
     let parsed-authors = family-names(reference.fields.parsed-author)
-    let year = str(reference.fields.year)
+    let year = str(reference.fields.parsed-date.year)
 
     if "extradate" in reference.fields {
       year += numbering("a", reference.fields.extradate + 1)

@@ -50,6 +50,33 @@
   concatenate-list(name-parts-array.map(d => format-name(d, format-str: options.name-format)), options)
 }
 
+#let month-bibstring-keys = (
+   "january", "february", "march", "april", "may", "june", 
+   "july", "august", "september", "october", "november", "december"
+)
+ 
+#let print-date(date-dict, options) = {
+  let month-entry = date-dict.at("month", default: none)
+
+  let month-str = if month-entry != none {
+    if type(month-entry) == int {
+      options.bibstring.at(month-bibstring-keys.at(month-entry - 1))
+    } else {
+      month-entry
+    }
+  } else {
+    none
+  }
+
+  if "day" in date-dict {
+    strfmt("{} {} {}", date-dict.day, month-str, date-dict.year)
+  } else if month-str != none {
+    strfmt("{} {}", month-str, date-dict.year)
+  } else {
+    str(date-dict.year)
+  }
+}
+
 #let field-formats = (
   // Used in the bibliography and bibliography lists
 
@@ -181,6 +208,12 @@
 
   "volumes": (value, reference, field, options, style) => {
     [#value #options.bibstring.volumes]
+  },
+
+  "date": "parsed-date",
+
+  "parsed-date": (value, reference, field, options, style) => {
+    print-date(value, options)
   },
 
   "extradate": (value, reference, field, options, style) => {
