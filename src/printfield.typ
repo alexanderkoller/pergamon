@@ -72,8 +72,10 @@
     strfmt("{} {} {}", date-dict.day, month-str, date-dict.year)
   } else if month-str != none {
     strfmt("{} {}", month-str, date-dict.year)
-  } else {
+  } else if "year" in date-dict {
     str(date-dict.year)
+  } else {
+    options.bibstring.nodate
   }
 }
 

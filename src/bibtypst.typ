@@ -280,11 +280,19 @@
     let sorting-function = if sort-key == "y" or sort-key == "d" {
       // year
       // TODO: currently we ignore the rest of the date if "d" specified, fix that
+      let extract-date(reference) = {
+        if reference.fields.parsed-date != none and "year" in reference.fields.parsed-date {
+          reference.fields.parsed-date.year
+        } else {
+          9999
+        }
+      }
+
       if i+1 < sorting-string.len() and sorting-string.at(i+1) == "d" {
-        reference => -reference.fields.parsed-date.year //   int(reference.fields.year)
+        reference => -extract-date(reference)
         i += 1
       } else {
-        reference => reference.fields.parsed-date.year //  int(reference.fields.year
+        reference => extract-date(reference)
       }
     } else if sort-key == "n" {
       // author name

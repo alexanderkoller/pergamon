@@ -26,6 +26,9 @@
     "dec": 12
   )
 
+// Returns an empty dictionary if the date field is unparseable.
+// (Returning "none" would cause trouble in printfield, which returns none
+// if the field value is none.)
 #let parse-date(reference, date-field, fallback-year-field: none, fallback-month-field: none) = {
   let options = (:) // these are print-reference options, and we are outside of print-reference
   let date-str = fd(reference, date-field, options)
@@ -50,14 +53,14 @@
           ("year": int(parts.at(0)), "month": int(parts.at(1)), "day": int(parts.at(2)))
         } else {
           // unparseable date
-          none
+          (:)
         }
       } else if parts.len() == 2 {
         // Format: year-month
          if is-integer(parts.at(0)) and is-integer(parts.at(1)) {          
           ("year": int(parts.at(0)), "month": int(parts.at(1)))
          } else {
-          none
+          (:)
          }
       }
     } else if is-integer(date-str) {
@@ -65,7 +68,7 @@
       ("year": int(date-str))
     } else {
       // unparsable date -> print as "n.d."
-      none
+      (:)
     }
   } else if fallback-year-field != none {
     // no date field, fall back to year field
@@ -94,10 +97,10 @@
       date-dict
     } else {
       // unparseable year -> print as "n.d."
-      none
+      (:)
     }
   } else {
     // no date or year field specified -> print as "n.d."
-    none
+    (:)
   }
 }

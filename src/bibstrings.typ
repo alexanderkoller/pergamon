@@ -201,7 +201,7 @@
   "origpubin": "originally published in",
   "astitle": "as",
   "bypublisher": "by",
-  "nodate": "no date",
+  "nodate": "n.d.", // was long version "no date"
   "page": "page",
   "pages": "pages",
   "column": "column",

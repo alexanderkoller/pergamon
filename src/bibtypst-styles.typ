@@ -395,7 +395,8 @@
 
 
 #let driver-article(reference, options) = {
-    require-fields(reference, options, "author", "title", "journaltitle", ("date", "year"))
+    require-fields(reference, options, "author", "title", "journaltitle")
+    // ("date", "year") don't have to be required - we just print "n.d." in that case
 
     // For now, I am mapping both \newunit and \newblock to periods.
     periods(
@@ -427,7 +428,7 @@
 
 
 #let driver-inproceedings(reference, options) = {
-  require-fields(reference, options, "author", "title", "booktitle", ("date", "year"))
+  require-fields(reference, options, "author", "title", "booktitle")
 
   // LIMITATION: If the date (= year) is followed directly by the pages, Biblatex separates
   // them with a comma rather than a period. I think is works because the \setunit in chapter+pages
@@ -460,7 +461,7 @@
 
 
 #let driver-incollection(reference, options) = {
-  require-fields(reference, options, "author", "title", "editor", "booktitle", ("date", "year"))
+  require-fields(reference, options, "author", "title", "editor", "booktitle")
 
   periods(
     author-translator-others(reference, options),
@@ -487,7 +488,7 @@
 
 #let driver-book(reference, options) = {
   // TODO - it's probably okay if there is an editor rather than an author
-  require-fields(reference, options, "author", "title", ("date", "year"))
+  require-fields(reference, options, "author", "title")
 
   periods(
     author-editor-others-translator-others(reference, options),
@@ -512,7 +513,7 @@
 }
 
 #let driver-misc(reference, options) = {
-  require-fields(reference, options, "author", "title", ("date", "year"))
+  require-fields(reference, options, "author", "title")
 
   periods(
     author-editor-others-translator-others(reference, options),
@@ -534,7 +535,7 @@
 
 
 #let driver-thesis(reference, options) = {
-  require-fields(reference, options, "author", "title", "type", "institution", ("date", "year"))
+  require-fields(reference, options, "author", "title", "type", "institution")
 
   periods(
     author(reference, options),
@@ -1022,7 +1023,9 @@
 
   let formatter(reference-dict, form) = {
     // access precomputed information that was stored in the label field
-    let (authors-str, year) = reference-dict.reference.at("label")
+    let (authors-str, year, extradate) = reference-dict.reference.at("label")
+
+    // TODO-DATE use extradate
 
     if form == "t" {
       // can't concatenate with strfmt because format-parens(year) is not a string
@@ -1040,10 +1043,16 @@
 
   let label-generator(index, reference) = {
     let parsed-authors = family-names(reference.fields.parsed-author)
-    let year = str(reference.fields.parsed-date.year)
+    let (year-defined, year) = if reference.fields.parsed-date != none and "year" in reference.fields.parsed-date {
+      (true, str(reference.fields.parsed-date.year))
+    } else {
+      (false, "n.d.") // TODO localize this through bibstring
+    }
 
-    if "extradate" in reference.fields {
-      year += numbering("a", reference.fields.extradate + 1)
+    let extradate = if "extradate" in reference.fields {
+      numbering("a", reference.fields.extradate + 1)
+    } else {
+      ""
     }
 
     let authors-str = if parsed-authors.len() == 1 {
@@ -1054,8 +1063,8 @@
       parsed-authors.at(0) + " et al."
     }
 
-    let lbl = (authors-str, year)
-    let lbl-repr = strfmt("{} {}", authors-str, year)
+    let lbl = (authors-str, year, extradate)
+    let lbl-repr = strfmt("{} {}{}", authors-str, year, extradate)
 
     (lbl, lbl-repr)
   }
