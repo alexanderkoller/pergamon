@@ -968,8 +968,13 @@
       }
     }
 
-    let year = fd(reference, "year", (:))
-    let lbl = strfmt("{}{:02}", abbreviation, year.slice(-2)) // calc.rem(paper-year(reference), 100))
+    let year = if is-year-defined(reference) {
+      str(reference.fields.parsed-date.year).slice(-2)
+    } else {
+      ""
+    }
+
+    let lbl = strfmt("{}{}", abbreviation, year) // calc.rem(paper-year(reference), 100))
     (lbl, lbl)
   }
 
@@ -1028,10 +1033,6 @@
   /// -> str
   author-year-separator: " "
 ) = {
-
-  // TODO: If date is undefined ("n.d."), Biblatex prints extradates in the citation as
-  // "Mammadov et al. n.d.(a)" and in the bibliography as "Mammadov, Tural et al. (n.d.[a])".
-
   let formatter(reference-dict, form) = {
     // access precomputed information that was stored in the label field
     let (authors-str, year, extradate) = reference-dict.reference.at("label")

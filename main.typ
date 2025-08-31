@@ -11,10 +11,10 @@
 
 
 // Author-Year:
-#let fcite = format-citation-authoryear()
+// #let fcite = format-citation-authoryear()
 
 // Alphabetic:
-// #let fcite = format-citation-alphabetic()
+#let fcite = format-citation-alphabetic()
 
 // Numeric:
 // #let fcite = format-citation-numeric()
@@ -22,7 +22,7 @@
 #let fref = format-reference(
   name-format: "{given} {family}",
   reference-label: fcite.reference-label,
-  print-date-after-authors: true,
+  // print-date-after-authors: true,
   // additional-fields: ("award",)
   // additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),
   highlight: (x, reference, index) => {
