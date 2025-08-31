@@ -11,10 +11,10 @@
 
 
 // Author-Year:
-// #let fcite = format-citation-authoryear()
+#let fcite = format-citation-authoryear()
 
 // Alphabetic:
-#let fcite = format-citation-alphabetic()
+// #let fcite = format-citation-alphabetic()
 
 // Numeric:
 // #let fcite = format-citation-numeric()

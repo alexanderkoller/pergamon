@@ -938,11 +938,6 @@
     /// -> str
     labelalphaothers: "+"
   ) = {
-
-  // TODO: If date is undefined ("n.d."), Biblatex prints extradates in the citation as
-  // "[Mam+a]" and in the bibliography as "[Mam+a]".
-
-
   let formatter(reference-dict, form) = {
     let (reference-label, extradate) = label-parts-alphabetic(reference-dict.reference)
 
