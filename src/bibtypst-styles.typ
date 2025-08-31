@@ -725,7 +725,7 @@
     /// also return `none`. This can be achieved conveniently with the `nn`
     /// function wrapper, see @sec:package:utility.
     /// 
-    /// -> function    
+    /// -> function
     format-brackets: nn(it => [[#it]]),
 
     /// Wraps text in double quotes. The argument needs to be a function

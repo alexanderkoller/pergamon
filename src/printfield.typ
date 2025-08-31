@@ -4,6 +4,7 @@
 #import "templating.typ": *
 #import "names.typ": format-name
 #import "bib-util.typ": is-integer
+#import "dates.typ": is-year-defined
 
 
 #let eprint(reference, options) = {
@@ -219,7 +220,11 @@
   },
 
   "extradate": (value, reference, field, options, style) => {
-    numbering("a", value+1)
+    if is-year-defined(reference) {      
+      numbering("a", value+1)
+    } else {
+      (options.format-brackets)(numbering("a", value+1))
+    }
   },
 
   "author": "parsed-author",
