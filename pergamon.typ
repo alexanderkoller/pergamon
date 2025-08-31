@@ -507,6 +507,25 @@ all other references unchanged.
   })
 }
 
+
+= Data model
+
+Let's talk about the assumptions #bibtypst makes about the structure and contents of the #bibtex file.
+This corresponds roughly to Chapter 2 ("Database Guide") of the #biblatex documentation.
+
+== Dates
+
+Dates can be specified in one of two ways:
+
+- In the `date` field using the ISO 8601-2 format: "YYYY-MM-DD" or "YYYY-MM" or "YYYY". Years, months, and days must be positive integers. Date ranges, approximate dates, and years BCE are currently not supported.
+- In the `year` and `month` fields. The `month` field should contain a positive integer, full English month names like `january`, or three-letter abbreviations of English month names like `feb`. These will all be resolved to the proper months and potentially localized. As a fallback option, you can also specify some other string, which will be printed in the reference verbatim.
+
+The "year/month" option is only available for the publication date of the paper.
+
+All other fields whose name ends in `date` (e.g. `urldate`) will also be parsed as in option 1.
+
+
+
 = Detailed documentation
 <sec:package-doc>
 
