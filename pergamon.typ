@@ -32,7 +32,8 @@
   "biblatex": biblatex,
   "zebraw": zebraw,
   "issue": issue,
-  "todo": todo
+  "todo": todo,
+  "unfinished": unfinished
 )
 
 #align(center)[

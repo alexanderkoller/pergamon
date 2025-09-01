@@ -212,10 +212,12 @@
 
 
 
-/// Create a citation to the bibliography entry with the given key.
+/// #unfinished[Create a citation to the bibliography entry with the given key.
 /// The `cite` function keeps track of what `refsection` we are in and
 /// uses that refsection's `format-citation` argument to typeset the
-/// citation. 
+/// citation. ]
+/// 
+/// #todo[Also fix documentation of citet etc.]
 /// 
 /// You can pass a `form` for finer control over the citation string,
 /// depending on what your citation style supports (see   @sec:builtin-citation-styles). If you do not specify
@@ -265,17 +267,6 @@
 
   // combine them with the separator
   format-citation(to-format, form)
-  // let formatted = to-format.map(x => link(label(x.at(0)), format-citation(x.at(1), form)))
-  // formatted.join(separator)
-
-  // TODO - This doesn't quite work, it does "(Author 2020); (Author 2021)", but it should do
-  // "(Author 2020; Author 2021)". We probably need to send the (lbl, value) list to the
-  // citation formatter in one go, so the style can take care of the brackets in the right way.
-
-  //     let citation-str = format-citation(value, form)
-  //     link(label(lbl))[#citation-str]
-
-  // [x]
 }
 
 /// Creates a citation with the form `"t"`, e.g. "Smith et al. (2020)".
