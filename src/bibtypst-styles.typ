@@ -1146,7 +1146,10 @@
 /// `format-citation`, `label-generator`, and `reference-label`. You can use the values
 /// under these keys as arguments to `refsection`, `print-bibliography`, and `format-reference`,
 /// respectively.
-#let format-citation-numeric() = {
+#let format-citation-numeric(
+    citation-separator: ", ",
+    format-brackets: nn(it => [[#it]])
+  ) = {
   let formatter(reference-dict, form) = {
     let lbl = reference-dict.reference.label
 
@@ -1154,6 +1157,22 @@
       [#{reference-dict.index+1}]
     } else {
       return [[#{reference-dict.index+1}]]
+    }
+  }
+
+  let list-formatter(reference-dicts, form) = {
+    let individual-form = "n"
+    let individual-citations = reference-dicts.map(x => {
+      let lbl = x.at(0)
+      let reference = x.at(1)
+      link(label(lbl), formatter(reference, individual-form))
+    })
+
+    let joined = individual-citations.join(citation-separator)
+    if form != "n" {
+      format-brackets(joined)
+    } else {
+      joined
     }
   }
 
@@ -1165,5 +1184,5 @@
     [[#reference.label]]
   }
 
-  ("format-citation": formatter, "label-generator": label-generator, "reference-label": reference-label)
+  ("format-citation": list-formatter, "label-generator": label-generator, "reference-label": reference-label)
 }

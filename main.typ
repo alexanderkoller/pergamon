@@ -11,13 +11,13 @@
 
 
 // Author-Year:
-#let fcite = format-citation-authoryear()
+// #let fcite = format-citation-authoryear()
 
 // Alphabetic:
 // #let fcite = format-citation-alphabetic()
 
 // Numeric:
-// #let fcite = format-citation-numeric()
+#let fcite = format-citation-numeric()
 
 #let fref = format-reference(
   name-format: "{given} {family}",
