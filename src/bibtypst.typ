@@ -30,12 +30,30 @@
 #let add-bib-resource(
     /// A #bibtex string to be parsed.
     /// -> str
-    bibtex-string
+    bibtex-string,
+
+    /// If `source-id` is not `none`, it is added to all references loaded from
+    /// this #bibtex source under the `source-id` field. This can e.g. be used
+    /// to filter bibliographies by source id.
+    /// 
+    /// For instance, this value of `filter` for @print-bibliography will only
+    /// show the references that were assigned the source id `other.bib`:
+    /// 
+    /// ```
+    /// filter: reference => reference.fields.at("source-id", default: none) == "other.bib"
+    /// ```
+    /// 
+    /// -> str | none
+    source-id: none
   ) = {
   bibliography.update(old-bib => {
     for (key, value) in load-bibliography(bibtex-string).pairs() {
       if key in old-bib {
         panic("Duplicate definition of bibliography key '" + key + "'.")
+      }
+
+      if source-id != none {
+        value.fields.insert("source-id", source-id)
       }
 
       old-bib.insert(key, value)
