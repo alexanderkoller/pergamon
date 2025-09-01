@@ -963,7 +963,21 @@
     /// The "et al" character that is appended if the number of authors exceeds the
     /// value of the `maxalphanames` parameter.
     /// -> str
-    labelalphaothers: "+"
+    labelalphaothers: "+",
+
+    /// The string that separates the author and year in the `p` citation form.
+    /// -> str
+    citation-separator: ", ",
+
+    /// Wraps text in square brackets. The argument needs to be a function
+    /// that takes one argument (`str` or `content`) and returns `content`.
+    /// 
+    /// It is essential that if the argument is `none`, the function must
+    /// also return `none`. This can be achieved conveniently with the `nn`
+    /// function wrapper, see @sec:package:utility.
+    /// 
+    /// -> function
+    format-brackets: nn(it => [[#it]])
   ) = {
   let formatter(reference-dict, form) = {
     let (reference-label, extradate) = label-parts-alphabetic(reference-dict.reference)
@@ -972,6 +986,23 @@
       [#reference-label#extradate]
     } else {
       return [[#reference-label#extradate]]
+    }
+  }
+
+
+  let list-formatter(reference-dicts, form) = {
+    let individual-form = "n"
+    let individual-citations = reference-dicts.map(x => {
+      let lbl = x.at(0)
+      let reference = x.at(1)
+      link(label(lbl), formatter(reference, individual-form))
+    })
+
+    let joined = individual-citations.join(citation-separator)
+    if form != "n" {
+      format-brackets(joined)
+    } else {
+      joined
     }
   }
 
@@ -1005,7 +1036,7 @@
     [[#reference-label#extradate]]
   }
 
-  ("format-citation": formatter, "label-generator": label-generator, "reference-label": reference-label)
+  ("format-citation": list-formatter, "label-generator": label-generator, "reference-label": reference-label)
 }
 
 
@@ -1147,7 +1178,18 @@
 /// under these keys as arguments to `refsection`, `print-bibliography`, and `format-reference`,
 /// respectively.
 #let format-citation-numeric(
+    /// The string that separates the author and year in the `p` citation form.
+    /// -> str
     citation-separator: ", ",
+
+    /// Wraps text in square brackets. The argument needs to be a function
+    /// that takes one argument (`str` or `content`) and returns `content`.
+    /// 
+    /// It is essential that if the argument is `none`, the function must
+    /// also return `none`. This can be achieved conveniently with the `nn`
+    /// function wrapper, see @sec:package:utility.
+    /// 
+    /// -> function
     format-brackets: nn(it => [[#it]])
   ) = {
   let formatter(reference-dict, form) = {

@@ -11,13 +11,13 @@
 
 
 // Author-Year:
-// #let fcite = format-citation-authoryear()
+#let fcite = format-citation-authoryear()
 
 // Alphabetic:
 // #let fcite = format-citation-alphabetic()
 
 // Numeric:
-#let fcite = format-citation-numeric()
+// #let fcite = format-citation-numeric()
 
 #let fref = format-reference(
   name-format: "{given} {family}",
@@ -61,7 +61,7 @@
 
   citet: !#citet("modelizer-24", "modelizer-24")!
 
-  citep: #citep("bender20:_climb_nlu")
+  citep: #citep("bender20:_climb_nlu", "knuth1990")
 
   citeg: #citeg("kandra-bsc-25", "kandra-bsc-25")
 
