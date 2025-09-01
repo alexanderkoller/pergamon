@@ -23,7 +23,8 @@
 /// )
 /// 
 /// You can call `add-bib-resource` multiple times, and this will add
-/// the contents of multiple bib files
+/// the contents of multiple bib files. However, all bibliography entries
+/// must have different keys, even if they are in different source files.
 /// 
 /// -> none
 #let add-bib-resource(
@@ -33,6 +34,10 @@
   ) = {
   bibliography.update(old-bib => {
     for (key, value) in load-bibliography(bibtex-string).pairs() {
+      if key in old-bib {
+        panic("Duplicate definition of bibliography key '" + key + "'.")
+      }
+
       old-bib.insert(key, value)
     }
 
