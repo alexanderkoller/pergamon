@@ -20,6 +20,12 @@
 #let biblatex = "BibLaTeX"
 #let bibtex = "BibTeX"
 
+#let unfinished-color = red.transparentize(80%)
+#let unfinished(x) = box(inset: 6pt, stroke: black, fill: unfinished-color)[
+  #place(top+right, dy: -6pt - 1em - 4pt, dx: 6pt)[#box(stroke: black, fill: unfinished-color, inset: 4pt, [*FINISH ME!*])]
+  #x
+]
+
 #let scope = (
   "bibtypst": bibtypst,
   "bibtex": bibtex,
@@ -507,7 +513,7 @@ all other references unchanged.
   })
 }
 
-
+#unfinished[
 = Data model
 
 Let's talk about the assumptions #bibtypst makes about the structure and contents of the #bibtex file.
@@ -523,7 +529,7 @@ Dates can be specified in one of two ways:
 The "year/month" option is only available for the publication date of the paper.
 
 All other fields whose name ends in `date` (e.g. `urldate`) will also be parsed as in option 1.
-
+]
 
 
 = Detailed documentation

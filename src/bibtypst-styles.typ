@@ -789,11 +789,22 @@
     /// -> array | none
     additional-fields: none,
 
-    /// An array of field names that should not be printed. References are treated
+    /// A specification of field names that should not be printed. References are treated
     /// as if they do not contain values for these fields, even if the #bibtex file
-    /// defines them. Instead of an array, you can also pass `none` to indicate that
+    /// defines them. 
+    /// 
+    /// You can pass an array of strings here. These field names will be suppressed in
+    /// all references.
+    /// 
+    /// Alternatively, you can pass a dictionary that maps entry types to arrays of strings.
+    /// `("inproceedings": ("editor", "location"))` means that the editor and location fields
+    /// will not be printed in `inproceedings` references, but may be printed in other
+    /// entry types. You can use the special key `"*"` to suppress fields in _all_ entry types.
+    /// 
+    /// Finally, you can also pass  `none` to indicate that
     /// no fields should be suppressed.
-    /// -> array | none
+    /// 
+    /// -> array | dictionary | none
     suppress-fields: none,
   ) = {
     
@@ -805,11 +816,27 @@
       }
 
       let suppressed-fields = (:)
-      if suppress-fields != none {
+      if type(suppress-fields) == array {
         for field in suppress-fields {
           suppressed-fields.insert(field, 1)
         }
+      } else if type(suppress-fields) == dictionary {
+        let general-suppress-fields = suppress-fields.at("*", default: ())
+        // panic(general-suppress-fields)
+        for field in general-suppress-fields {
+          suppressed-fields.insert(field, 1)
+        }
+
+        let type-suppress-fields = suppress-fields.at(reference.entry_type, default: ())
+        for field in type-suppress-fields {
+          suppressed-fields.insert(field, 1)
+        }
       }
+      // if suppress-fields != none {
+      //   for field in suppress-fields {
+      //     suppressed-fields.insert(field, 1)
+      //   }
+      // }
 
       let options = (
         link-titles: link-titles,

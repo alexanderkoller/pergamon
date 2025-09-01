@@ -1,5 +1,6 @@
 
-#import "@preview/pergamon:0.1.0": *
+// #import "@preview/pergamon:0.1.0": *
+#import "lib.typ": *
 
 
 // In this example document, we are putting the whole bibliography source
