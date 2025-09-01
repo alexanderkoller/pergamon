@@ -59,15 +59,13 @@
 
   = Another section
 
-  citet: !#citet("modelizer-24")!
+  citet: !#citet("modelizer-24", "modelizer-24")!
 
   citep: #citep("bender20:_climb_nlu")
 
-  citeg: #citeg("kandra-bsc-25")
+  citeg: #citeg("kandra-bsc-25", "kandra-bsc-25")
 
-  citen: #citen("yang2025goescrosslinguisticstudyimpossible")
-
-  #citen("yang2025goescrosslinguisticstudyimpossible")\; #citen("yang2025goescrosslinguisticstudyimpossible")
+  citen: #citen("yang2025goescrosslinguisticstudyimpossible", "yang2025goescrosslinguisticstudyimpossible")
 
   #cite("sec:intro")
 

@@ -283,32 +283,32 @@
 #let citet(
   /// The key of the #bibtex entry you want to cite.
   /// -> str
-  key
-) = cite(key, form: "t")
+  ..key
+) = cite(..key, form: "t")
 
 /// Creates a citation with the form `"p"`, e.g. "(Smith et al. 2020)".
 /// See @cite for details.
 #let citep(
   /// The key of the #bibtex entry you want to cite.
   /// -> str
-  key
-) = cite(key, form: "p")
+  ..key
+) = cite(..key, form: "p")
 
 /// Creates a citation with the form `"g"`, e.g. "Smith et al.'s (2020)".
 /// See @cite for details.
 #let citeg(
   /// The key of the #bibtex entry you want to cite.
   /// -> str
-  key
-) = cite(key, form: "g")
+  ..key
+) = cite(..key, form: "g")
 
 /// Creates a citation with the form `"n"`, e.g. "Smith et al. 2020".
 /// See @cite for details.
 #let citen(
   /// The key of the #bibtex entry you want to cite.
   /// -> str
-  key
-) = cite(key, form: "n")
+  ..key
+) = cite(..key, form: "n")
 
 
 
