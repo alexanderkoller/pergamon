@@ -78,7 +78,7 @@
 
   #cite("irtg-sgraph-15")
 
-  #cite("wu-etal-2024-reasoning") #cite("knuth1990") #cite("yao2025language") #cite("hershcovichItMeaningThat2021")
+  #cite("wu-etal-2024-reasoning", "knuth1990") #cite("yao2025language") #cite("hershcovichItMeaningThat2021")
   #cite("abgrallMeasurementsppmKpm2016") #cite("kuhlmann2003tiny") #cite("fake-mastersthesis")
 
   #cite("multi1") #citen("multi2")

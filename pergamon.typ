@@ -342,9 +342,9 @@ functions:
   that the reference labeler of a citation style either always returns `none` or never returns `none`,
   making for a consistent number of columns.
 
-- The _citation formatter_ is passed as an argument to `refsection`. It receives a reference dictionary
+- #unfinished[The _citation formatter_ is passed as an argument to `refsection`. It receives a reference dictionary
   and a citation form (see above) as arguments and returns content. This function generates the actual citation 
-  that is typeset into the document.
+  that is typeset into the document.]
 
 Note that the label information that the label generator produces will be stored in the `label` field of the 
 reference dictionary. When the reference labeler and the citation formatter are called, the `label` information 

@@ -1053,8 +1053,13 @@
 
   /// The string that separates the author and year in the `p` citation form.
   /// -> str
-  author-year-separator: " "
+  author-year-separator: " ",
+
+  /// Separator symbol to connect the citations for the different keys.
+  /// -> str
+  citation-separator: "; "
 ) = {
+  
   let formatter(reference-dict, form) = {
     // access precomputed information that was stored in the label field
     let (authors-str, year, extradate) = reference-dict.reference.at("label")
@@ -1081,6 +1086,22 @@
       [#authors-str #year#extradate]
     } else { // auto or "p"
       format-parens([#authors-str#author-year-separator#year#extradate])
+    }
+  }
+
+  let list-formatter(reference-dicts, form) = {
+    let individual-form = if form == "p" or form == auto { "n" } else { form }
+    let individual-citations = reference-dicts.map(x => {
+      let lbl = x.at(0)
+      let reference = x.at(1)
+      link(label(lbl), formatter(reference, individual-form))
+    })
+
+    let joined = individual-citations.join(citation-separator)
+    if form == "p" or form == auto {
+      format-parens(joined)
+    } else {
+      joined
     }
   }
 
@@ -1113,7 +1134,7 @@
     (lbl, lbl-repr)
   }
 
-  ("format-citation": formatter, "label-generator": label-generator, "reference-label": (index, reference) => none)
+  ("format-citation": list-formatter, "label-generator": label-generator, "reference-label": (index, reference) => none)
 }
 
 /// The _numeric_ citation style renders citations in a form like "[1]".
