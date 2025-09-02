@@ -55,8 +55,6 @@
 #show heading.where(level: 1): set heading(numbering: "1.1")
 #show heading.where(level: 2): set heading(numbering: "1.1")
 
-#todo[TODO: Document `fjoin`]
-
 = Introduction
 
 #bibtypst is a package for typesetting bibliographies in Typst.
@@ -288,31 +286,13 @@ convenience, #biblatex defines the functions `citet`, `citep`, `citen`, and `cit
 just call `cite` with the respective citation form.
 
 
-#figure(
-  table(columns: 4,
-    align: left + horizon,
-    // column-gutter: 1em,
-    inset: (x: 1em, y: 0.7em),
-    // stroke: none,
-    fill: (_, y) => if calc.odd(y) { rgb("EAF2F5") },
-
-    [], [*authoryear*], [*alphabetic*], [*numeric*],
-    [`auto`], [(Bender and Koller 2020)], [[BK20]], [[1]],
-    [p], [(Bender and Koller 2020)], [--], [--],
-    [t], [Bender and Koller (2020)], [--], [--],
-    [g], [Bender and Koller's (2020)], [--], [--],
-    [n], [Bender and Koller 2020], [BK20], [1]
-  ),
-  placement: top,
-  caption: [Citation forms.]
-) <fig:citation-forms>
-
 
 == Implementing custom styles 
 <sec:custom-styles>
 
 Instead of using the builtin styles, you can also define your own #bibtypst style
--- either a reference style or a citation style or both. 
+-- either a reference style or a citation style or both. It is recommended to look at the
+default styles in #link("https://github.com/alexanderkoller/pergamon/blob/main/src/bibtypst-styles.typ")[bibtypst-styles.typ] to get a clearer picture.
 
 Implementing a reference style amounts to defining a Typst function that can be passed 
 as the `format-reference` argument to `print-bibliography`. Such a function receives 
@@ -344,14 +324,36 @@ functions:
   that the reference labeler of a citation style either always returns `none` or never returns `none`,
   making for a consistent number of columns.
 
-- #unfinished[The _citation formatter_ is passed as an argument to `refsection`. It receives a reference dictionary
-  and a citation form (see above) as arguments and returns content. This function generates the actual citation 
-  that is typeset into the document.]
+- The _citation formatter_ is passed as an argument to `refsection`. It is responsible for
+  formatting the actual citations into content that is inserted into the document text.
+  The citation formatter receives two arguments: an array of citation specifications and a citation 
+  form (cf. "Citation forms" in @sec:builtin-citation-styles). See the `format-citation` argument 
+  of the `refsection` function in @sec:package:main for details on the citation specifications.
 
 Note that the label information that the label generator produces will be stored in the `label` field of the 
 reference dictionary. When the reference labeler and the citation formatter are called, the `label` information 
 will still be available, allowing you to precompute any information you find useful.
 
+
+
+#figure(
+  table(columns: 4,
+    align: left + horizon,
+    // column-gutter: 1em,
+    inset: (x: 1em, y: 0.7em),
+    // stroke: none,
+    fill: (_, y) => if calc.odd(y) { rgb("EAF2F5") },
+
+    [], [*authoryear*], [*alphabetic*], [*numeric*],
+    [`auto`], [(Bender and Koller 2020)], [[BK20]], [[1]],
+    [p], [(Bender and Koller 2020)], [--], [--],
+    [t], [Bender and Koller (2020)], [--], [--],
+    [g], [Bender and Koller's (2020)], [--], [--],
+    [n], [Bender and Koller 2020], [BK20], [1]
+  ),
+  placement: top,
+  caption: [Citation forms.]
+) <fig:citation-forms>
 
 = Advanced usage 
 
@@ -607,6 +609,7 @@ caption: [Example of a reference dictionary.])
 
 
 == Main functions
+<sec:package:main>
 
 These are functions implementing the base functionality of #bibtypst, such as `cite` and `print-bibliography`.
 
@@ -645,3 +648,14 @@ The following functions may be helpful in the advanced usage and customization o
 #let x = tidy.parse-module(read("src/bibstrings.typ"), scope: scope)
 #tidy.show-module(x, style: tidy.styles.default, show-outline: false)
 
+
+= Changelog
+
+==== Changes in v0.2
+
+- Aggregated citation commands: `#cite("key1", "key2", ...)`.
+- Support for `date` and `month` fields.
+- Added `source-id` parameter to `add-bib-resource`.
+- The `suppress-fields` option in `format-reference` can now be defined per entry type.
+- Default style avoids printing two punctuation symbols in a row.
+- Defining multiple references with the same key is now an error.
