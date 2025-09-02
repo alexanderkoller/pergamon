@@ -134,6 +134,8 @@
 ///  but exclude their captions, pass the name `"caption"`.
 #let map-tree(f, content, exclude: IGNORED_ELEMENTS) = {
   if content == none { return none }
+  if type(content) == str { return content }
+
   let exclude = interpret-exclude-patterns(exclude)
   let map-subtree = map-tree.with(f, exclude: exclude)
 
@@ -206,6 +208,8 @@
     } else if type(result) == str {
       return result
     } else {
+      // [#type(result)]
+      // [#type(result): #result]
       return result.flatten().join()
     }
   }

@@ -22,8 +22,9 @@
 #let fref = format-reference(
   name-format: "{given} {family}",
   reference-label: fcite.reference-label,
+  format-quotes: it => it,
   // suppress-fields: ("*": ("pages",), "inproceedings": ("editor", "publisher") ),
-  print-date-after-authors: true,
+  // print-date-after-authors: true,
   // additional-fields: ("award",)
   additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),
   highlight: (x, reference, index) => {
@@ -79,6 +80,8 @@
   #cite("abgrallMeasurementsppmKpm2016") #cite("kuhlmann2003tiny") #cite("fake-mastersthesis")
 
   #cite("multi1") #citen("multi2")
+
+  to test trailing punctuation: #cite("tedeschi-etal-2023-whats")
 
   #print-bibliography(format-reference: fref, sorting: sorting,
     label-generator: fcite.label-generator,

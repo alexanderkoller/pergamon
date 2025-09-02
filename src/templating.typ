@@ -57,7 +57,13 @@
     none
   } else {
     if finish-with-connector {
-      parts.push(connector)
+      let x = xs.at(-1)
+      let s = content-to-string(x)
+      let previous-character = if s != none and s.len() > 0 { s.at(-1) } else { s }
+
+      if not skip-if(previous-character) {
+        parts.push(connector)
+      }
     }
     let ret = parts.join("")
     format(ret)

@@ -123,7 +123,7 @@
     none
   } else {
     [: ]
-    periods(
+    (options.periods)(
       fjoin(options.subtitlepunct, format: options.format-issuetitle, issuetitle, issuesubtitle),
       printfield(reference, "issuetitleaddon", options)
     )
@@ -138,7 +138,7 @@
   if jt == none and jst == none {
     none
   } else {
-    let journaltitle = periods(
+    let journaltitle = (options.periods)(
       fjoin(options.subtitlepunct, jt, none, format: options.format-journaltitle),
       printfield(reference, "journaltitleaddon", options)
     )
@@ -155,7 +155,7 @@
 
 // biblatex.def withothers
 #let withothers(reference, options) = {
-  periods(
+  (options.periods)(
     ifdef(reference, "commentator", options, commentator => spaces(options.bibstring.withcommentator, commentator)),
     ifdef(reference, "annotator", options, annotator => spaces(options.bibstring.withannotator, annotator)),
     ifdef(reference, "introduction", options, introduction => spaces(options.bibstring.withintroduction, introduction)),
@@ -168,7 +168,7 @@
 #let bytranslator-others(reference, options) = {
   let translator = printfield(reference, "parsed-translator", options)
 
-  periods(
+  (options.periods)(
     // TODO bibstring.bytranslator should be expanded as in bytranslator+othersstrg
     ifdef(reference, "translator", options, translator => spaces(options.bibstring.bytranslator, translator)),
     withothers(reference, options)
@@ -179,7 +179,7 @@
 #let byeditor-others(reference, options) = {
   let editor = printfield(reference, "editor", options)
 
-  periods(
+  (options.periods)(
     // TODO bibstring.byeditor should be expanded as in byeditor+othersstrg
     ifdef(reference, "editor", options, reference => spaces(options.bibstring.byeditor, editor)),
 
@@ -196,7 +196,7 @@
 
 // standard.bbx doi+eprint+url
 #let doi-eprint-url(reference, options) = {
-  periods(
+  (options.periods)(
     if options.print-doi { printfield(reference, "doi", options) } else { none },
     if options.print-eprint { printfield(reference, "eprint", options) } else { none },
     if options.print-url { printfield(reference, "url", options) } else { none },
@@ -205,14 +205,14 @@
 
 // standard.bbx addendum+pubstate
 #let addendum-pubstate(reference, options) = {
-  periods(
+  (options.periods)(
     printfield(reference, "addendum", options),
     printfield(reference, "pubstate", options)
   )
 }
 
 #let maintitle(reference, options) = {
-  periods(
+  (options.periods)(
     fjoin(options.subtitlepunct, 
       printfield(reference, "maintitle", options, style: "titlecase"), 
       printfield(reference, "mainsubtitle", options, style: "titlecase")),
@@ -223,7 +223,7 @@
 }
 
 #let booktitle(reference, options) = {
-  periods(
+  (options.periods)(
     fjoin(options.subtitlepunct, 
       printfield(reference, "booktitle", options, style: "titlecase"), 
       printfield(reference, "booksubtitle", options, style: "titlecase")),
@@ -259,8 +259,8 @@
   let volume-prefix = if print-maintitle { epsilons(printfield(reference, "volume", options), printfield(reference, "part", options)) } else { none }
 
   let maintitle-str = if print-maintitle {
-    periods(
-      periods(
+    (options.periods)(
+      (options.periods)(
         printfield(reference, "maintitle", options),
         printfield(reference, "mainsubtitle", options)
       ),
@@ -288,12 +288,12 @@
   let format-parens = options.at("format-parens")
 
   spaces(
-    periods(
+    (options.periods)(
       printfield(reference, "eventtitle", options),
       printfield(reference, "eventtitleaddon", options),
     ),
     format-parens(
-      commas(
+      (options.commas)(
         printfield(reference, "venue", options),
         print-event-date(reference, options)
       )
@@ -315,7 +315,7 @@
 }
 
 #let xxx-location-date(reference, options, xxx) = {
-  commas(
+  (options.commas)(
     fjoin(
       ":",
       printfield(reference, "location", options), // Biblatex: printlist{location}
@@ -400,7 +400,7 @@
     // ("date", "year") don't have to be required - we just print "n.d." in that case
 
     // For now, I am mapping both \newunit and \newblock to periods.
-    periods(
+    (options.periods)(
       author-translator-others(reference, options),
       printfield(reference, "title", options),
       language(reference, options),
@@ -437,7 +437,7 @@
   // can't do this without major changes to the way we concatenate strings, so we have to live 
   // with periods for now. (Same for @articles.)
 
-  periods(
+  (options.periods)(
     author-translator-others(reference, options),
     printfield(reference, "title", options),
     language(reference, options),
@@ -464,7 +464,7 @@
 #let driver-incollection(reference, options) = {
   require-fields(reference, options, "author", "title", "editor", "booktitle")
 
-  periods(
+  (options.periods)(
     author-translator-others(reference, options),
     printfield(reference, "title", options),
     language(reference, options),
@@ -491,7 +491,7 @@
   // TODO - it's probably okay if there is an editor rather than an author
   require-fields(reference, options, "author", "title")
 
-  periods(
+  (options.periods)(
     author-editor-others-translator-others(reference, options),
     maintitle-title(reference, options),
     language(reference, options),
@@ -516,7 +516,7 @@
 #let driver-misc(reference, options) = {
   require-fields(reference, options, "author", "title")
 
-  periods(
+  (options.periods)(
     author-editor-others-translator-others(reference, options),
     printfield(reference, "title", options),
     language(reference, options),
@@ -538,7 +538,7 @@
 #let driver-thesis(reference, options) = {
   require-fields(reference, options, "author", "title", "type", "institution")
 
-  periods(
+  (options.periods)(
     author(reference, options),
     printfield(reference, "title", options),
     language(reference, options),
@@ -806,6 +806,32 @@
     /// 
     /// -> array | dictionary | none
     suppress-fields: none,
+
+    /// Function that joins an arbitrary number of strings or contents with a period symbol.
+    /// This corresponds roughly (but not precisely) to blocks in #biblatex.
+    /// 
+    /// The function should return `none` if the argument is `none`, and it should skip all
+    /// elements of `..x` that are `none` when joining the elements.
+    /// 
+    /// It may be convenient to use `fjoin` to implement this function. The default
+    /// connects elements with an actual period. It skips the period if the preceding element
+    /// ends with punctuation.
+    /// 
+    /// -> function
+    periods: (..x) => fjoin(".", ..x, skip-if: ".,?!;:"),
+
+    /// Function that joins an arbitrary number of strings or contents with a comma symbol.
+    /// This corresponds roughly (but not precisely) to units in #biblatex.
+    /// 
+    /// The function should return `none` if the argument is `none`, and it should skip all
+    /// elements of `..x` that are `none` when joining the elements.
+    /// 
+    /// It may be convenient to use `fjoin` to implement this function. The default
+    /// connects elements with an actual comma. It skips the comma if the preceding element
+    /// already ends with a comma.
+    /// 
+    /// -> function
+    commas: (..x) => fjoin(",", ..x, skip-if: ","),
   ) = {
     
     let formatter(index, reference, eval-mode) = {
@@ -864,7 +890,9 @@
         print-date-after-authors: print-date-after-authors,
         volume-number-separator: volume-number-separator,
         bibstring: bibstring,
-        suppressed-fields: suppressed-fields
+        suppressed-fields: suppressed-fields,
+        periods: periods,
+        commas: commas,
       )
 
       // process type aliases
@@ -881,23 +909,18 @@
         for field in additional-fields {
           if type(field) == str {
             let value = printfield(reference, field, options)
-            if value != none {
-              ret += ". "
-              ret += value
-            }
+            ret = periods(ret, value)
           } else if type(field) == function {
             let value = field(reference, options)
-            if value != none {
-              ret += ". "
-              ret += value
-            }
+            ret = periods(ret, value)
           }
         }
       }
 
       // add label if requested
       let lbl = reference-label(index, reference)
-      let highlighted = highlight(ret + ".", reference, index)
+      let finished = fjoin(".", ret, finish-with-connector: true, skip-if: ".,?!;:")
+      let highlighted = highlight(finished, reference, index)
 
       if lbl == none {
         ([#highlighted],)
