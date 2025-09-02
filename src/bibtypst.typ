@@ -139,24 +139,32 @@
 /// in a place that is earlier than the refsection in rendering order.
 /// -> none
 #let refsection(
-  /// #unfinished[A function that generates the citation string for a given reference.
-  /// The function receives a #link(<sec:reference>)[reference dictionary] as its
-  /// first argument and a `form` string as its second argument. It returns
+  /// A function that generates the citation string for a list of references.
+  /// The function receives an array of _citation specifications_ as its first
+  /// argument and a `form` string as its second argument. It returns
   /// the content that is displayed in place of a @cite call.
+  /// 
+  /// A citation specification is an array `(lbl, reference)`, where `lbl`
+  /// is a citation label and `reference` is a reference dictionary.
+  /// The citation formatter is expected to use the information in the reference
+  /// dictionary to generate the citation and then embed it in a #link("https://typst.app/docs/reference/model/link/")[link] 
+  /// to the given label (which is anchored by the reference in the bibliography).
+  /// This might look like this:
+  /// ```
+  /// #link(label(lbl), format(reference))
+  /// ```
   /// 
   /// The function you pass here will typically be defined in a #bibtypst citation style, to be
   /// compatible with the `format-reference` function that is passed to
-  /// @print-bibliography. Note that `format-citation` can return any content
-  /// it wants, but it does not need to generate a hyperlink to the bibliography;
-  /// the citation string is automatically wrapped in a `link` by #bibtypst.
+  /// @print-bibliography.
   /// 
   /// You can pass `none` in this argument to indicate that you want to use the
   /// same citation formatter as in the previous `refsection`. If you pass `none`
   /// to the first refsection in the document, #bibtypst will use the dummy
-  /// citation formatter `(reference, form) => [CITATION]`.]
+  /// citation formatter `(references, form) => [CITATION]`.
 
-  /// -> function | none
-  format-citation: none,
+  /// -> function | auto
+  format-citation: auto,
 
   /// A unique identifier for this refsection. Each refsection needs its own unique
   /// id, which distinguishes it from all the other refsections. You can either specify
@@ -170,8 +178,8 @@
   /// will silently introduce and reference a label `ref1-knuth1990`. If the refsection
   /// identifier is `none`, the original label `knuth1990` will be used instead.
   /// 
-  /// -> str | none
-  id: none,
+  /// -> str | auto
+  id: auto,
 
   /// The section of the document that is to be wrapped in this `refsection`.
   /// -> content
@@ -181,7 +189,7 @@
   reference-collection.update((:))
 
   // update the citation formatter if one was specified
-  if format-citation != none {
+  if format-citation != auto {
     current-citation-formatter.update(it => format-citation)
   }
 
@@ -194,7 +202,7 @@
     }
 
     // determine the refsection ID
-    if id != none {
+    if id != auto {
       refsection-id.update(id)
     } else {
       let id = refsection-counter.get()
@@ -510,7 +518,7 @@
     /// `column-gutter: 0.5em`. You can overwrite these values and specify new ones with this argument;
     /// the revised style specification will be passed to the `grid` function.
     /// 
-    /// -> dict
+    /// -> dictionary
     grid-style: (:),
 
     /// The output of `format-reference` can be passed through the Typst #link("https://typst.app/docs/reference/foundations/eval/")[eval]
