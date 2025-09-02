@@ -807,32 +807,47 @@
     /// -> array | dictionary | none
     suppress-fields: none,
 
-    /// Function that joins an arbitrary number of strings or contents with a period symbol.
+    /// Specifies how string or content elements are joined using period symbols.
     /// This corresponds roughly (but not precisely) to blocks in #biblatex.
     /// 
-    /// The function should return `none` if the argument is `none`, and it should skip all
-    /// elements of `..x` that are `none` when joining the elements.
+    /// If you specify a string here, this string will be used to join
+    /// the elements. #bibtypst will avoid duplicating connector symbols, i.e.
+    /// it will not print a period if the preceding symbol was already a period.
     /// 
-    /// It may be convenient to use `fjoin` to implement this function. The default
-    /// connects elements with an actual period. It skips the period if the preceding element
-    /// ends with punctuation.
+    /// Alternatively, you can specify an array `(connector, skip-chars)`, where
+    /// `connector` is the period symbol. The connector is skipped if the
+    /// preceding character occurs in the string `skip-chars`.
     /// 
-    /// -> function
-    periods: (..x) => fjoin(".", ..x, skip-if: ".,?!;:"),
+    /// -> str | array
+    period: (".", ".,?!;:"),
 
-    /// Function that joins an arbitrary number of strings or contents with a comma symbol.
+    /// Function that joins an arbitrary number of strings or contents with a 
+    /// comma symbol. 
     /// This corresponds roughly (but not precisely) to units in #biblatex.
     /// 
-    /// The function should return `none` if the argument is `none`, and it should skip all
-    /// elements of `..x` that are `none` when joining the elements.
+    /// See the documentation for `period` for details.
     /// 
-    /// It may be convenient to use `fjoin` to implement this function. The default
-    /// connects elements with an actual comma. It skips the comma if the preceding element
-    /// already ends with a comma.
-    /// 
-    /// -> function
-    commas: (..x) => fjoin(",", ..x, skip-if: ","),
+    /// -> str | array
+    comma: ",",
   ) = {
+    // construct fjoin functions for periods and commas
+    let make-fjoin-function(separator) = {
+      if type(separator) == function {
+        // In contrast to the official documentation, you can also pass the
+        // fjoin function directly as an argument. But this is complicated,
+        // so let's keep it a secret.
+        separator
+      } else if type(separator) == str {
+        (..x) => fjoin(separator, ..x, skip-if: separator)
+      } else if type(separator) == array {
+        (..x) => fjoin(separator.at(0), ..x, skip-if: separator.at(1))
+      } else {
+        (..x) => fjoin(".", ..x, skip-if: ".")
+      }
+    }
+
+    let commas = make-fjoin-function(comma)
+    let periods = make-fjoin-function(period)
     
     let formatter(index, reference, eval-mode) = {
       // Unfortunately, this still causes "layout did not converge" errors, rather

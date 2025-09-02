@@ -4,16 +4,16 @@
 #let not-none(el) = el != none
 // #let strip-final(s, character) = if s.ends-with(character) { s.slice(0, -1) } else { s }
 
-#let final-character(s) = {
+// #let final-character(s) = {
 
-  if type(s) == str and s.len() > 0 {
-    return s.at(-1)
-  } else if type(s) == text {
-    return s.text //.at(-1)
-  } else {
-    return none
-  }
-}
+//   if type(s) == str and s.len() > 0 {
+//     return s.at(-1)
+//   } else if type(s) == text {
+//     return s.text //.at(-1)
+//   } else {
+//     return none
+//   }
+// }
 
 #let fjoin(connector, format: it => it, add-space: true, skip-if: previous-character => false, finish-with-connector: false, ..xx) = {
   let xs = xx.pos()

@@ -26,7 +26,7 @@
   // suppress-fields: ("*": ("pages",), "inproceedings": ("editor", "publisher") ),
   // print-date-after-authors: true,
   // additional-fields: ("award",)
-  // periods: (..x) => fjoin(".", ..x, skip-if: ".,?!;:"),
+  //  period: ",",
   additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),
   highlight: (x, reference, index) => {
    if "highlight" in reference.fields.at("keywords", default: ()) {
