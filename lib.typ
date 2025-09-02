@@ -4,4 +4,5 @@
 #import "src/names.typ": family-names
 #import "src/bib-util.typ": fd, ifdef, nn
 #import "src/bibstrings.typ": default-bibstring
+#import "src/content-to-string.typ": content-to-string
 
