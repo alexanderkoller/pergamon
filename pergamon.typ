@@ -517,23 +517,43 @@ all other references unchanged.
   })
 }
 
-#unfinished[
+
+
+
 = Data model
 
-Let's talk about the assumptions #bibtypst makes about the structure and contents of the #bibtex file.
-This corresponds roughly to Chapter 2 ("Database Guide") of the #biblatex documentation.
+#bibtypst makes a number of assumptions on the contents of the #bibtex entries.
+These are typically consistent with those that #biblatex makes (see Chapter 2 "Database Guide"
+in the #biblatex documentation), but some of them are worth discussing.
 
 == Dates
 
-Dates can be specified in one of two ways:
+Dates can occur in a number of places in the #bibtex entry. The most important one
+is the publication date of the reference. It can be specified in one of two ways:
 
-- In the `date` field using the ISO 8601-2 format: "YYYY-MM-DD" or "YYYY-MM" or "YYYY". Years, months, and days must be positive integers. Date ranges, approximate dates, and years BCE are currently not supported.
-- In the `year` and `month` fields. The `month` field should contain a positive integer, full English month names like `january`, or three-letter abbreviations of English month names like `feb`. These will all be resolved to the proper months and potentially localized. As a fallback option, you can also specify some other string, which will be printed in the reference verbatim.
+- In the `date` field, using the ISO 8601-2 format: "YYYY-MM-DD" or "YYYY-MM" or "YYYY".
+  In this format, years, months, and days must all be positive integers.
+- In the `year` and `month` fields. In this format, the value of `year` should be a positive integer.
+  The `month` field should contain a positive integer (1--12), full English month names like 
+  `january`, or three-letter abbreviations of English month names like `feb`. 
+  Dates specified in this way will be potentially localized using `bibstring`
+  (see @sec:package:utility). As a fallback option, you can also specify some other string
+  for the month, which will be printed in the reference verbatim.
 
-The "year/month" option is only available for the publication date of the paper.
+All other #bibtex fields whose name ends in `date` (e.g. `urldate`) will also be parsed
+as in the `date` option described above.
 
-All other fields whose name ends in `date` (e.g. `urldate`) will also be parsed as in option 1.
-]
+The parsed dates will be stored in the #link(<sec:reference>)[reference dictionary] `reference`
+under `reference.fields.parsed-X`, where `X` is the name of the `date` field. (If the publication 
+date is specified with a `year` field, its value will still be stored in `reference.fields.parsed-date`.)
+This makes them available for other functions and styles. A parsed date is represented as a dictionary 
+with keys `year`, `month`, and `day`, all of which may be missing. The values under these fields are 
+all positive integers. If a date specification in the #bibtex entry cannot be parsed, it will be
+represented as an empty dictionary.
+
+In addition to these basic date specifications, #biblatex allows for date ranges (#issue(55),
+approximate dates (#issue(56)), and years before the Common Era (#issue(57)). These features 
+are not yet supported in #bibtypst.
 
 
 = Detailed documentation
