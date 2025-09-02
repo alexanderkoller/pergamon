@@ -158,8 +158,8 @@
   /// compatible with the `format-reference` function that is passed to
   /// @print-bibliography.
   /// 
-  /// You can pass `none` in this argument to indicate that you want to use the
-  /// same citation formatter as in the previous `refsection`. If you pass `none`
+  /// You can pass `auto` in this argument to indicate that you want to use the
+  /// same citation formatter as in the previous `refsection`. If you pass `auto`
   /// to the first refsection in the document, #bibtypst will use the dummy
   /// citation formatter `(references, form) => [CITATION]`.
 
@@ -168,7 +168,7 @@
 
   /// A unique identifier for this refsection. Each refsection needs its own unique
   /// id, which distinguishes it from all the other refsections. You can either specify
-  /// an explicit identifier here, or you can pass `none` to indicate that Pergamon
+  /// an explicit identifier here, or you can pass `auto` to indicate that Pergamon
   /// should assign an identifier automatically. In this case, the first refsection
   /// in the document receives the identifier `none`, and the subsequent refsections
   /// will be named `ref1`, `ref2`, and so on.
