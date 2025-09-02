@@ -22,10 +22,10 @@
 #let fref = format-reference(
   name-format: "{given} {family}",
   reference-label: fcite.reference-label,
-  // suppress-fields: ("*": ("pages",), "inproceedings": ("editor",) ),
-  // print-date-after-authors: true,
+  // suppress-fields: ("*": ("pages",), "inproceedings": ("editor", "publisher") ),
+  print-date-after-authors: true,
   // additional-fields: ("award",)
-  // additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),
+  additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),
   highlight: (x, reference, index) => {
    if "highlight" in reference.fields.at("keywords", default: ()) {
       [#text(size: 8pt)[#emoji.star.box] #x]

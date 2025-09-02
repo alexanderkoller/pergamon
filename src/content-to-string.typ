@@ -194,13 +194,22 @@
 }
 
 #let content-to-string(cnt) = {
-  let result = map-tree(x => x, cnt)
-  
-  if result == none {
+  if cnt == none {
     none
-  } else if type(result) == str {
-    return result
+  } else if cnt == "" {
+    ""
   } else {
-    return result.flatten().join()
+    let result = map-tree(x => x, cnt)
+    
+    if result == none {
+      none
+    } else if type(result) == str {
+      return result
+    } else {
+      return result.flatten().join()
+    }
   }
 }
+
+
+// English punctuation: ".,?!;:"
