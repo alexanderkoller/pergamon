@@ -671,7 +671,7 @@ The following functions may be helpful in the advanced usage and customization o
 
 = Changelog
 
-==== Changes in v0.2
+==== Changes in v0.2.0
 
 - Aggregated citation commands: `#cite("key1", "key2", ...)`.
 - Support for `date` and `month` fields.
