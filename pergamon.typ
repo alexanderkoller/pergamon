@@ -243,7 +243,7 @@ when you use #bibtypst. The exact string that is inserted depends on
 the citation style you use. 
 
 The difference between the three builtin citation styles is illustrated in @fig:example-output (numeric), @fig:example-alphabetic (alphabetic), and @fig:example-authoryear (authoryear). _Numeric_ and _alphabetic_ both create a label for each bibliography entry;
-in the case of _numeric_, the label is the position in the bibliography, and in the case of _alphabetic_, it is a unique string consisting of the first characters of the author names and the year. In both cases, these labels are displayed next to the references and also used as the string to which `@key` expands. By contrast, _authoryear_ does not display any labels next to the references; it expands `@key` to a string consisting of the last names of the authors and the year.
+in the case of _numeric_, the label is the position in the bibliography, and in the case of _alphabetic_, it is a unique string consisting of the first characters of the author names and the year. In both cases, these labels are displayed next to the references and also used as the string to which `#cite(key)` expands. By contrast, _authoryear_ does not display any labels next to the references; it expands `#cite(key)` to a string consisting of the last names of the authors and the year.
 
 Some of the citation styles have options that will let you control the appearance of the citations in detail.
 These are documented in @sec:package:builtin-reference. For instance, to enclose the year in the _authoryear_ style
