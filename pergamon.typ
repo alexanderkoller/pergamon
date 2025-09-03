@@ -417,7 +417,7 @@ Citations in #bibtypst are #link("https://typst.app/docs/reference/model/link/")
 and can be styled using show rules. However, it is 
 not entirely trivial to distinguish a `link` element that represents a #bibtypst citation from 
 any other `link` element (referring e.g. to a website). #bibtypst therefore provides a function 
- `if-citation` function which will make this distinction for you. The following piece of code
+ `if-citation` which will make this distinction for you. The following piece of code
 typesets all #bibtypst citations in blue:
 
 #zebraw(lang: false,
@@ -617,6 +617,7 @@ zebraw(lang: false,
     sortstr-author: "Bender,Emily M. Koller,Alexander",
     parsed-editor: none,
     parsed-translator: none,
+    parsed-date: (year: 2020)
   ),
   label: ("Bender and Koller", "2020"),
   label-repr: "Bender and Koller 2020",

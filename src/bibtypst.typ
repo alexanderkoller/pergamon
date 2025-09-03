@@ -490,7 +490,7 @@
     /// - `a`: the contents of the `label` field (if defined); for the `alphabetic` style, this amounts to the alphabetic paper key
     /// 
     /// For instance, `"nydt"` sorts the references first by author name, then by descending year, then by title.   
-    /// Note that #bibtypst currently makes no distinction between the year and the full date (cf. #issue(24)).
+    /// Note that #bibtypst currently makes no distinction between the year and the full date (cf. #issue(60)).
     /// 
     /// If `none` or the string `"none"` is passed as the `sorting` argument, the references
     /// are sorted in an arbitrary order. There is currently no reliable support for sorting
