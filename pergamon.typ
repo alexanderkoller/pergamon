@@ -251,7 +251,7 @@ in square brackets rather than round ones, you can replace line 4 in the above e
 
 #zebraw(lang: false,
 ```typ
-#let style = format-citation-authoryear(format-parens: nn(it => [(#it)]))
+#let style = format-citation-authoryear(format-parens: nn(it => [[#it]]))
 ```
 )
 
