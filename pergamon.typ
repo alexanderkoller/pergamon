@@ -349,6 +349,8 @@ will still be available, allowing you to precompute any information you find use
     [p], [(Bender and Koller 2020)], [--], [--],
     [t], [Bender and Koller (2020)], [--], [--],
     [g], [Bender and Koller's (2020)], [--], [--],
+    [name], [Bender and Koller], [--], [--],
+    [year], [2020], [--], [--],
     [n], [Bender and Koller 2020], [BK20], [1]
   ),
   placement: top,

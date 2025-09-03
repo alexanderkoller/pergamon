@@ -313,7 +313,21 @@
   ..keys
 ) = cite(..keys, form: "n")
 
+/// Typesets a citation with the form `"name"`, e.g. "Smith et al.".
+/// See @cite for details.
+#let citename(
+  /// The keys of the #bibtex entries you want to cite.
+  /// -> arguments
+  ..keys
+) = cite(..keys, form: "name")
 
+/// Typesets a citation with the form `"year"`, e.g. "2020a".
+/// See @cite for details.
+#let citeyear(
+  /// The keys of the #bibtex entries you want to cite.
+  /// -> arguments
+  ..keys
+) = cite(..keys, form: "year")
 
 
 #let construct-sorting(sorting-string) = {

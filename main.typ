@@ -71,9 +71,9 @@
 
   #cite("sec:intro")
 
-  #cite("kandra-bsc-25")
+  #citename("kandra-bsc-25")
 
-  #cite("bender20:_climb_nlu")
+  #citeyear("bender20:_climb_nlu")
 
   #cite("irtg-sgraph-15")
 

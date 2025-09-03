@@ -1146,7 +1146,11 @@
       format-parens(extradate)
     }
 
-    if form == "t" {
+    if form == "name" {
+      authors-str
+    } else if form == "year" {
+      [#year#extradate]
+    } else if form == "t" {
       // can't concatenate with strfmt because format-parens(year) is not a string
       [#authors-str #format-parens([#year#extradate])]
     } else if form == "g" {
