@@ -93,7 +93,7 @@
 
   "edition": (value, reference, field, options, style) => {
     if is-integer(value) {
-      [#nth(int(value)) #options.bibstring.edition]
+      spaces(nth(int(value)), options.bibstring.edition)
     } else {
       value
     }
@@ -104,23 +104,23 @@
   },
 
   "issn": (value, reference, field, options, style) => {
-    [ISSN #value]
+    spaces("ISSN", value)
   },
 
   "isbn": (value, reference, field, options, style) => {
-    [ISBN #value]
+    spaces("ISBN", value)
   },
 
   "isrn": (value, reference, field, options, style) => {
-    [ISRN #value]
+    spaces("ISRN", value)
   },
 
   "pages": (value, reference, field, options, style) => {
     if value.contains("-") or value.contains(sym.dash.en) {
       // Typst biblatex library converts "--" into an endash "–"
-      [pp. #value]
+      spaces("pp.", value)
     } else {
-      [p. #value]
+      spaces("p.", value)
     }
   },
 
@@ -128,7 +128,7 @@
     if reference.entry_type in ("article", "periodical") {
       value
     } else {
-      [#options.bibstring.volume #value]
+      spaces(options.bibstring.volume, value)
     }
   },
 
@@ -158,19 +158,19 @@
   },
 
   "chapter": (value, reference, field, options, style) => {
-    [#options.bibstring.chapter #value]
+    spaces(options.bibstring.chapter, value)
   },
 
   "part": (value, reference, field, options, style) => {
     // physical part of a logical volume
-    [.#value]
+    "." + value
   },
 
   "series": (value, reference, field, options, style) => {
     if reference.entry_type in ("article", "periodical") {
       // series of a journal
       if is-integer(value) {
-        [#nth(int(value)) #options.bibstring.jourser]
+        spaces(nth(int(value)), options.bibstring.jourser)
       } else {
         options.bibstring.at(value, default: value)
       }
@@ -210,11 +210,11 @@
   },
 
   "version": (value, reference, field, options, style) => {
-    [#options.bibstring.version #value]
+    spaces(options.bibstring.version, value)
   },
 
   "volumes": (value, reference, field, options, style) => {
-    [#value #options.bibstring.volumes]
+    spaces(value, options.bibstring.volumes)
   },
 
   "date": "parsed-date",
