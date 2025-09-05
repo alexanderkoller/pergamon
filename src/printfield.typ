@@ -281,7 +281,7 @@
   } else {
     field = lower(field)
 
-    if field in field-formats {
+    let printed = if field in field-formats {
       let format = field-formats.at(field)
 
       // resolve format aliases, e.g. "editor" to "parsed-editor"
@@ -295,6 +295,12 @@
     } else {
       value
     }
+
+    if options.eval-mode != none and type(printed) == str {
+      printed = eval(printed, mode: options.eval-mode, scope: options.eval-scope)
+    }
+
+    printed
   }
 }
 
