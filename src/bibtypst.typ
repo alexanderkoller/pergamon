@@ -1,8 +1,8 @@
 
 #import "@preview/oxifmt:1.0.0": strfmt
-#import "@preview/citegeist:0.1.0": load-bibliography
+#import "@preview/citegeist:0.2.0": load-bibliography
 #import "bib-util.typ": collect-deduplicate
-#import "names.typ": parse-names, parse-reference-names
+#import "names.typ": parse-reference-names  // TODOA parse-names, 
 #import "dates.typ": parse-date
 
 #let reference-collection = state("reference-collection", (:))
@@ -557,6 +557,7 @@
     /// @sec:reference for an example.
     /// -> array
     name-fields: ("author", "editor", "translator")
+    // TODOA: complete them
   ) = context {
 
   let bib = bibliography.get()
