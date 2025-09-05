@@ -382,11 +382,11 @@
 
 // Generate labels for the references, add extradates to distinguish them where
 // necessary, and return the sorted bibliography.
-#let label-sort-deduplicate(bibl-unsorted, label-generator, sorting-function) = {
+#let label-sort-deduplicate(bibl-unsorted, label-generator, sorting-function, start-index) = {
   // Generate preliminary labels; note that the indices we pass to label-generator
   // are meaningless at this point, but they are guaranteed to be all different.
   for (index, reference) in bibl-unsorted.enumerate() {
-    let (lbl, lbl-repr) = label-generator(index, reference)
+    let (lbl, lbl-repr) = label-generator(start-index + index, reference)
     bibl-unsorted.at(index).insert("label", lbl)
     bibl-unsorted.at(index).insert("label-repr", lbl-repr)
   }
@@ -410,7 +410,7 @@
   // Generate final labels
   for (index, reference) in sorted.enumerate() {
     // call label-generator with meaningless indices, just in case it is needed
-    let (lbl, lbl-repr) = label-generator(index, reference)
+    let (lbl, lbl-repr) = label-generator(start-index + index, reference)
     sorted.at(index).insert("label", lbl)
     sorted.at(index).insert("label-repr", lbl-repr)
   }
@@ -435,6 +435,7 @@
 
   ref
 }
+
 
 /// Prints the bibliography for the @refsection in which it is contained.
 /// This function cannot be used outside of a refsection.
@@ -561,8 +562,12 @@
         "shortauthor",
         "shorteditor",
         "translator"),
+
+    /// #todo[document me]
+    start-index: 1
   ) = context {
 
+  let start-index = start-index - 1
   let bib = bibliography.get()
   let refsection-id-here = refsection-id.get()
 
@@ -574,6 +579,7 @@
 
   // extract references for the cited keys
   let bibl-unsorted = ()
+  let count-references = 0
 
   if show-all {
     for reference in bib.values() {
@@ -595,10 +601,10 @@
   }
 
   bibl-unsorted = bibl-unsorted.filter(filter)
-  let sorted = label-sort-deduplicate(bibl-unsorted, label-generator, sorting-function)
-  let formatted-references = sorted.enumerate().map(it => format-reference(it.at(0), it.at(1)))  
+  let sorted = label-sort-deduplicate(bibl-unsorted, label-generator, sorting-function, start-index)
+  let n = sorted.len()
+  let formatted-references = sorted.enumerate(start: start-index).map(it => format-reference(it.at(0), it.at(1)))   // TODOC
   // -> array(array(content))
-  // TODOB
   let num-columns = if formatted-references.len() == 0 { 0 } else { formatted-references.at(0).len() }
   let cells = ()
 
@@ -611,7 +617,7 @@
     let meta = (
       kind: "reference-data",
       key: reference.entry_key,
-      index: index,
+      index: start-index + index,  // TODOC
       reference: reference,
     )
 
@@ -626,11 +632,10 @@
     }
   }
 
-
   // "References" heading
-  if title != none [
-    #heading(title, numbering: none)
-  ]
+  if title != none {
+    heading(title, numbering: none)
+  }
 
   // layout the cells in a grid
   if num-columns > 0 {

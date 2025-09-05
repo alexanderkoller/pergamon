@@ -120,6 +120,7 @@
 
 
 
+// #pergamon-index-counter.update(0)
 #let style2 = format-citation-numeric()
 #refsection(format-citation: style2.format-citation)[
   #v(2em)
@@ -133,4 +134,25 @@
     format-reference: format-reference(reference-label: style2.reference-label),
     label-generator: style2.label-generator
   )
+  // #pergamon-index-counter.update(val => val + 2)
+
 ]
+
+
+// #update-pergamon-counter()
+#refsection()[
+  #v(2em)
+  = Fourth refsection
+
+  Here is a third refsection. It uses a different citation style than the first two, and
+  therefore both the citations and the bibliography look different
+  [#citen("knuth1990"), #citen("modelizer-24")].
+
+  #print-bibliography(
+    start-index: 3,
+    format-reference: format-reference(reference-label: style2.reference-label),
+    label-generator: style2.label-generator
+  )
+]
+
+// #context { per-refsection-counter.get() }
