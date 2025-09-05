@@ -683,9 +683,10 @@
   }
 
   // layout the cells in a grid
+  let alignment = if num-columns > 1 { (right, left) } else { (left,) }
   if num-columns > 0 {
     // allow grid-style argument to override default layout parameters
-    let final-grid-style = (columns: num-columns, row-gutter: 1.2em, column-gutter: 0.5em)
+    let final-grid-style = (columns: num-columns, align: alignment, row-gutter: 1.2em, column-gutter: 0.8em)
     for (key, value) in grid-style.pairs() {
       final-grid-style.insert(key, value)
     }
