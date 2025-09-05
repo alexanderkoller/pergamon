@@ -1,5 +1,6 @@
 
-#import "lib.typ": *
+// #import "lib.typ": *
+#import "@preview/pergamon:0.2.0": *
 
 #let darkgreen = green.darken(20%)
 #let darkblue = blue.darken(20%)
@@ -23,7 +24,7 @@
   name-format: "{given} {family}",
   reference-label: fcite.reference-label,
   format-quotes: it => it,
-  eval-scope: ("todo": x => text(fill: red, x)),
+  // eval-scope: ("todo": x => text(fill: red, x)),
   // suppress-fields: ("*": ("pages",), "inproceedings": ("editor", "publisher") ),
   // print-date-after-authors: true,
   // additional-fields: ("award",)
@@ -72,9 +73,9 @@
 
   #cite("sec:intro")
 
-  #citename("kandra-bsc-25")
+  // #citename("kandra-bsc-25")
 
-  #citeyear("bender20:_climb_nlu")
+  // #citeyear("bender20:_climb_nlu")
 
   #cite("irtg-sgraph-15")
 

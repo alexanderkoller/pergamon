@@ -202,8 +202,8 @@
   "astitle": "as",
   "bypublisher": "by",
   "nodate": "n.d.", // was long version "no date"
-  "page": "page",
-  "pages": "pages",
+  "page": "p.", // "page",
+  "pages": "pp.", //"pages",
   "column": "column",
   "columns": "columns",
   "line": "line",

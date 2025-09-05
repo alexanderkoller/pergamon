@@ -118,9 +118,9 @@
   "pages": (value, reference, field, options, style) => {
     if value.contains("-") or value.contains(sym.dash.en) {
       // Typst biblatex library converts "--" into an endash "–"
-      spaces("pp.", value)
+      spaces(options.bibstring.pages, value)
     } else {
-      spaces("p.", value)
+      spaces(options.bibstring.page, value)
     }
   },
 
