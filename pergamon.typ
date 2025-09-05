@@ -479,6 +479,40 @@ and nothing else:
 )
 ```)
 
+== Continuous numbering
+
+#unfinished[
+  explain this
+
+  ```typ
+ #let index  = state("index", 0)
+
+#let cvsection(title, filter) = {
+  refsection(format-citation: style.format-citation)[
+    #context {
+      print-bibliography(
+        title: title,
+        resume-after: index.get(),
+        format-reference: fref,
+        label-generator: style.label-generator,
+        show-all: true,
+        filter: filter
+      )
+    }
+  ]
+
+  context {
+    let x = index.get()
+    index.update(x + count-bib-entries(show-all: true, filter: filter))
+  }
+}
+
+
+#cvsection("Journal articles", reference => reference.entry_type == "article" and "Koller" in reference.fields.author)
+#cvsection("Conference papers", x => "Koller" in x.fields.author and x.entry_type == "inproceedings" and ("keywords" not in x.fields or "workshop" not in x.fields.keywords))
+```
+]
+
 == Highlighting references
 <sec:highlighting>
 

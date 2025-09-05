@@ -437,6 +437,36 @@
 }
 
 
+#let count-bib-entries(show-all: false, filter: reference => true) = {
+  let bibl-unsorted = ()
+  let refsection-id-here = refsection-id.get()
+  let bib = bibliography.get()
+
+  if show-all {
+    for reference in bib.values() {
+      // let ref = preprocess-reference(reference, name-fields)
+      bibl-unsorted.push(reference)
+    }
+  } else {
+    let cited-keys = reference-collection.get().keys()
+    for lbl in cited-keys {
+      let key = split(str(lbl), refsection-id-here)
+
+      if key in bib { // skip references to labels that are not bib keys
+        let bib-entry = bib.at(key)
+        // bib-entry = preprocess-reference(bib-entry, name-fields)
+        // [#bib-entry]
+        bibl-unsorted.push(bib-entry)
+      }
+    }
+  }
+
+  bibl-unsorted = bibl-unsorted.filter(filter)
+
+  return bibl-unsorted.len()
+
+}
+
 /// Prints the bibliography for the @refsection in which it is contained.
 /// This function cannot be used outside of a refsection.
 ///
@@ -563,11 +593,24 @@
         "shorteditor",
         "translator"),
 
-    /// #todo[document me]
-    start-index: 1
+    /// Starts the numbering of entries in this bibliography after the number
+    /// specified in this argument. Let's say you typeset two bibliographies in
+    /// your document, and the first one has 15 entries. You can pass `15` in 
+    /// the `resume-after` argument to make the numbering of entries in the second
+    /// bibliography start at 16.
+    /// 
+    /// The `index` parameters of functions like `format-reference` and `format-citation`
+    /// will receive the sum of resume-after and the actual position in this particular
+    /// bibliography as an argument. In the example above, the first reference in the
+    /// second bibliography will be called with index=15 (because the count in the
+    /// second bibliography is zero-based). The only default citation style that cares
+    /// about indices is _numeric_.
+    /// 
+    /// -> int
+    resume-after: 0
   ) = context {
 
-  let start-index = start-index - 1
+  let start-index = resume-after
   let bib = bibliography.get()
   let refsection-id-here = refsection-id.get()
 
@@ -607,6 +650,8 @@
   // -> array(array(content))
   let num-columns = if formatted-references.len() == 0 { 0 } else { formatted-references.at(0).len() }
   let cells = ()
+
+  // pergamon-start-index.update(start-index + bibl-unsorted.len())
 
   // collect cells
   for index in range(sorted.len()) {

@@ -138,6 +138,8 @@
 
 ]
 
+// #context { pergamon-start-index.get() }
+
 
 // #update-pergamon-counter()
 #refsection()[
@@ -148,11 +150,16 @@
   therefore both the citations and the bibliography look different
   [#citen("knuth1990"), #citen("modelizer-24")].
 
-  #print-bibliography(
-    start-index: 3,
+  #context {
+
+  print-bibliography(
+    resume-after:  count-bib-entries(show-all: true, filter: x => { x.entry_type == "article" }),
     format-reference: format-reference(reference-label: style2.reference-label),
     label-generator: style2.label-generator
   )
+  }
 ]
+
+// #context { pergamon-start-index.get() }
 
 // #context { per-refsection-counter.get() }
