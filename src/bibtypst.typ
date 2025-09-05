@@ -2,7 +2,7 @@
 #import "@preview/oxifmt:1.0.0": strfmt
 #import "@preview/citegeist:0.2.0": load-bibliography
 #import "bib-util.typ": collect-deduplicate
-#import "names.typ": parse-reference-names  // TODOA parse-names, 
+#import "names.typ": parse-reference-names
 #import "dates.typ": parse-date
 
 #let reference-collection = state("reference-collection", (:))
@@ -555,9 +555,26 @@
     /// #bibtypst will enrich the reference dictionary with a field `parsed-X` that contains an array of
     /// name-part dictionaries, such as `("family": "Smith", "given": "John")`. See
     /// @sec:reference for an example.
+    /// 
+    /// If the field `X` is not defined in the #bibtex entry, #bibtypst will still insert
+    /// a field `parsed-X`; in this case, it will have the value `none`.
+    /// 
     /// -> array
-    name-fields: ("author", "editor", "translator")
-    // TODOA: complete them
+    name-fields: ("afterword",
+        "annotator",
+        "author",
+        "bookauthor",
+        "commentator",
+        "editor",
+        "editora",
+        "editorb",
+        "editorc",
+        "foreword",
+        "holder",
+        "introduction",
+        "shortauthor",
+        "shorteditor",
+        "translator"),
   ) = context {
 
   let bib = bibliography.get()
@@ -585,8 +602,6 @@
       if key in bib { // skip references to labels that are not bib keys
         let bib-entry = bib.at(key)
         bib-entry = preprocess-reference(bib-entry, name-fields)
-        
-
         // [#bib-entry]
         bibl-unsorted.push(bib-entry)
       }

@@ -44,7 +44,12 @@
   let ret = format-str
   for (key, value) in name-parts-dict.pairs() {
     ret = ret.replace("{" + key + "}", value)
-    // ret = ret.replace("{" + key.at(0) + "}", value.at(0)) // TODOA
+
+    // Citegeist inserts keys with empty strings as values into the 
+    // name-parts dictionary; skip those.
+    if value.len() > 0 {
+      ret = ret.replace("{" + key.at(0) + "}", value.at(0))
+    }
   }
   return ret
 }
