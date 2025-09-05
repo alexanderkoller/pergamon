@@ -55,6 +55,8 @@
 #show heading.where(level: 1): set heading(numbering: "1.1")
 #show heading.where(level: 2): set heading(numbering: "1.1")
 
+#todo[Revise eval-mode documentation]
+
 = Introduction
 
 #bibtypst is a package for typesetting bibliographies in Typst.
