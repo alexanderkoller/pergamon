@@ -453,11 +453,6 @@
     /// for the reference
     /// in the second argument.
     /// 
-    /// The third argument is a `mode` string that #bibtypst expects your
-    /// `format-reference` function to pass to the
-    /// Typst #link("https://typst.app/docs/reference/foundations/eval/")[eval] function.
-    /// See the explanation for print-bibliography's own `eval-mode` argument below.
-    /// 
     /// It returns an
     /// array of contents. The elements of this array will be laid out as the columns
     /// of a grid, in the same row, permitting e.g. bibliography layouts with one
@@ -467,7 +462,7 @@
     /// All calls to `format-reference` should return arrays of the same length.
     /// 
     /// -> function
-    format-reference: (index, reference, eval-mode) => ([REFERENCE],),
+    format-reference: (index, reference) => ([REFERENCE],),
 
     /// Generates label information for the given reference. The function takes
     /// the reference dictionary and the reference's index in the sorted bibliography as input and returns
@@ -535,15 +530,6 @@
     /// -> dictionary
     grid-style: (:),
 
-    /// The output of `format-reference` can be passed through the Typst #link("https://typst.app/docs/reference/foundations/eval/")[eval]
-    /// function
-    /// for final rendering. This is useful e.g. to typeset math in a paper title correctly.
-    /// Pass the `eval` mode in this argument, or pass `none` if you don't want to call
-    /// `eval`.
-    /// 
-    /// -> str | none
-    eval-mode: "markup",
-
     /// The title that will be typeset above the bibliography in the document.
     /// The string given here will be rendered as a first-level heading without numbering.
     /// Pass `none` to suppress the bibliography title.
@@ -610,7 +596,9 @@
 
   bibl-unsorted = bibl-unsorted.filter(filter)
   let sorted = label-sort-deduplicate(bibl-unsorted, label-generator, sorting-function)
-  let formatted-references = sorted.enumerate().map(it => format-reference(it.at(0), it.at(1), eval-mode))  // -> array(array(content))
+  let formatted-references = sorted.enumerate().map(it => format-reference(it.at(0), it.at(1)))  
+  // -> array(array(content))
+  // TODOB
   let num-columns = if formatted-references.len() == 0 { 0 } else { formatted-references.at(0).len() }
   let cells = ()
 

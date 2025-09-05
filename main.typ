@@ -23,6 +23,7 @@
   name-format: "{given} {family}",
   reference-label: fcite.reference-label,
   format-quotes: it => it,
+  eval-scope: ("todo": x => text(fill: red, x)),
   // suppress-fields: ("*": ("pages",), "inproceedings": ("editor", "publisher") ),
   // print-date-after-authors: true,
   // additional-fields: ("award",)

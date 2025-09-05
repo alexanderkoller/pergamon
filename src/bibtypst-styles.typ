@@ -673,6 +673,12 @@
     /// -> str
     eval-mode: "markup",
 
+    /// The `scope` argument that is passed to the `eval` call (see `eval-mode`).
+    /// This allows you to call Typst functions from within the #bibtex entries.
+    /// 
+    /// -> dictionary
+    eval-scope: (:),
+
     /// When typesetting lists (e.g. author names), #bibtypst will use this
     /// delimiter to combine list items before the last one.
     /// -> str
@@ -849,7 +855,7 @@
     let commas = make-fjoin-function(comma)
     let periods = make-fjoin-function(period)
     
-    let formatter(index, reference, eval-mode) = {
+    let formatter(index, reference) = {
       // Unfortunately, this still causes "layout did not converge" errors, rather
       // than just printing the error message.
       if reference-label == none {
@@ -882,6 +888,7 @@
       let options = (
         link-titles: link-titles,
         eval-mode: eval-mode,
+        eval-scope: eval-scope,
         use-author: use-author,
         use-translator: use-translator,
         use-editor: use-editor,
