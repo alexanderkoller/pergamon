@@ -36,7 +36,7 @@ sed -i '.bak' -e "s/pergamon-.*.pdf/pergamon-$VERSION.pdf/" -e "s/preview\/perga
 # Put together release
 cp lib.typ $RELEASE_DIR/lib.typ
 mkdir -p $RELEASE_DIR/src
-cp src/*.typ $RELEASE_DIR
+cp src/*.typ $RELEASE_DIR/src
 cp README.md $RELEASE_DIR/
 cp LICENSE $RELEASE_DIR/
 

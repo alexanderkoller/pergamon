@@ -437,6 +437,7 @@
 }
 
 
+/// #todo[document me]
 #let count-bib-entries(show-all: false, filter: reference => true) = {
   let bibl-unsorted = ()
   let refsection-id-here = refsection-id.get()
