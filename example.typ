@@ -105,7 +105,7 @@
 
 
 #refsection()[
-  #v(2em)
+  #v(1em)
   = Second refsection
 
   Here is another refsection. If you cite different papers than in the first 
@@ -119,11 +119,9 @@
 
 
 
-
-// #pergamon-index-counter.update(0)
 #let style2 = format-citation-numeric()
 #refsection(format-citation: style2.format-citation)[
-  #v(2em)
+  #v(1em)
   = Third refsection
 
   Here is a third refsection. It uses a different citation style than the first two, and
@@ -134,32 +132,24 @@
     format-reference: format-reference(reference-label: style2.reference-label),
     label-generator: style2.label-generator
   )
-  // #pergamon-index-counter.update(val => val + 2)
-
 ]
 
-// #context { pergamon-start-index.get() }
 
-
-// #update-pergamon-counter()
 #refsection()[
-  #v(2em)
+  #v(1em)
   = Fourth refsection
 
-  Here is a third refsection. It uses a different citation style than the first two, and
-  therefore both the citations and the bibliography look different
-  [#citen("knuth1990"), #citen("modelizer-24")].
-
+  Here is a fourth refsection
+  #cite("knuth1990", "modelizer-24").
+  Notice that the numeric labels start at 3,
+  because we passed `resume-after: 2` to `print-bibliography`.
+  
   #context {
 
   print-bibliography(
-    resume-after:  count-bib-entries(show-all: true, filter: x => { x.entry_type == "article" }),
     format-reference: format-reference(reference-label: style2.reference-label),
+    resume-after: 2, // this only works in Pergamon >= 0.3
     label-generator: style2.label-generator
   )
   }
 ]
-
-// #context { pergamon-start-index.get() }
-
-// #context { per-refsection-counter.get() }
