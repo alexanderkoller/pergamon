@@ -113,7 +113,7 @@ see also #link("https://github.com/alexanderkoller/pergamon/blob/main/example.pd
 )
 
 #figure(
-  box(stroke: 1pt)[#image("doc-materials/example-output.png", width: 100%)],
+  box(stroke: 1pt)[#image("docs/materials/example-output.png", width: 100%)],
   placement: top,
   caption: [Example bibliography typeset with #bibtypst.]
 ) <fig:example-output>
@@ -198,7 +198,7 @@ implementing them.
 
 
 #figure(
-  box(stroke: 1pt)[#image("doc-materials/modified-example-output.png", width: 100%)],
+  box(stroke: 1pt)[#image("docs/materials/modified-example-output.png", width: 100%)],
   placement: top,
   caption: [Bibliography with the configuration of @sec:builtin-reference.]
 ) <fig:modified-example-output>
@@ -256,14 +256,14 @@ in square brackets rather than round ones, you can replace line 4 in the above e
 )
 
 #figure(
-  box(stroke: 1pt)[#image("doc-materials/example-alphabetic.png", width: 100%)],
+  box(stroke: 1pt)[#image("docs/materials/example-alphabetic.png", width: 100%)],
   placement: top,
   caption: [Bibliography with the `alphabetic` citation style.]
 ) <fig:example-alphabetic>
 
 
 #figure(
-  box(stroke: 1pt)[#image("doc-materials/example-authoryear.png", width: 100%)],
+  box(stroke: 1pt)[#image("docs/materials/example-authoryear.png", width: 100%)],
   placement: top,
   caption: [Bibliography with the `authoryear` citation style.]
 ) <fig:example-authoryear>
@@ -557,7 +557,7 @@ This will place a marker before each reference with the "highlight" keyword, and
 all other references unchanged.
 
 #figure(
-  box(stroke: 1pt)[#image("doc-materials/highlighting.png", width: 100%)],
+  box(stroke: 1pt)[#image("docs/materials/highlighting.png", width: 100%)],
   placement: top,
   caption: [Highlighting a reference.]
 ) <fig:highlighting>
