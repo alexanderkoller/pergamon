@@ -63,6 +63,13 @@
 #let print-date(date-dict, options) = {
   let month-entry = date-dict.at("month", default: none)
 
+  // Special treatment for "month": It could not be suppressed in parse-date
+  // (that was too early, we didn't have the format-reference options yet),
+  // so we have to do it here. :/
+  if "month" in options.suppressed-fields {
+    month-entry = none
+  }
+
   let month-str = if month-entry != none {
     if type(month-entry) == int {
       options.bibstring.at(month-bibstring-keys.at(month-entry - 1))

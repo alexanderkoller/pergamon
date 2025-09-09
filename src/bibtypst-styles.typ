@@ -869,7 +869,6 @@
         }
       } else if type(suppress-fields) == dictionary {
         let general-suppress-fields = suppress-fields.at("*", default: ())
-        // panic(general-suppress-fields)
         for field in general-suppress-fields {
           suppressed-fields.insert(field, 1)
         }
@@ -879,11 +878,6 @@
           suppressed-fields.insert(field, 1)
         }
       }
-      // if suppress-fields != none {
-      //   for field in suppress-fields {
-      //     suppressed-fields.insert(field, 1)
-      //   }
-      // }
 
       let options = (
         link-titles: link-titles,

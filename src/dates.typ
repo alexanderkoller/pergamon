@@ -74,10 +74,11 @@
     // no date field, fall back to year field
     let year-str = fd(reference, fallback-year-field, options)
     if year-str != none and is-integer(year-str) {
-      let date-dict = ("year": int(year-str.trim()))
+      let date-dict = ("year": int(year-str.trim()))      
 
       if fallback-month-field != none {
         let month-str = fd(reference, fallback-month-field, options)
+
         if month-str != none {
           month-str = month-str.trim()
 
