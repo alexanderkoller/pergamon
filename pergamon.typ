@@ -55,8 +55,6 @@
 #show heading.where(level: 1): set heading(numbering: "1.1")
 #show heading.where(level: 2): set heading(numbering: "1.1")
 
-#todo[Revise eval-mode documentation]
-
 = Introduction
 
 #bibtypst is a package for typesetting bibliographies in Typst.
@@ -298,9 +296,9 @@ default styles in #link("https://github.com/alexanderkoller/pergamon/blob/main/s
 
 Implementing a reference style amounts to defining a Typst function that can be passed 
 as the `format-reference` argument to `print-bibliography`. Such a function receives 
-arguments `(index, reference, eval-mode)` containing the zero-based position of the 
-reference in the bibliography; a reference dictionary; and the mode in which `eval` should
-evaluate the paper titles. A call to your function should return some `content`, which
+arguments `(index, reference)` containing the zero-based position of the 
+reference in the bibliography and a reference dictionary. A call to your function should
+ return some `content`, which
 will be displayed in the bibliography.
 
 Reference dictionaries are a central data structure of #bibtypst. They represent the information 
@@ -480,38 +478,57 @@ and nothing else:
 ```)
 
 == Continuous numbering
+<sec:continuous-numbering>
 
-#unfinished[
-  explain this
+When you typeset a CV, it is sometimes useful to have separate bibliographies for
+journal articles, papers in conference proceedings, and so on. In this case, you might want to 
+use the _numeric_ citation style to number all your references, and you might want to continue 
+counting the papers across the different bibliographies; if you have seven journal papers, you
+want the first conference paper to be "[8]".
 
-  ```typ
- #let index  = state("index", 0)
+You can achieve this using the `resume-after` parameter of `print-bibliography`. If you pass the 
+number `7` for this parameter, the first entry in the bibliography will be labeled "[8]".
 
-#let cvsection(title, filter) = {
-  refsection(format-citation: style.format-citation)[
-    #context {
-      print-bibliography(
-        title: title,
-        resume-after: index.get(),
-        format-reference: fref,
-        label-generator: style.label-generator,
-        show-all: true,
-        filter: filter
-      )
-    }
-  ]
-
-  context {
-    let x = index.get()
-    index.update(x + count-bib-entries(show-all: true, filter: filter))
-  }
-}
+It would be desirable to automatically keep a running count of the bibliography entries, so
+the arguments for `resume-after` can be calculated automatically. This should be doable
+using counters or states, but I have not managed to figure out how to do it in a stable way.
+The function `count-bib-entries` is intended for this use. If you find out how to do it,
+please let me know!
 
 
-#cvsection("Journal articles", reference => reference.entry_type == "article" and "Koller" in reference.fields.author)
-#cvsection("Conference papers", x => "Koller" in x.fields.author and x.entry_type == "inproceedings" and ("keywords" not in x.fields or "workshop" not in x.fields.keywords))
-```
-]
+
+
+// #unfinished[
+//   explain this
+
+//   ```typ
+//  #let index  = state("index", 0)
+
+// #let cvsection(title, filter) = {
+//   refsection(format-citation: style.format-citation)[
+//     #context {
+//       print-bibliography(
+//         title: title,
+//         resume-after: index.get(),
+//         format-reference: fref,
+//         label-generator: style.label-generator,
+//         show-all: true,
+//         filter: filter
+//       )
+//     }
+//   ]
+
+//   context {
+//     let x = index.get()
+//     index.update(x + count-bib-entries(show-all: true, filter: filter))
+//   }
+// }
+
+
+// #cvsection("Journal articles", reference => reference.entry_type == "article" and "Koller" in reference.fields.author)
+// #cvsection("Conference papers", x => "Koller" in x.fields.author and x.entry_type == "inproceedings" and ("keywords" not in x.fields or "workshop" not in x.fields.keywords))
+// ```
+// ]
 
 == Highlighting references
 <sec:highlighting>
@@ -710,6 +727,14 @@ The following functions may be helpful in the advanced usage and customization o
 
 
 = Changelog
+
+==== Changes in v0.3.0
+
+- Author names are now parsed as in #biblatex, using the parser of the #link("https://crates.io/crates/biblatex")[biblatex crate].
+- The `format-reference` function of the default style now accepts an `eval-scope` argument. Dropped the `eval-mode` parameter from `print-bibliography`; it is now specified directly on `format-reference`.
+- Added `name` and `year` citation forms.
+- `print-bibliography` now has a `resume-after` parameter.
+- More correct date handling: months can now be suppressed in the bibliography, and the `d` sorting specifier works correctly.
 
 ==== Changes in v0.2.0
 

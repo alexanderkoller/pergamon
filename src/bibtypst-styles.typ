@@ -578,7 +578,7 @@
 ///
 /// A call to `format-reference` takes a number of options as argument
 /// and returns a function that will take
-/// arguments `index`, `reference`, and `eval-mode` and return a rendered reference.
+/// arguments `index` and `reference` and return a rendered reference.
 /// This function is suitable as an argument to the `format-reference` parameter
 /// of `print-bibliography`, and will control how the references in this
 /// bibliography are rendered. See the documentation of `print-bibliography`

@@ -452,7 +452,13 @@
 }
 
 
-/// #todo[document me]
+/// Counts the entries that would be rendered by `print-bibliography`.
+/// This may (eventually?) be useful to implement automatic continuous counting
+/// using print-bibliography's `resume-after` parameter; see @sec:continuous-numbering.
+/// 
+/// See @print-bibliography for an explanation of the parameters.
+/// 
+/// -> int
 #let count-bib-entries(show-all: false, filter: reference => true) = {
   let bibl-unsorted = ()
   let refsection-id-here = refsection-id.get()
