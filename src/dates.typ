@@ -110,3 +110,48 @@
 #let is-year-defined(reference) = {
   reference.fields.parsed-date != none and "year" in reference.fields.parsed-date
 }
+
+// Converts a date dictionary into a tuple of (year, month, day).
+// These tuples are suitable for comparing dates. 
+// Missing fields are treated as zero.
+// If the "reversed" parameter is true, all numbers are negated
+// (for sorting in descending order).
+#let make-date-tuple(date-dict, reversed: false) = {
+  let ret = ("year", "month", "day").map(x => {
+    let v = date-dict.at(x, default: 0)
+    if v == none or type(v) != int {
+      v = 0
+    }
+    if reversed {
+      v = -v
+    }
+    v
+  })
+
+  return ret
+}
+
+// #{make-date-tuple(("year": 2025, "month": "sep"))}
+
+// #{(1,2) < (1, 3)}
+
+// #{
+//   let a = (1,)
+//   let b = (1,)
+//   a.push(2)
+//   b.push(3)
+//   a < b
+// }
+
+// #{ (1,2) < (1,2,3) } -> true
+
+// #{
+//   let x = (1,2,3)
+//   let y = array(x)
+//   [#x]
+//   [#y]
+//   x.at(0) = 5
+//     [#x]
+//   [#y]
+
+// }

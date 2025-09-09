@@ -565,6 +565,7 @@ These are typically consistent with those that #biblatex makes (see Chapter 2 "D
 in the #biblatex documentation), but some of them are worth discussing.
 
 == Dates
+<sec:dates>
 
 Dates can occur in a number of places in the #bibtex entry. The most important one
 is the publication date of the reference. It can be specified in one of two ways:

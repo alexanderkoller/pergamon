@@ -3,7 +3,7 @@
 #import "@preview/citegeist:0.2.0": load-bibliography
 #import "bib-util.typ": collect-deduplicate
 #import "names.typ": parse-reference-names
-#import "dates.typ": parse-date
+#import "dates.typ": parse-date, make-date-tuple
 
 #let reference-collection = state("reference-collection", (:))
 #let bibliography = state("bibliography", (:))
@@ -340,14 +340,13 @@
 
   while i < sorting-string.len() {
     let sort-key = sorting-string.at(i)
-    let sorting-function = if sort-key == "y" or sort-key == "d" {
+    let sorting-function = if sort-key == "y" {
       // year
-      // TODO: currently we ignore the rest of the date if "d" specified, fix that
       let extract-date(reference) = {
         if reference.fields.parsed-date != none and "year" in reference.fields.parsed-date {
-          reference.fields.parsed-date.year
+            reference.fields.parsed-date.year
         } else {
-          9999
+          0
         }
       }
 
@@ -356,6 +355,22 @@
         i += 1
       } else {
         reference => extract-date(reference)
+      }
+    } else if sort-key == "d" {
+      // date
+      let extract-date(reference, negate-year) = {
+        if reference.fields.parsed-date != none {
+          make-date-tuple(reference.fields.parsed-date, reversed: negate-year)
+        } else {
+          (0,0,0)
+        }
+      }
+
+      if i+1 < sorting-string.len() and sorting-string.at(i+1) == "d" {
+        reference => extract-date(reference, true)
+        i += 1
+      } else {
+        reference => extract-date(reference, false)
       }
     } else if sort-key == "n" {
       // author name
@@ -526,12 +541,17 @@
     /// supported:
     /// - `n`: author name (lastname firstname)
     /// - `t`: paper title
-    /// - `y` or `d`: the year in which the paper was published; write `yd` or `dd` for descending order
+    /// - `y`: the year in which the paper was published; write `yd` for descending order
+    /// - `d`: the date on which the paper was published; write `dd` for descending order
     /// - `v`: volume, if defined
     /// - `a`: the contents of the `label` field (if defined); for the `alphabetic` style, this amounts to the alphabetic paper key
     /// 
-    /// For instance, `"nydt"` sorts the references first by author name, then by descending year, then by title.   
-    /// Note that #bibtypst currently makes no distinction between the year and the full date (cf. #issue(60)).
+    /// For instance, `"nydt"` sorts the references first by author name, then by descending year, then by title.
+    /// 
+    /// See @sec:dates for details on how dates are parsed in the #bibtex entries. If
+    /// a field of the date (year, month, day) is missing, it is treated as zero for the purposes
+    /// of sorting. Months that are specified as strings (e.g. `"July"` rather than `7` or `jul`)
+    /// are also treated as zero.
     /// 
     /// If `none` or the string `"none"` is passed as the `sorting` argument, the references
     /// are sorted in an arbitrary order. There is currently no reliable support for sorting

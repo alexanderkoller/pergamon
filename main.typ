@@ -40,7 +40,7 @@
 }
 )
 
-#let sorting = "nyt"
+#let sorting = "ddnt"
 
 
 #add-bib-resource(read("bibs/bibliography.bib"))
