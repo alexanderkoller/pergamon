@@ -40,7 +40,7 @@
 }
 )
 
-#let sorting = "ddnt"
+#let sorting = "nyt"
 
 
 #add-bib-resource(read("bibs/bibliography.bib"))
@@ -86,6 +86,8 @@
   #cite("multi1") #citen("multi2")
 
   to test trailing punctuation: #cite("tedeschi-etal-2023-whats")
+
+  to test editors: #cite("hempel1965science")
 
   #print-bibliography(format-reference: fref, sorting: sorting,
     label-generator: fcite.label-generator,
