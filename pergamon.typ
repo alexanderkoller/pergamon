@@ -731,7 +731,8 @@ The following functions may be helpful in the advanced usage and customization o
 ==== Changes in v0.3.0
 
 - Author names are now parsed as in #biblatex, using the parser of the #link("https://crates.io/crates/biblatex")[biblatex crate].
-- The `format-reference` function of the default style now accepts an `eval-scope` argument. Dropped the `eval-mode` parameter from `print-bibliography`; it is now specified directly on `format-reference`.
+- Added an `eval-scope` argument to `format-reference` and dropped the `eval-mode`
+  parameter from `print-bibliography`. It is now specified directly on `format-reference`.
 - Added `name` and `year` citation forms.
 - `print-bibliography` now has a `resume-after` parameter.
 - More correct date handling: months can now be suppressed in the bibliography, and the `d` sorting specifier works correctly.
