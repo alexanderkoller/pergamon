@@ -124,7 +124,7 @@
 
     if targets != none and targets.len() > 0 {
       let meta = targets.first() // reference metadata
-      if type(meta.value) == dictionary and meta.value.at("kind", default: none) == "reference-data" {
+      if "value" in meta.fields() and type(meta.value) == dictionary and meta.value.at("kind", default: none) == "reference-data" {
         citation-content(meta.value)
       } else {
         other-content(it)
