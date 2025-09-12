@@ -27,6 +27,7 @@ FORKNAME=typst-packages-$PACKAGE-$VERSION
 WORKDIR=`pwd`
 
 cd /tmp
+rm -rf $FORKNAME
 gh repo fork https://github.com/typst/packages --clone --fork-name $FORKNAME
 cd $FORKNAME
 
