@@ -1,3 +1,15 @@
+
+0.3.0
+
+Pergamon is a package for typesetting bibliographies in Typst. It is inspired by BibLaTeX, in that the way in which it typesets bibliographies can be easily customized through Typst code.
+
+Version 0.3.0 adds improved support for nontrivial names, support for calling Typst functions when rendering Bibtex entries, and the ability to continue counting up reference indices across bibliographies.
+
+
+
+
+
+
 <!--
 Thanks for submitting a package! Please read and follow the submission guidelines detailed in the repository's README and check the boxes below. Please name your PR as `name:version` of the submitted package.
 
