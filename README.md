@@ -8,7 +8,7 @@ Pergamon can be configured to use different styles for typesetting
 references and citations; unlike it, these styles are all defined through
 Typst code, rather than CSL. 
 
-Pergamon is documented in the [user guide](https://github.com/alexanderkoller/pergamon/blob/main/docs/pergamon-0.3.1.pdf).
+Pergamon is documented in the [user guide](https://github.com/alexanderkoller/pergamon/blob/main/docs/pergamon-0.3.0.pdf).
 See a somewhat complex example: [Typst](https://github.com/alexanderkoller/pergamon/blob/main/example.typ), [PDF](https://github.com/alexanderkoller/pergamon/blob/main/example.pdf).
 
 Pergamon has a number of advantages over the builtin Typst bibliographies:
@@ -39,7 +39,7 @@ Its library was second only to the Library of Alexandria around 200 BC.
 The following piece of code typesets a bibliography using Pergamon.
 
   ```typ
-#import "@preview/pergamon:0.3.1": *
+#import "@preview/pergamon:0.3.0": *
 
 #let style = format-citation-numeric()
 
@@ -57,14 +57,14 @@ The following piece of code typesets a bibliography using Pergamon.
 
 It generates citations and a bibliography that look like this:
 
-<img src="https://github.com/alexanderkoller/pergamon/blob/main/doc-materials/example-output.png" style='border:1px solid #000000' />
+<img src="https://github.com/alexanderkoller/pergamon/blob/main/docs/materials/example-output.png" style='border:1px solid #000000' />
 
 You can try out [a more complex example](https://github.com/alexanderkoller/pergamon/blob/main/example.typ) yourself;
 here's [the PDF it generates](https://github.com/alexanderkoller/pergamon/blob/main/example.pdf).
 
 ## Documentation
 
-Please see the [Pergamon guide](https://github.com/alexanderkoller/pergamon/blob/main/docs/pergamon-0.3.1.pdf) for more details.
+Please see the [Pergamon guide](https://github.com/alexanderkoller/pergamon/blob/main/docs/pergamon-0.3.0.pdf) for more details.
 
 ## Contributors
 
