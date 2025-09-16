@@ -40,7 +40,7 @@
 
       if i < rightmost-nonempty-index {
         let s = content-to-string(x)
-        let previous-character = if s != none and s.len() > 0 { s.at(-1) } else { s }
+        let previous-character = if s != none and s.len() > 0 { s.codepoints().at(-1) } else { s }
 
         if not skip-if(previous-character) {
           parts.push(connector)
