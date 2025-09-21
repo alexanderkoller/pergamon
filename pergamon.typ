@@ -406,6 +406,11 @@ is needed to display a label or not.
 You can style this grid by passing a dictionary in the `grid-style` argument of `print-bibliography`.
 The values in this dictionary will be used to overwrite the default values. 
 
+In addition, the individual entries in the bibliography are typeset as paragraphs,
+one per bib entry. You can style these paragraphs through `set par` rules, e.g. 
+to give the entries a hanging indentation.
+
+
 == Sorting the bibliography
 
 You can furthermore control the order in which references are presented in the bibliography.
