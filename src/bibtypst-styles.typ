@@ -936,7 +936,7 @@
       // add label if requested
       let lbl = reference-label(index, reference)
       let finished = fjoin(".", ret, finish-with-connector: true, skip-if: ".,?!;:")
-      let highlighted = highlight(finished, reference, index)
+      let highlighted = [#parbreak()#highlight(finished, reference, index)]
 
       if lbl == none {
         ([#highlighted],)

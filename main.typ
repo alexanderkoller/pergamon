@@ -20,6 +20,9 @@
 // Numeric:
 // #let fcite = format-citation-numeric()
 
+#let marker = text(size: 8pt)[#emoji.star] 
+
+
 #let fref = format-reference(
   name-format: "{given} {family}",
   reference-label: fcite.reference-label,
@@ -32,12 +35,11 @@
   //  period: ",",
   additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),
   highlight: (x, reference, index) => {
-   if "highlight" in reference.fields.at("keywords", default: ()) {
-      [#text(size: 8pt)[#emoji.star.box] #x]
-   } else {
-      x
-   }
-}
+    if "highlight" in reference.fields.at("keywords", default: ()) {
+      place(dx: -1.5em, dy: -0.15em, marker)
+    }
+    x
+  },
 )
 
 #let sorting = "nyt"
@@ -89,7 +91,9 @@
 
   to test editors: #cite("hempel1965science")
 
+  // #set par(hanging-indent: 1em)
   #print-bibliography(format-reference: fref, sorting: sorting,
+    // grid-style: (row-gutter: 0.8em),
     label-generator: fcite.label-generator,
   )
 ]
