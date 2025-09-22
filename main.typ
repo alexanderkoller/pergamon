@@ -93,6 +93,8 @@
 
   to test prefix and suffix: #cite("tedeschi-etal-2023-whats", prefix: "e.g. ", suffix: ", page 17")
 
+  to test undefined citations: #cite("DOES-NOT-EXIST", "tedeschi-etal-2023-whats")
+
   // #set par(hanging-indent: 1em)
   #print-bibliography(format-reference: fref, sorting: sorting,
     // grid-style: (row-gutter: 0.8em),

@@ -1032,9 +1032,13 @@
   let list-formatter(reference-dicts, form, options) = {
     let individual-form = "n"
     let individual-citations = reference-dicts.map(x => {
-      let lbl = x.at(0)
-      let reference = x.at(1)
-      link(label(lbl), formatter(reference, individual-form))
+      if type(x) == str {
+        [*?#x?*]
+      } else {
+        let lbl = x.at(0)
+        let reference = x.at(1)
+        link(label(lbl), formatter(reference, individual-form))
+      }
     })
 
     let joined = individual-citations.join(citation-separator)
@@ -1169,9 +1173,13 @@
 
     let individual-form = if form == "p" or form == auto { "n" } else { form }
     let individual-citations = reference-dicts.map(x => {
-      let lbl = x.at(0)
-      let reference = x.at(1)
-      link(label(lbl), formatter(reference, individual-form))
+      if type(x) == str {
+        [*?#x?*]
+      } else {
+        let lbl = x.at(0)
+        let reference = x.at(1)
+        link(label(lbl), formatter(reference, individual-form))
+      }
     })
 
     let joined = individual-citations.join(citation-separator)
@@ -1251,9 +1259,13 @@
   let list-formatter(reference-dicts, form, options) = {
     let individual-form = "n"
     let individual-citations = reference-dicts.map(x => {
-      let lbl = x.at(0)
-      let reference = x.at(1)
-      link(label(lbl), formatter(reference, individual-form))
+      if type(x) == str {
+        [*?#x?*]
+      } else {
+        let lbl = x.at(0)
+        let reference = x.at(1)
+        link(label(lbl), formatter(reference, individual-form))
+      }
     })
 
     let joined = individual-citations.join(citation-separator)
