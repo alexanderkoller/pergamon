@@ -286,6 +286,26 @@ convenience, #biblatex defines the functions `citet`, `citep`, `citen`, and `cit
 just call `cite` with the respective citation form.
 
 
+=== Citation options
+
+You can pass extra named arguments to the Pergamon citation commands
+`cite`, `citet`, etc. These arguments will be passed as _options_ to the
+citation formatter. For instance, the following citation will render as
+"(see Bender et al. 2020, p. 3)":
+
+#zebraw(lang: false,
+```typ
+#cite("bender20:_climb_nlu", prefix: "see ", suffix: ", p. 3")
+```
+)
+
+Currently, the only builtin citation style that supports such arguments
+is the _authoryear_ style. It accepts the `prefix` and `suffix` options,
+as in the example, and will print them just inside the opening and closing
+parentheses in the `p` and `auto` citation styles. You can still pass options 
+to the other citation styles; they will simply ignore them.
+
+
 
 == Implementing custom styles 
 <sec:custom-styles>
@@ -326,8 +346,9 @@ functions:
 
 - The _citation formatter_ is passed as an argument to `refsection`. It is responsible for
   formatting the actual citations into content that is inserted into the document text.
-  The citation formatter receives two arguments: an array of citation specifications and a citation 
-  form (cf. "Citation forms" in @sec:builtin-citation-styles). See the `format-citation` argument 
+  The citation formatter receives three arguments: an array of citation specifications, a citation 
+  form (cf. "Citation forms" in @sec:builtin-citation-styles), and an options
+  dictionary (cf. "Citation options" in @sec:builtin-citation-styles). See the `format-citation` argument 
   of the `refsection` function in @sec:package:main for details on the citation specifications.
 
 Note that the label information that the label generator produces will be stored in the `label` field of the 

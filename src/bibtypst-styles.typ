@@ -1029,7 +1029,7 @@
   }
 
 
-  let list-formatter(reference-dicts, form) = {
+  let list-formatter(reference-dicts, form, options) = {
     let individual-form = "n"
     let individual-citations = reference-dicts.map(x => {
       let lbl = x.at(0)
@@ -1163,7 +1163,10 @@
     }
   }
 
-  let list-formatter(reference-dicts, form) = {
+  let list-formatter(reference-dicts, form, options) = {
+    let prefix = options.at("prefix", default: "")
+    let suffix = options.at("suffix", default: "")
+
     let individual-form = if form == "p" or form == auto { "n" } else { form }
     let individual-citations = reference-dicts.map(x => {
       let lbl = x.at(0)
@@ -1173,7 +1176,7 @@
 
     let joined = individual-citations.join(citation-separator)
     if form == "p" or form == auto {
-      format-parens(joined)
+      format-parens([#prefix#joined#suffix])
     } else {
       joined
     }
@@ -1245,7 +1248,7 @@
     }
   }
 
-  let list-formatter(reference-dicts, form) = {
+  let list-formatter(reference-dicts, form, options) = {
     let individual-form = "n"
     let individual-citations = reference-dicts.map(x => {
       let lbl = x.at(0)

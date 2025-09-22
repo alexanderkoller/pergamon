@@ -7,7 +7,7 @@
 
 #let reference-collection = state("reference-collection", (:))
 #let bibliography = state("bibliography", (:))
-#let current-citation-formatter = state("format-citation", (reference, form) => [CITATION], )
+#let current-citation-formatter = state("format-citation", (reference, form, options) => [CITATION], )
 
 #let refsection-id = state("refsection-id", none)
 #let refsection-counter = state("refsection-counter", 0)
@@ -141,7 +141,8 @@
 #let refsection(
   /// A function that generates the citation string for a list of references.
   /// The function receives an array of _citation specifications_ as its first
-  /// argument and a `form` string as its second argument. It returns
+  /// argument, a `form` string as its second argument, and an `options` dictionary
+  /// as its third argument. It returns
   /// the content that is displayed in place of a @cite call.
   /// 
   /// A citation specification is an array `(lbl, reference)`, where `lbl`
@@ -153,6 +154,16 @@
   /// ```
   /// #link(label(lbl), format(reference))
   /// ```
+  /// 
+  /// The `form` string specifies the exact form in which the citation is rendered;
+  /// see @sec:builtin-citation-styles for details. This makes the difference e.g.
+  /// between "Smith et al. (2025)" and "(Smith et al. 2025)".
+  /// 
+  /// The `options` dictionary specifies options that control the rendering of the
+  /// citation in detail. For instance, the _authoryear_ style accepts 
+  /// `prefix` and `suffix` arguments. Not every citation style is required to
+  /// interpret the same options; see the documentation of the citation style
+  /// for details.
   /// 
   /// The function you pass here will typically be defined in a #bibtypst citation style, to be
   /// compatible with the `format-reference` function that is passed to
@@ -278,7 +289,7 @@
   }
 
   // call the citation formatter to typeset the citations
-  format-citation(to-format, form)
+  format-citation(to-format, form, keys.named())
 }
 
 /// Typesets a citation with the form `"t"`, e.g. "Smith et al. (2020)".
