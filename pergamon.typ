@@ -754,6 +754,12 @@ The following functions may be helpful in the advanced usage and customization o
 
 = Changelog
 
+==== Changes in v0.3.1
+
+- Fixes a number of bugs.
+- Can now specify different name formats for authors, editors, etc.
+- Can now specify prefixes and suffixes in authoryear citations.
+
 ==== Changes in v0.3.0
 
 - Author names are now parsed as in #biblatex, using the parser of the #link("https://crates.io/crates/biblatex")[biblatex crate].
