@@ -155,6 +155,14 @@
   /// #link(label(lbl), format(reference))
   /// ```
   /// 
+  /// In addition to `(lbl, reference)` pairs, the citation specification array
+  /// can also contain elements that are strings (i.e. Typst objects of type `str`). 
+  /// This happens in cases where the
+  /// user cites a paper that does not exist in the bibliography. In this case,
+  /// the string is the key of the cited paper, and the citation formatter is
+  /// expected to render an appropriate error message. The builtin styles 
+  /// render the key as "*?key?*"".
+  /// 
   /// The `form` string specifies the exact form in which the citation is rendered;
   /// see @sec:builtin-citation-styles for details. This makes the difference e.g.
   /// between "Smith et al. (2025)" and "(Smith et al. 2025)".
