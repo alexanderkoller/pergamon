@@ -95,6 +95,8 @@
 
   to test undefined citations: #cite("DOES-NOT-EXIST", "tedeschi-etal-2023-whats")
 
+  #context { count-bib-entries() }
+
   // #set par(hanging-indent: 1em)
   #print-bibliography(format-reference: fref, sorting: sorting,
     // grid-style: (row-gutter: 0.8em),

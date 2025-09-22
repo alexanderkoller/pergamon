@@ -477,6 +477,17 @@
 /// This may (eventually?) be useful to implement automatic continuous counting
 /// using print-bibliography's `resume-after` parameter; see @sec:continuous-numbering.
 /// 
+/// This function uses #link("https://typst.app/docs/reference/context/")[context],
+/// but does not acquire it internally. This is so you can access the int value
+/// returned by `count-bib-entries` in your own code, rather than getting it
+/// back wrapped in content. Calls to the function must therefore be enclosed
+/// in the `context` keyword, e.g.
+/// 
+/// #zebraw(lang: false,
+/// ```typ
+/// #context { count-bib-entries() }
+/// ```)
+/// 
 /// See @print-bibliography for an explanation of the parameters.
 /// 
 /// -> int
