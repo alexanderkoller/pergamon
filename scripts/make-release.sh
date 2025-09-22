@@ -1,5 +1,8 @@
 #! /bin/bash
 
+# For local testing, just run ./scripts/make-release.sh VERSION
+# To prepare a public release, run ./scripts/make-release.sh VERSION --update-readme
+
 VERSION=$1
 
 if [ -z "$VERSION" ];
@@ -30,8 +33,11 @@ cp pergamon.pdf $DOCS_DIR/pergamon-$VERSION.pdf
 cp $DOCS_DIR/pergamon-$VERSION.pdf $DOCS_DIR/pergamon-latest.pdf
 
 
-# Update occurrences of version in the README
-sed -i '.bak' -e "s/pergamon-.*.pdf/pergamon-$VERSION.pdf/" -e "s/preview\/pergamon:[^\"]*/preview\/pergamon:$VERSION/" README.md
+if [[ "$2" == "--update-readme" ]]; then
+    # Update occurrences of version in the README, but only if requested
+    echo "Updating README to version $VERSION."
+    sed -i '.bak' -e "s/pergamon-.*.pdf/pergamon-$VERSION.pdf/" -e "s/preview\/pergamon:[^\"]*/preview\/pergamon:$VERSION/" README.md
+fi
 
 # Put together release
 cp lib.typ $RELEASE_DIR/lib.typ
