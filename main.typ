@@ -24,7 +24,11 @@
 
 
 #let fref = format-reference(
-  name-format: "{given} {family}",
+  // name-format: "{given} {family}",
+  name-format: (
+    "author": "{given} {family}",
+    "editor": "{g}. {family}"
+  ),
   reference-label: fcite.reference-label,
   format-quotes: it => it,
   suppress-fields: ("*": ("month",)),

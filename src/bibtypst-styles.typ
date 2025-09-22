@@ -749,7 +749,13 @@
     /// and `{family}`; these will be replaced by the person's actual name parts.
     /// You can use `{g}` and `{f}` for the first letters of the given and family
     /// name, respectively.
-    /// -> str
+    /// 
+    /// Instead of a string, you can also pass a dictionary in this argument.
+    /// The keys are name types ("author", "editor", etc.), and the values are
+    /// name format strings as explained above. The style will use a default
+    /// format of `"{given} {family}"` for name types that you did not specify.
+    /// 
+    /// -> str | dictionary
     name-format: "{given} {family}",
 
     /// Separator symbol for "volume" and "number" fields, e.g. in `@article`s.

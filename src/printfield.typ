@@ -51,8 +51,9 @@
 
 // Prints a list of author names. Names are formatted and concatenated
 // as specified in the options. `name-parts-array` is an array of name-parts dictionaries.
-#let print-name(name-parts-array, options) = {
-  concatenate-list(name-parts-array.map(d => format-name(d, format-str: options.name-format)), options)
+// "name-type" is the Bibtex field name, e.g. "author" or "editor".
+#let print-name(name-parts-array, name-type, options) = {
+  concatenate-list(name-parts-array.map(d => format-name(d, name-type: name-type, format: options.name-format)), options)
 }
 
 #let month-bibstring-keys = (
@@ -241,19 +242,19 @@
   "author": "parsed-author",
 
   "parsed-author": (value, reference, field, options, style) => {
-    print-name(value, options)
+    print-name(value, "author", options)
   },
 
   "editor": "parsed-editor",
 
   "parsed-editor": (value, reference, field, options, style) => {
-    print-name(value, options)
+    print-name(value, "editor", options)
   },
 
   "translator": "parsed-translator",
   
   "parsed-translator": (value, reference, field, options, style) => {
-    print-name(value, options)
+    print-name(value, "translator", options)
   },
 
   "language": (value, reference, field, options, style) => {

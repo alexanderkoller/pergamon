@@ -40,7 +40,13 @@
 }
 
 // Spells out a name-parts dictionary 
-#let format-name(name-parts-dict, format-str: "{family}, {given}") = {
+#let format-name(name-parts-dict, name-type: "author", format: "{family}, {given}") = {
+  let format-str = if type(format) == dictionary {
+    format.at(name-type, default: "{family}, {given}")
+  } else {
+    format
+  }
+
   let ret = format-str
   for (key, value) in name-parts-dict.pairs() {
     ret = ret.replace("{" + key + "}", value)
