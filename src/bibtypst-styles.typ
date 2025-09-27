@@ -624,6 +624,23 @@
     /// -> bool
     link-titles: true,
 
+    /// Array of reference identifiers that should be printed at the end of 
+    /// the bibliography entry. The array contains a list of strings; possible
+    /// values are `"doi"`, `"url"`, and `"eprint"`. For each bib entry, these
+    /// values are considered in the order in which they appear in the array,
+    /// and the first value that is defined as a key in the bib entry is printed.
+    /// 
+    /// `print-identifiers` acts as a flexible version of the `print-url`,
+    /// `print-doi`, and `print-eprint` parameters. For the first `X` in the array
+    /// that is defined in the bib entry, it effectively sets `print-X` to `true`.
+    /// The values of the other `print-X` parameters are left unchanged;
+    /// thus, you could e.g. still force the rendering of `eprint` by
+    /// setting `print-eprint` to `true`, even if `print-identifiers`
+    /// matches on the DOI instead.
+    /// 
+    /// -> array
+    print-identifiers: (),
+
     /// If `true`, prints the reference's URL at the end of the bibliography entry.
     /// -> bool
     print-url: false,
@@ -885,6 +902,15 @@
         }
       }
 
+      // determine field selected by print-identifiers
+      let print-identifiers-field = none
+      for fieldname in print-identifiers {
+        if lower(fieldname) in reference.fields {
+          print-identifiers-field = lower(fieldname)
+          break
+        }
+      }
+
       let options = (
         link-titles: link-titles,
         eval-mode: eval-mode,
@@ -906,9 +932,9 @@
         bibeidpunct: bibeidpunct,
         bibpagespunct: bibpagespunct,
         print-isbn: print-isbn,
-        print-url: print-url,
-        print-doi: print-doi,
-        print-eprint: print-eprint,
+        print-url: print-url or print-identifiers-field == "url",
+        print-doi: print-doi or print-identifiers-field == "doi",
+        print-eprint: print-eprint or print-identifiers-field == "eprint",
         print-date-after-authors: print-date-after-authors,
         volume-number-separator: volume-number-separator,
         bibstring: bibstring,
