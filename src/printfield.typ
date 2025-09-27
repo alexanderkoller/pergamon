@@ -96,7 +96,7 @@
   // Used in the bibliography and bibliography lists
 
   "doi": (value, reference, field, options, style) => {
-    [DOI: #link("https://doi.org/" + value)]
+    [DOI: #link("https://doi.org/" + value, value)]
   },
 
   "edition": (value, reference, field, options, style) => {

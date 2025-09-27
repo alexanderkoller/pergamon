@@ -31,6 +31,7 @@
   ),
   reference-label: fcite.reference-label,
   format-quotes: it => it,
+  print-doi: true,
   suppress-fields: ("*": ("month",)),
   eval-scope: ("todo": x => text(fill: red, x)),
   // suppress-fields: ("*": ("pages",), "inproceedings": ("editor", "publisher") ),
