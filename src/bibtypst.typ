@@ -119,19 +119,19 @@
     /// -> function
     other-content: x => x
   ) = {
-    let lbl-name = str(it.dest)
-    let targets = query(label(lbl-name))
+    if type(it.dest) == str or type(it.dest) == label {
+      let lbl-name = str(it.dest)
+      let targets = query(label(lbl-name))
 
-    if targets != none and targets.len() > 0 {
-      let meta = targets.first() // reference metadata
-      if "value" in meta.fields() and type(meta.value) == dictionary and meta.value.at("kind", default: none) == "reference-data" {
-        citation-content(meta.value)
-      } else {
-        other-content(it)
+      if targets != none and targets.len() > 0 {
+        let meta = targets.first() // reference metadata
+        if "value" in meta.fields() and type(meta.value) == dictionary and meta.value.at("kind", default: none) == "reference-data" {
+          return citation-content(meta.value)
+        }
       }
-    } else {
-      other-content(it)
     }
+
+    return other-content(it)
   }
 
 /// Defines a section of the document with its own bibliography.

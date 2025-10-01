@@ -70,6 +70,13 @@
   = Introduction <sec:intro>
   #lorem(100)
 
+  To reproduce #78:
+  #context {
+    let hdr = query(heading).first()
+    // [#hdr.fields()]
+    link(hdr.location())[#hdr.body]
+  }
+
   = Another section
 
   citet: !#citet("modelizer-24", "modelizer-24")!
