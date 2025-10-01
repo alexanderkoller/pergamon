@@ -70,10 +70,9 @@
   = Introduction <sec:intro>
   #lorem(100)
 
-  To reproduce #78:
+  To reproduce \#78:
   #context {
     let hdr = query(heading).first()
-    // [#hdr.fields()]
     link(hdr.location())[#hdr.body]
   }
 
