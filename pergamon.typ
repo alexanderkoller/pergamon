@@ -754,7 +754,12 @@ The following functions may be helpful in the advanced usage and customization o
 
 = Changelog
 
-==== Changes in v0.3.1
+==== Changes in v0.3.2 (2025-10-02)
+
+- Fixes a number of bugs.
+- Added the `print-identifiers` parameter to `format-reference`.
+
+==== Changes in v0.3.1 (2025-09-22)
 
 - Fixes a number of bugs.
 - Can now specify different name formats for authors, editors, etc.
