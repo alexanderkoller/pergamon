@@ -8,4 +8,4 @@ authors = ["Alexander Koller <akoller@gmail.com>"]
 license = "MIT"
 description = "Biblatex-style reference management for Typst."
 repository = "https://github.com/alexanderkoller/pergamon"
-
+keywords = [ "bibliography", "bibtex", "biblatex", "citations" ]
