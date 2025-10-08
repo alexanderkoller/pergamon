@@ -55,66 +55,69 @@
 #add-bib-resource(read("bibs/other.bib"))
 #add-bib-resource(read("bibs/physics.bib"))
 
-#refsection(format-citation: fcite.format-citation)[
-  // This show rule has to come inside the refsection, otherwise it is
-  // overwritten by the show rule that is defined in refsection's source code.
-  // It colors the citation links based on whether the reference is to a PI publication.
-  #show link: it => if-citation(it, value => {
-    let color = if "Koller" in family-names(value.reference.fields.parsed-author) { darkgreen } else { darkblue }
-    set text(fill: color)
-    it
-  })
-  
-  #set par(justify: true)
+#for i in range(1) { // to test whether multiple refsections cause issues
 
-  = Introduction <sec:intro>
-  #lorem(100)
+  refsection(format-citation: fcite.format-citation)[
+    // This show rule has to come inside the refsection, otherwise it is
+    // overwritten by the show rule that is defined in refsection's source code.
+    // It colors the citation links based on whether the reference is to a PI publication.
+    #show link: it => if-citation(it, value => {
+      let color = if "Koller" in family-names(value.reference.fields.parsed-author) { darkgreen } else { darkblue }
+      set text(fill: color)
+      it
+    })
+    
+    #set par(justify: true)
 
-  To reproduce \#78:
-  #context {
-    let hdr = query(heading).first()
-    link(hdr.location())[#hdr.body]
-  }
+    = Introduction <sec:intro>
+    #lorem(100)
 
-  = Another section
+    To reproduce \#78:
+    #context {
+      let hdr = query(heading).first()
+      link(hdr.location())[#hdr.body]
+    }
 
-  citet: !#citet("modelizer-24", "modelizer-24")!
+    = Another section
 
-  citep: #citep("bender20:_climb_nlu", "knuth1990")
+    citet: !#citet("modelizer-24", "modelizer-24")!
 
-  citeg: #citeg("kandra-bsc-25", "kandra-bsc-25")
+    citep: #citep("bender20:_climb_nlu", "knuth1990")
 
-  citen: #citen("yang2025goescrosslinguisticstudyimpossible", "yang2025goescrosslinguisticstudyimpossible")
+    citeg: #citeg("kandra-bsc-25", "kandra-bsc-25")
 
-  #cite("sec:intro")
+    citen: #citen("yang2025goescrosslinguisticstudyimpossible", "yang2025goescrosslinguisticstudyimpossible")
 
-  // #citename("kandra-bsc-25")
+    #cite("sec:intro")
 
-  // #citeyear("bender20:_climb_nlu")
+    // #citename("kandra-bsc-25")
 
-  #cite("irtg-sgraph-15")
+    // #citeyear("bender20:_climb_nlu")
 
-  #cite("wu-etal-2024-reasoning", "knuth1990") #cite("yao2025language") #cite("hershcovichItMeaningThat2021")
-  #cite("abgrallMeasurementsppmKpm2016") #cite("kuhlmann2003tiny") #cite("fake-mastersthesis")
+    #cite("irtg-sgraph-15")
 
-  #cite("multi1") #citen("multi2")
+    #cite("wu-etal-2024-reasoning", "knuth1990") #cite("yao2025language") #cite("hershcovichItMeaningThat2021")
+    #cite("abgrallMeasurementsppmKpm2016") #cite("kuhlmann2003tiny") #cite("fake-mastersthesis")
 
-  to test trailing punctuation: #cite("tedeschi-etal-2023-whats")
+    #cite("multi1") #citen("multi2")
 
-  to test editors: #cite("hempel1965science")
+    to test trailing punctuation: #cite("tedeschi-etal-2023-whats")
 
-  to test prefix and suffix: #cite("tedeschi-etal-2023-whats", prefix: "e.g. ", suffix: ", page 17")
+    to test editors: #cite("hempel1965science")
 
-  to test undefined citations: #cite("DOES-NOT-EXIST", "tedeschi-etal-2023-whats")
+    to test prefix and suffix: #cite("tedeschi-etal-2023-whats", prefix: "e.g. ", suffix: ", page 17")
 
-  #context { count-bib-entries() }
+    to test undefined citations: #cite("DOES-NOT-EXIST", "tedeschi-etal-2023-whats")
 
-  // #set par(hanging-indent: 1em)
-  #print-bibliography(format-reference: fref, sorting: sorting,
-    // grid-style: (row-gutter: 0.8em),
-    label-generator: fcite.label-generator,
-  )
-]
+    #context { count-bib-entries() }
+
+    // #set par(hanging-indent: 1em)
+    #print-bibliography(format-reference: fref, sorting: sorting,
+      // grid-style: (row-gutter: 0.8em),
+      label-generator: fcite.label-generator,
+    )
+  ]
+}
 
 #refsection(id: "hallo")[ lkjdf ]
 
