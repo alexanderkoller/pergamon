@@ -51,7 +51,7 @@
 
   format-fields: (
     // highlight my name in all references
-    "parsed-author": (dffmt, value, reference, field, options, style) => {
+    "author": (dffmt, value, reference, field, options, style) => {
       let formatted-names = value.map(d => {
         let highlighted = (d.family == "Koller")
         let name = format-name(d, name-type: "author", format: options.name-format)
