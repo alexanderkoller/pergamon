@@ -144,27 +144,6 @@
     raw(value)
   },
 
-  "journaltitle": (value, reference, field, options, style) => {
-    options.at("format-journaltitle")(value)
-  },
-
-  "issuetitle": (value, reference, field, options, style) => {
-    options.at("format-issuetitle")(value)
-  },
-
-  "maintitle": (value, reference, field, options, style) => {
-    emph(value)
-  },
-
-  "mainsubtitle": (value, reference, field, options, style) => {
-    emph(value)
-  },
-
-
-  "booktitle": (value, reference, field, options, style) => {
-    emph(value)
-  },
-
   "chapter": (value, reference, field, options, style) => {
     spaces(options.bibstring.chapter, value)
   },

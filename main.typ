@@ -47,7 +47,7 @@
   },
 
   // This (together with the field formatters for volume and number below) addresses #46.
-  volume-number-separator: " ",
+  // volume-number-separator: " ",
 
   format-fields: (
     // highlight my name in all references
@@ -62,24 +62,30 @@
     },
 
 
-    // This (together with the volume-number-separator above) addresses #46.
-    "volume": (dffmt, value, reference, field, options, style) => {
-      if reference.entry_type == "article" {
-        [vol. #value]
-      } else {
-        dffmt(value, reference, field, options, style)
-      }
-    },
+    // // This (together with the volume-number-separator above) addresses #46.
+    // "volume": (dffmt, value, reference, field, options, style) => {
+    //   if reference.entry_type == "article" {
+    //     [vol. #value]
+    //   } else {
+    //     dffmt(value, reference, field, options, style)
+    //   }
+    // },
 
-    "number": (dffmt, value, reference, field, options, style) => {
-      if reference.entry_type == "article" {
-        [no. #value]
-      } else {
-        dffmt(value, reference, field, options, style)
-      }
-    },
+    // "number": (dffmt, value, reference, field, options, style) => {
+    //   if reference.entry_type == "article" {
+    //     [no. #value]
+    //   } else {
+    //     dffmt(value, reference, field, options, style)
+    //   }
+    // },
   )
 )
+
+
+/*
+maintitle - emph
+booktitle - emph
+*/
 
 #let sorting = "nyt"
 
@@ -141,6 +147,8 @@
     to test prefix and suffix: #cite("tedeschi-etal-2023-whats", prefix: "e.g. ", suffix: ", page 17")
 
     to test undefined citations: #cite("DOES-NOT-EXIST", "tedeschi-etal-2023-whats")
+
+    to test journal subtitles: #cite("clls")
 
     #context { count-bib-entries() }
 

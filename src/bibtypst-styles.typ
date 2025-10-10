@@ -116,8 +116,8 @@
 // biblatex.def issue
 // -- in contrast to the original, we include the preceding colon here
 #let issue(reference, options) = {
-  let issuetitle = fd(reference, "issuetitle", options)
-  let issuesubtitle = fd(reference, "issuesubtitle", options)
+  let issuetitle = printfield(reference, "issuetitle", options)
+  let issuesubtitle = printfield(reference, "issuesubtitle", options)
 
   if issuetitle == none and issuesubtitle == none {
     none
@@ -132,14 +132,14 @@
 
 // standard.bbx journal+issuetitle
 #let journal-issue-title(reference, options) = {
-  let jt = fd(reference, "journaltitle", options)
-  let jst = fd(reference, "journalsubtitle", options)
+  let jt = printfield(reference, "journaltitle", options)
+  let jst = printfield(reference, "journalsubtitle", options)
 
   if jt == none and jst == none {
     none
   } else {
     let journaltitle = (options.periods)(
-      fjoin(options.subtitlepunct, jt, none, format: options.format-journaltitle),
+      fjoin(options.subtitlepunct, jt, jst, format: options.format-journaltitle),
       printfield(reference, "journaltitleaddon", options)
     )
 
@@ -215,7 +215,8 @@
   (options.periods)(
     fjoin(options.subtitlepunct, 
       printfield(reference, "maintitle", options, style: "titlecase"), 
-      printfield(reference, "mainsubtitle", options, style: "titlecase")),
+      printfield(reference, "mainsubtitle", options, style: "titlecase"), 
+      format: options.format-maintitle),
     printfield(reference, "maintitleaddon", options)
   )
 
@@ -226,7 +227,8 @@
   (options.periods)(
     fjoin(options.subtitlepunct, 
       printfield(reference, "booktitle", options, style: "titlecase"), 
-      printfield(reference, "booksubtitle", options, style: "titlecase")),
+      printfield(reference, "booksubtitle", options, style: "titlecase"),
+      format: options.format-booktitle),
     printfield(reference, "booktitleaddon", options)
   )
 
@@ -260,9 +262,11 @@
 
   let maintitle-str = if print-maintitle {
     (options.periods)(
-      (options.periods)(
+      fjoin(
+        options.subtitlepunct,
         printfield(reference, "maintitle", options),
-        printfield(reference, "mainsubtitle", options)
+        printfield(reference, "mainsubtitle", options),
+        format: options.format-maintitle
       ),
       epsilons(
         printfield(reference, "volume", options), 
@@ -721,15 +725,43 @@
     /// -> str
     subtitlepunct: ".",
 
-    /// Renders the title of a journal as content. The default argument
-    /// typesets it in italics.
+    /// Renders the title and subtitle of a journal as content.
+    /// The default argument typesets it in italics.
+    /// 
+    /// Certain titles (journaltitle, issuetitle, maintitle, booktitle)
+    /// can be combined with subtitles (e.g. journalsubtitle). The title and
+    /// subtitle are joined by `subtitlepunct` to obtain e.g. "Journal title: subtitle".
+    /// The subtitlepunct needs to be formatted the same as the title and
+    /// subtitle, but its formatting cannot be controlled by `format-fields`. This is
+    /// why #pergamon offers parameters such as `format-journaltitle` to format
+    /// the entire concatenated title and subtitle.
+    ///     
     /// -> function
     format-journaltitle: it => emph(it),
 
     /// Renders the title of a special issue as content. The default argument
     /// typesets it in italics.
+    /// 
+    /// See `format-journaltitle` for further explanation.
+    /// 
     /// -> function
     format-issuetitle: it => emph(it),
+
+    /// Renders the main title of a multi-volume work as content. The default argument
+    /// typesets it in italics.
+    /// 
+    /// See `format-journaltitle` for further explanation.
+    /// 
+    /// -> function
+    format-maintitle: it => emph(it),
+
+    /// Renders the title of a book as content. The default argument
+    /// typesets it in italics.
+    /// 
+    /// See `format-journaltitle` for further explanation.
+    /// 
+    /// -> function
+    format-booktitle: it => emph(it),
 
     /// #todo[Override the formatting for individual fields.]
     /// -> dictionary
@@ -941,6 +973,8 @@
         subtitlepunct: subtitlepunct,
         format-journaltitle: format-journaltitle,
         format-issuetitle: format-issuetitle,
+        format-booktitle: format-booktitle,
+        format-maintitle: format-maintitle,
         format-parens: format-parens,
         format-brackets: format-brackets,
         format-quotes: format-quotes,
