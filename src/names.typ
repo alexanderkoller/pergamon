@@ -39,9 +39,30 @@
   }
 }
 
-/// Spells out a name-parts dictionary 
-/// #todo[DOCUMENT ME, I'M NOW PUBLIC]
-#let format-name(name-parts-dict, name-type: "author", format: "{family}, {given}") = {
+/// Spells out a name-part dictionary into a string.
+/// See the documentation of the `name-format` argument of
+/// @format-reference for details on the format string.
+/// 
+/// -> str
+#let format-name(
+  /// A name-part dictionary
+  /// -> dictionary
+  name-parts-dict, 
+  
+  /// The type of name as which the name-part dictionary
+  /// should be formatted. If `format` is a dictionary,
+  /// `format-name` will look up the format string under this
+  /// key in `format`.
+  /// -> str
+  name-type: "author", 
+  
+  /// A format string or dictionary which specifies how the
+  /// name should be formatted. You can either pass a string,
+  /// or you can pass a dictionary that maps name types to
+  /// strings.
+  /// -> str | dictionary
+  format: "{family}, {given}"
+  ) = {
   let format-str = if type(format) == dictionary {
     format.at(name-type, default: "{family}, {given}")
   } else {

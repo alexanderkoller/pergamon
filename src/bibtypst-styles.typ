@@ -763,7 +763,29 @@
     /// -> function
     format-booktitle: it => emph(it),
 
-    /// #todo[Override the formatting for individual fields.]
+    /// Overrides the way individual fields in the reference are rendered.
+    /// The argument is a dictionary that maps the names of fields in a #bibtex
+    /// entry to _extended field formatters_, i.e. functions that compute
+    /// Typst content and take the following positional parameters:
+    /// - `dffmt`: the _default_ field formatter, which is applied if no 
+    ///   more specific field formatter is specified through `format-fields`.
+    /// - `value`: the value of the field in the #bibtex entry.
+    /// - `reference`: the reference dictionary, cf. @sec:reference.
+    /// - `field`: the name of the field.
+    /// - `options`: a dictionary containing all the options that were passed
+    ///   to `format-reference` as arguments.
+    /// - `style`: an optional style specification for the field.
+    /// 
+    /// If you do not override the rendering of a field, #pergamon
+    /// uses a default field formatter, i.e. a function that computes content
+    /// from the `value`, `reference`, `field`, `options`, and `style`
+    /// parameters explained above. This default field formatter is passed
+    /// as the first argument (`dffmt`) to the extended field formatter
+    /// explained above.
+    /// 
+    /// Some examples of how `format-fields` can be used are shown in 
+    /// @sec:styling-individual-references.
+    /// 
     /// -> dictionary
     format-fields: (),
   
@@ -832,7 +854,7 @@
     /// IDs of bibliographic constants (such as "In: " or "edited by") to
     /// their language-dependent surface forms. Replace some or all of the values
     /// with your own surface forms to control the way the bibliography is rendered.
-    /// -> dict
+    /// -> dictionary
     bibstring: default-bibstring,
 
     /// An array of additional fields which will be printed at the end of each

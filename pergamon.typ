@@ -17,6 +17,7 @@
 #let version = toml("typst.toml").package.version
 
 #let bibtypst = "Pergamon"
+#let pergamon = bibtypst
 #let biblatex = "BibLaTeX"
 #let bibtex = "BibTeX"
 
@@ -30,6 +31,7 @@
   "bibtypst": bibtypst,
   "bibtex": bibtex,
   "biblatex": biblatex,
+  "pergamon": bibtypst,
   "zebraw": zebraw,
   "issue": issue,
   "todo": todo,
@@ -432,6 +434,87 @@ one per bib entry. You can style these paragraphs through `set par` rules, e.g.
 to give the entries a hanging indentation.
 
 
+== Styling individual references
+<sec:styling-individual-references>
+
+The default reference style of #pergamon gives you fine-grained control over the way the
+individual fields of a reference are rendered. A _field formatter_ is a function with parameters 
+`(value, reference, field, options, style)`, where `field` is the name and `value` is the value
+of a field in the reference; `reference` is the entire reference dictionary; `options` are the 
+options that were passed to the reference style; and `style` is an optional style specification 
+for the field. The field formatter is expected to return content representing the field's value.
+
+You can override the formatters for specific fields by using the `format-fields` parameter 
+of `format-reference`. The argument should be a dictionary that maps field names to field formatters.
+One use of this mechanism is to highlight specific authors in a reference. For instance, to 
+highlight my name in a reference, I could use the following call:
+
+#zebraw(lang: false,
+```typ
+#format-reference(
+  format-fields: (
+    "author": (dffmt, value, reference, field, options, style) => {
+      let formatted-names = value.map(d => {
+        let highlighted = (d.family == "Koller")
+        let name = format-name(d, name-type: "author", 
+                                  format: options.name-format)
+        if highlighted { strong(name) } else { name }
+      })
+
+      formatted-names.join(", ", last: ", and ")
+    }
+  )
+)
+```)
+
+#figure(
+  box(stroke: 1pt)[#image("docs/materials/highlighted-author.png", width: 100%)],
+  placement: top,
+  caption: [Reference with highlighted author.]
+) <fig:highlighted-author>
+
+This will produce output as in @fig:highlighted-author.
+
+Another effect that can be achieved by overriding field formatters is to change the 
+presentation of the volume and number of the journal in which an article appears. Here's how
+the default presentation "VOL.NUM" can be replaced with "vol. VOL, no. NUM":
+
+#zebraw(lang: false,
+```typ
+#format-reference(
+  volume-number-separator: ", ",
+  format-fields: (
+    "volume": (dffmt, value, reference, field, options, style) => {
+      if reference.entry_type == "article" {
+        [vol. #value]
+      } else {
+        dffmt(value, reference, field, options, style)
+      }
+    },
+
+    "number": (dffmt, value, reference, field, options, style) => {
+      if reference.entry_type == "article" {
+        [no. #value]
+      } else {
+        dffmt(value, reference, field, options, style)
+      }
+    },
+  )
+)
+```)
+
+Note that this implementation makes use of the `dffmt` argument, which receives the
+default implementation of the field formatters for volume and number, respectively, so 
+that we can delegate the formatting of the field for references that are not journal articles.
+
+One special case that is not covered by field formatters arises in the case of subtitles.
+In #biblatex, the titles of journals, books, special issues, and multi-volume books can have
+optional subtitles. If both are specified, #pergamon concatenates the title and subtitle
+with the `subtitlepunct` argument, e.g. to "Title: Subtitle". It then applies a formatting function
+to the entire concatenated title and subtitle; for instance, `format-journaltitle` defaults to
+setting the title and subtitle in italics. You can override the default behavior by passing 
+your own functions in these arguments. 
+
 == Sorting the bibliography
 
 You can furthermore control the order in which references are presented in the bibliography.
@@ -754,16 +837,22 @@ The following functions may be helpful in the advanced usage and customization o
 
 = Changelog
 
+==== Changes in 0.4.0 (unreleased)
+- Introduced the `format-field` argument, which allows flexible control 
+  over how #pergamon formats individual #bibtex fields in the reference.
+- Cleaned up the formatting of titles that permit subtitles.
+
 ==== Changes in v0.3.2 (2025-10-02)
 
-- Fixes a number of bugs.
+- Fixed a number of bugs.
 - Added the `print-identifiers` parameter to `format-reference`.
 
 ==== Changes in v0.3.1 (2025-09-22)
 
-- Fixes a number of bugs.
+- Fixed a number of bugs.
 - Can now specify different name formats for authors, editors, etc.
 - Can now specify prefixes and suffixes in authoryear citations.
+- Citing a nonexistent reference key now displays a warning.
 
 ==== Changes in v0.3.0
 
