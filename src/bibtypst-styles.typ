@@ -918,7 +918,8 @@
       // construct field-formats
       let field-formatters = default-field-formats
       for (field, formatter) in format-fields {
-        field-formatters.insert(field, formatter.with(field-formatters.at(field)))
+        let default-formatter = field-formatters.at(field, default: (value, reference, field, options, style) => value)
+        field-formatters.insert(field, formatter.with(default-formatter))
       }
 
       let options = (

@@ -39,7 +39,8 @@
   }
 }
 
-// Spells out a name-parts dictionary 
+/// Spells out a name-parts dictionary 
+/// #todo[DOCUMENT ME, I'M NOW PUBLIC]
 #let format-name(name-parts-dict, name-type: "author", format: "{family}, {given}") = {
   let format-str = if type(format) == dictionary {
     format.at(name-type, default: "{family}, {given}")

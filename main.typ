@@ -46,6 +46,9 @@
     x
   },
 
+  // This (together with the field formatters for volume and number below) addresses #46.
+  volume-number-separator: " ",
+
   format-fields: (
     // highlight my name in all references
     "parsed-author": (dffmt, value, reference, field, options, style) => {
@@ -56,7 +59,25 @@
       })
 
       formatted-names.join(", ", last: ", and ")
-    }       
+    },
+
+
+    // This (together with the volume-number-separator above) addresses #46.
+    "volume": (dffmt, value, reference, field, options, style) => {
+      if reference.entry_type == "article" {
+        [vol. #value]
+      } else {
+        dffmt(value, reference, field, options, style)
+      }
+    },
+
+    "number": (dffmt, value, reference, field, options, style) => {
+      if reference.entry_type == "article" {
+        [no. #value]
+      } else {
+        dffmt(value, reference, field, options, style)
+      }
+    },
   )
 )
 
