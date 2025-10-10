@@ -1,7 +1,7 @@
 #import "bibtypst.typ": *
 #import "templating.typ": *
 #import "bibstrings.typ": default-bibstring
-#import "printfield.typ": printfield
+#import "printfield.typ": printfield, default-field-formats
 #import "bib-util.typ": fd, ifdef, type-aliases, nn, concatenate-list
 #import "names.typ": family-names
 #import "dates.typ": is-year-defined
@@ -730,6 +730,10 @@
     /// typesets it in italics.
     /// -> function
     format-issuetitle: it => emph(it),
+
+    /// #todo[Override the formatting for individual fields.]
+    /// -> dictionary
+    format-fields: (),
   
     /// Wraps text in round brackets. The argument needs to be a function
     /// that takes one argument (`str` or `content`) and returns `content`.
@@ -911,6 +915,12 @@
         }
       }
 
+      // construct field-formats
+      let field-formatters = default-field-formats
+      for (field, formatter) in format-fields {
+        field-formatters.insert(field, formatter.with(field-formatters.at(field)))
+      }
+
       let options = (
         link-titles: link-titles,
         eval-mode: eval-mode,
@@ -928,6 +938,7 @@
         format-parens: format-parens,
         format-brackets: format-brackets,
         format-quotes: format-quotes,
+        field-formatters: field-formatters,
         name-format: name-format,
         bibeidpunct: bibeidpunct,
         bibpagespunct: bibpagespunct,

@@ -22,7 +22,6 @@
 
 #let marker = text(size: 8pt)[#emoji.star] 
 
-
 #let fref = format-reference(
   // name-format: "{given} {family}",
   name-format: (
@@ -46,6 +45,19 @@
     }
     x
   },
+
+  format-fields: (
+    // highlight my name in all references
+    "parsed-author": (dffmt, value, reference, field, options, style) => {
+      let formatted-names = value.map(d => {
+        let highlighted = (d.family == "Koller")
+        let name = format-name(d, name-type: "author", format: options.name-format)
+        if highlighted { strong(name) } else { name }
+      })
+
+      formatted-names.join(", ", last: ", and ")
+    }       
+  )
 )
 
 #let sorting = "nyt"

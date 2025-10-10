@@ -92,7 +92,7 @@
   }
 }
 
-#let field-formats = (
+#let default-field-formats = (
   // Used in the bibliography and bibliography lists
 
   "doi": (value, reference, field, options, style) => {
@@ -282,6 +282,7 @@
 
 
 #let printfield(reference, field, options, style: none) = {
+  let field-formats = options.at("field-formatters")
   let value = fd(reference, field, options)
   
   if value == none {
