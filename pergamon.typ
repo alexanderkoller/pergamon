@@ -840,6 +840,7 @@ The following functions may be helpful in the advanced usage and customization o
 ==== Changes in 0.4.0 (unreleased)
 - Introduced the `format-field` argument, which allows flexible control 
   over how #pergamon formats individual #bibtex fields in the reference.
+- More flexible control over the bibstring table.
 - Cleaned up the formatting of titles that permit subtitles.
 
 ==== Changes in v0.3.2 (2025-10-02)

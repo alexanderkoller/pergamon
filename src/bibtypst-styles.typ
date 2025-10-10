@@ -850,12 +850,17 @@
     /// -> bool
     print-isbn: false,
 
-    /// The bibstring table. This is a dictionary that maps language-independent
-    /// IDs of bibliographic constants (such as "In: " or "edited by") to
-    /// their language-dependent surface forms. Replace some or all of the values
-    /// with your own surface forms to control the way the bibliography is rendered.
+    /// Overrides entries in the bibstring table. The bibstring table is a dictionary
+    /// that maps language-independent
+    /// IDs of bibliographic constants (e.g. "in") to  
+    /// their language-dependent surface forms (such as "In: " or "edited by").
+    /// The ID-form pairs you specify in the `bibstring` argument will overwrite
+    /// the default entries.
+    /// 
+    /// See the documentation for @default-bibstring in @sec:package:utility for
+    /// more information on the bibstring table.
     /// -> dictionary
-    bibstring: default-bibstring,
+    bibstring: (:),
 
     /// An array of additional fields which will be printed at the end of each
     /// bibliography entry. Fields can be specified either as a string, in which case
@@ -1010,7 +1015,7 @@
         print-eprint: print-eprint or print-identifiers-field == "eprint",
         print-date-after-authors: print-date-after-authors,
         volume-number-separator: volume-number-separator,
-        bibstring: bibstring,
+        bibstring: default-bibstring + bibstring,
         suppressed-fields: suppressed-fields,
         periods: periods,
         commas: commas,

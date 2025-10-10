@@ -46,6 +46,9 @@
     x
   },
 
+  // Override bibstring entries like this:
+  bibstring: ("in": "In"),
+
   // This (together with the field formatters for volume and number below) addresses #46.
   // volume-number-separator: " ",
 
