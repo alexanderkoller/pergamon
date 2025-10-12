@@ -840,6 +840,8 @@ The following functions may be helpful in the advanced usage and customization o
 ==== Changes in 0.4.0 (unreleased)
 - Introduced the `format-field` argument, which allows flexible control 
   over how #pergamon formats individual #bibtex fields in the reference.
+- Added the `minnames` and `maxnames` arguments to `format-reference`
+  and `format-citation-authoryear`, replicating the #biblatex options.
 - More flexible control over the bibstring table.
 - Cleaned up the formatting of titles that permit subtitles.
 
