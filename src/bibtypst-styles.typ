@@ -1419,7 +1419,6 @@
       str(reference.fields.parsed-date.year)
     } else {
       options.bibstring.nodate
-      // "n.d." // TODO localize this through bibstring
     }
 
     let extradate = if "extradate" in reference.fields {
