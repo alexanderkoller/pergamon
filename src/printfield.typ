@@ -53,7 +53,8 @@
 // as specified in the options. `name-parts-array` is an array of name-parts dictionaries.
 // "name-type" is the Bibtex field name, e.g. "author" or "editor".
 #let print-name(name-parts-array, name-type, options) = {
-  concatenate-list(name-parts-array.map(d => format-name(d, name-type: name-type, format: options.name-format)), options)
+  let names = name-parts-array.map(d => format-name(d, name-type: name-type, format: options.name-format))
+  concatenate-list(names, options, minnames: options.minnames, maxnames: options.maxnames)
 }
 
 #let month-bibstring-keys = (

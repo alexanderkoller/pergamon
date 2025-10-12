@@ -52,17 +52,18 @@
   // This (together with the field formatters for volume and number below) addresses #46.
   // volume-number-separator: " ",
 
-  format-fields: (
-    // highlight my name in all references
-    "author": (dffmt, value, reference, field, options, style) => {
-      let formatted-names = value.map(d => {
-        let highlighted = (d.family == "Koller")
-        let name = format-name(d, name-type: "author", format: options.name-format)
-        if highlighted { strong(name) } else { name }
-      })
+  // format-fields: (
+  //   // highlight my name in all references
+  //   "author": (dffmt, value, reference, field, options, style) => {
+  //     let formatted-names = value.map(d => {
+  //       let highlighted = (d.family == "Koller")
+  //       let name = format-name(d, name-type: "author", format: options.name-format)
+  //       if highlighted { strong(name) } else { name }
+  //     })
 
-      formatted-names.join(", ", last: ", and ")
-    },
+         // TODO: cover the case of two authors, or just use concatenate-list
+  //     formatted-names.join(", ", last: ", and ")
+  //   },
 
 
     // // This (together with the volume-number-separator above) addresses #46.

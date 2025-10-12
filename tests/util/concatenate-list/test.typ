@@ -1,35 +1,48 @@
 #import "/src/bib-util.typ": *
-
-// #let concatenate-list(names, options) = {
+#import "/src/bibstrings.typ": *
 
 
 #let default-options = (
     list-middle-delim: ", ",
     list-end-delim-two: " and ",
     list-end-delim-many: ", and ",
+    bibstring: default-bibstring
 )
 
-#let cld(..names, opt:(:)) = concatenate-list(names.pos(), default-options + opt)
+#let cld(..names, maxnames: 2, minnames: 1, opt:(:)) = concatenate-list(names.pos(), default-options + opt, maxnames: maxnames, minnames: minnames)
+
+///// for the bibliography: maxnames=99
+
 
 // single author
-#assert.eq("Koller", cld("Koller"))
+#assert.eq("Koller", cld("Koller", maxnames: 99))
 
 // two authors
-#assert.eq("Bender and Koller", cld("Bender", "Koller"))
+#assert.eq("Bender and Koller", cld("Bender", "Koller", maxnames: 99))
 
 // three authors
-#assert.eq("Kandra, Demberg, and Koller", cld("Kandra", "Demberg", "Koller"))
+#assert.eq("Kandra, Demberg, and Koller", cld("Kandra", "Demberg", "Koller", maxnames: 99))
 
 // many authors
-#assert.eq("Yao, Du, Zhu, Hahn, and Koller", cld("Yao", "Du", "Zhu", "Hahn", "Koller"))
+#assert.eq("Yao, Du, Zhu, Hahn, and Koller", cld("Yao", "Du", "Zhu", "Hahn", "Koller", maxnames: 99))
 
 // change list-end-delim-two
-#assert.eq("BenderxxKoller", cld("Bender", "Koller", opt: (list-end-delim-two: "xx")))
+#assert.eq("BenderxxKoller", cld("Bender", "Koller", opt: (list-end-delim-two: "xx"), maxnames: 99))
 
 // change list-middle-delim
-#assert.eq("Kandra :Demberg, and Koller", cld("Kandra", "Demberg", "Koller", opt: (list-middle-delim: " :")))
+#assert.eq("Kandra :Demberg, and Koller", cld("Kandra", "Demberg", "Koller", opt: (list-middle-delim: " :"), maxnames: 99))
 
 // change list-delim-many
-#assert.eq("Kandra, Demberg and:Koller", cld("Kandra", "Demberg", "Koller", opt: (list-end-delim-many: " and:")))
+#assert.eq("Kandra, Demberg and:Koller", cld("Kandra", "Demberg", "Koller", opt: (list-end-delim-many: " and:"), maxnames: 99))
 
+// et al.
+#assert.eq("Yao et al.", concatenate-list(("Yao", "Du", "Zhu", "Hahn", "Koller"), default-options))
 
+// two authors, maxnames=1
+#assert.eq("Bender et al.", cld("Bender", "Koller", maxnames: 1))
+
+// minnames=2
+#assert.eq("Yao, Du et al.", concatenate-list(("Yao", "Du", "Zhu", "Hahn", "Koller"), default-options, maxnames: 2, minnames: 2))
+
+// too many minnames
+#assert.eq("Bender and Koller", cld("Bender", "Koller", maxnames: 1, minnames: 10))

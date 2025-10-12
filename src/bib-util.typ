@@ -22,23 +22,27 @@
 }
 
 
-// Concatenate an array of strings ("A", "B", "C") into "A, B, and C".
-#let concatenate-list(names, options) = {
-  let ret = names.at(0)
+/// Concatenates an array of names. If there is only one name, it is returned
+/// unmodified. If there are two names, they are concatenated with the
+/// value `options.list-end-delim-two` ("and"). If there are three names, they
+/// are concatenated with the value `options.list-middle-delim` (", "), except
+/// the last name is joined with `options.list-end-delim-many` (", and").
+#let concatenate-list(names, options, maxnames: 2, minnames: 1) = {
+  let etal = names.len() > maxnames and names.len() > minnames // print "et al.", at least one name dropped
+  let num-names = if etal { calc.min(minnames, names.len()) } else { names.len() } // #names that will be printed
 
-  for i in range(1, names.len()) {
-    if type(names.at(i)) != dictionary { // no idea how it would be a dictionary
-      if names.len() == 2 {
-        ret = ret + options.list-end-delim-two + names.at(i)
-      } else if i == names.len()-1 {
-        ret = ret + options.list-end-delim-many + names.at(i)
-      } else {
-        ret = ret + options.list-middle-delim + names.at(i)
-      }
+  if etal {
+    let nn = names.slice(0, num-names).join(options.list-middle-delim)
+    nn + " " + options.bibstring.andothers
+  } else {
+    if names.len() == 1 {
+      names.at(0)
+    } else if names.len() == 2 {
+      names.at(0) + options.list-end-delim-two + names.at(1)
+    } else {
+      names.join(options.list-middle-delim, last: options.list-end-delim-many)
     }
   }
-
-  ret
 }
 
 

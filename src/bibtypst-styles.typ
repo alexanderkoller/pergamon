@@ -921,6 +921,32 @@
     /// 
     /// -> str | array
     comma: ",",
+
+    /// Maximum number of names that are displayed in name lists (author, editor, etc.).
+    /// If the actual number of names exceeds `maxnames`, only the first `maxnames`
+    /// names are shown and `bibstring.andothers` ("et al.") is appended.
+    /// 
+    /// This parameter is modeled after the `maxnames`/`maxbibnames` option
+    /// in #biblatex.
+    /// 
+    /// -> int
+    maxnames: 99,
+
+    /// Minimum number of names that are displayed in name lists (author, editor, etc.).
+    /// This can be used in conjunction with `maxnames` to create name lists like
+    /// "Jones, Smith et al." (minnames = 2, maxnames = 2). 
+    /// 
+    /// `minnames` trumps `maxnames`: That is, if the name list is at least as long
+    /// as `minnames`, the reference will show `minnames` names, even if this exceeds
+    /// `maxnames`. In typical use cases, `minnames` will be less or equal than `maxnames`,
+    /// so this situation will usually not occur.
+    /// 
+    /// This parameter is modeled after the `minnames`/`minbibnames` option
+    /// in #biblatex.
+    /// 
+    /// -> int
+    minnames: 99,
+
   ) = {
     // construct fjoin functions for periods and commas
     let make-fjoin-function(separator) = {
@@ -1019,6 +1045,8 @@
         suppressed-fields: suppressed-fields,
         periods: periods,
         commas: commas,
+        minnames: minnames,
+        maxnames: maxnames
       )
 
       // process type aliases
@@ -1300,6 +1328,16 @@
     }
   }
 
+  // TODO - configure me
+  let options = (
+    list-middle-delim: ", ",
+    list-end-delim-two: " and ",
+    list-end-delim-many: ", and ",
+    bibstring: default-bibstring,
+    minnames: 1,
+    maxnames: 2
+  )
+
   let label-generator(index, reference) = {
     let parsed-authors = family-names(reference.fields.parsed-author)
     let year-defined = is-year-defined(reference)
@@ -1315,13 +1353,7 @@
       none
     }
 
-    let authors-str = if parsed-authors.len() == 1 {
-      parsed-authors.at(0)
-    } else if parsed-authors.len() == 2 {
-      strfmt("{} and {}", parsed-authors.at(0), parsed-authors.at(1))
-    } else {
-      parsed-authors.at(0) + " et al."
-    }
+    let authors-str = concatenate-list(parsed-authors, options, minnames: options.minnames, maxnames: options.maxnames)
 
     let lbl = (authors-str, year, extradate)
     let lbl-repr = strfmt("{} {}{}", authors-str, year, extradate)
