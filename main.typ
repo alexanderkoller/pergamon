@@ -154,6 +154,8 @@ booktitle - emph
 
     to test journal subtitles: #cite("clls")
 
+    to test nodate: #cite("nodate")
+
     #context { count-bib-entries() }
 
     // #set par(hanging-indent: 1em)

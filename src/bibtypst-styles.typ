@@ -1269,8 +1269,91 @@
 
   /// Separator symbol to connect the citations for the different keys.
   /// -> str
-  citation-separator: "; "
+  citation-separator: "; ",
+
+  /// When typesetting lists (e.g. author names), #bibtypst will use this
+  /// delimiter to combine list items before the last one.
+  /// 
+  /// Will typically match the `list-middle-delim` argument of
+  /// @format-reference.
+  /// 
+  /// -> str
+  list-middle-delim: ", ",
+
+  /// When typesetting lists (e.g. author names), #bibtypst will use this
+  /// delimiter to combine the items of lists of length two.
+  /// 
+  /// Will typically match the `list-end-delim-two` argument of
+  /// @format-reference.
+  /// 
+  /// -> str
+  list-end-delim-two: " and ",
+
+  /// When typesetting lists (e.g. author names), #bibtypst will use this
+  /// delimiter in lists of length three of more to combine the final
+  /// item in the list with the rest.
+  /// 
+  /// Will typically match the `list-end-delim-many` argument of
+  /// @format-reference.
+  /// 
+  /// -> str
+  list-end-delim-many: ", and ",
+  
+  /// Overrides entries in the bibstring table. The bibstring table is a dictionary
+  /// that maps language-independent
+  /// IDs of bibliographic constants (e.g. "in") to
+  /// their language-dependent surface forms (such as "In: " or "edited by").
+  /// The ID-form pairs you specify in the `bibstring` argument will overwrite
+  /// the default entries.
+  /// 
+  /// Will typically match the `bibstring` argument of
+  /// @format-reference.
+  ///
+  /// See the documentation for @default-bibstring in @sec:package:utility for
+  /// more information on the bibstring table.
+  /// 
+  /// -> dictionary
+  bibstring: (:),
+
+  /// Maximum number of names that are displayed in name lists (author, editor, etc.).
+  /// If the actual number of names exceeds `maxnames`, only the first `maxnames`
+  /// names are shown and `bibstring.andothers` ("et al.") is appended.
+  ///
+  /// This parameter is modeled after the `maxnames`/`maxcitenames` option
+  /// in #biblatex. Just like `maxbibnames` is not necessarily the same as 
+  /// `maxcitenames`, the value of `maxnames` here need not match the value
+  /// of `maxnames` in @format-reference.
+  ///
+  /// -> int
+  maxnames: 2,
+
+  /// Minimum number of names that are displayed in name lists (author, editor, etc.).
+  /// This can be used in conjunction with `maxnames` to create name lists like
+  /// "Jones, Smith et al." (minnames = 2, maxnames = 2).
+  ///
+  /// `minnames` trumps `maxnames`: That is, if the name list is at least as long
+  /// as `minnames`, the reference will show `minnames` names, even if this exceeds
+  /// `maxnames`. In typical use cases, `minnames` will be less or equal than `maxnames`,
+  /// so this situation will usually not occur.
+  ///
+  /// This parameter is modeled after the `minnames`/`mincitenames` option
+  /// in #biblatex. Just like `minbibnames` is not necessarily the same as 
+  /// `mincitenames`, the value of `minnames` here need not match the value
+  /// of `names` in @format-reference.
+  ///
+  /// -> int
+  minnames: 1,
+
+
 ) = {
+  let options = (
+    list-middle-delim: list-middle-delim,
+    list-end-delim-two: list-end-delim-two,
+    list-end-delim-many: list-end-delim-many,
+    bibstring: default-bibstring + bibstring,
+    minnames: minnames,
+    maxnames: maxnames
+  )
   
   let formatter(reference-dict, form) = {
     // access precomputed information that was stored in the label field
@@ -1328,15 +1411,6 @@
     }
   }
 
-  // TODO - configure me
-  let options = (
-    list-middle-delim: ", ",
-    list-end-delim-two: " and ",
-    list-end-delim-many: ", and ",
-    bibstring: default-bibstring,
-    minnames: 1,
-    maxnames: 2
-  )
 
   let label-generator(index, reference) = {
     let parsed-authors = family-names(reference.fields.parsed-author)
@@ -1344,7 +1418,8 @@
     let year = if reference.fields.parsed-date != none and "year" in reference.fields.parsed-date {
       str(reference.fields.parsed-date.year)
     } else {
-      "n.d." // TODO localize this through bibstring
+      options.bibstring.nodate
+      // "n.d." // TODO localize this through bibstring
     }
 
     let extradate = if "extradate" in reference.fields {
