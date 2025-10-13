@@ -957,7 +957,7 @@ The following functions may be helpful in the advanced usage and customization o
 
 = Changelog
 
-==== Changes in 0.4.0 (unreleased)
+==== Changes in 0.4.0 (2025-10-13)
 - Introduced the `format-field` argument, which allows flexible control 
   over how #pergamon formats individual #bibtex fields in the reference.
 - Added the `minnames` and `maxnames` arguments to `format-reference`
