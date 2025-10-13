@@ -522,8 +522,7 @@ highlight my name in a reference, I could use the following call:
     "author": (dffmt, value, reference, field, options, style) => {
       let formatted-names = value.map(d => {
         let highlighted = (d.family == "Koller")
-        let name = format-name(d, name-type: "author", 
-                                  format: options.name-format)
+        let name = format-name(d, format: "{given} {family}")
         if highlighted { strong(name) } else { name }
       })
 
@@ -553,7 +552,7 @@ highlight my name in a reference, I could use the following call:
             "author": (dffmt, value, reference, field, options, style) => {
               let formatted-names = value.map(d => {
                 let highlighted = (d.family == "Koller")
-                let name = format-name(d, name-type: "author", format: options.name-format)
+                let name = format-name(d, format: "{given} {family}")
                 if highlighted { strong(name) } else { name }
               })
 
@@ -871,8 +870,7 @@ dictionary and adds some fields of its own.
 
 - The `parsed-X` fields contain parsed name information. For instance, `parsed-author` represents the outcome of
   parsing the names in the `author` field. It consists of an array of _name-part dictionaries_, which map the keys
-  `given` and `family` (aka "first" and "last" names) to the parts of that author's name. Name parsing is currently
-  a bit naive; see #issue(9) to track progress on this.
+  `given` and `family` (aka "first" and "last" names) to the parts of that author's name.
 
 - The `sortstr-author` field concatenates the author names, family-name first. It is used when sorting references
   in a bibliography using the `n` identifier.
