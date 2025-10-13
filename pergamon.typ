@@ -97,25 +97,28 @@ The following piece of code typesets a bibliography using #bibtypst.
 (You can try out a more complex example yourself: download #link("https://github.com/alexanderkoller/pergamon/blob/main/example.typ")[example.typ from Github]\;
 see also #link("https://github.com/alexanderkoller/pergamon/blob/main/example.pdf")[the generated PDF].)
 
-#zebraw(lang: false,
-  ```typ
-#import "@preview/pergamon:0.1.0": *
+
+// construct code example, with the right Pergamon version interpolated in
+#let example-raw = "#import \"@preview/pergamon:VERSION\": *
 
 #let style = format-citation-numeric()
-#add-bib-resource(read("bibliography.bib"))
+#add-bib-resource(read(\"bibliography.bib\"))
 
 #refsection(format-citation: style.format-citation)[
   ... some text here ...
-  #cite("bender20:_climb_nlu")
+  #cite(\"bender20:_climb_nlu\")
 
   #print-bibliography(
        format-reference: 
              format-reference(reference-label: style.reference-label), 
        label-generator: style.label-generator,
-       sorting: "nyt")
-]
-  ```
-)
+       sorting: \"nyt\")
+]".replace("VERSION", version)
+
+#zebraw(lang: false, raw(example-raw, lang: "typ", block: true))
+
+
+
 
 #figure(
   box(stroke: 1pt, inset: 6pt)[
