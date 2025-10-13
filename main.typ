@@ -51,15 +51,15 @@
 
   format-fields: (
     // highlight my name in all references
-    "author": (dffmt, value, reference, field, options, style) => {
-      let formatted-names = value.map(d => {
-        let highlighted = (d.family == "Koller")
-        let name = format-name(d, name-type: "author", format: options.name-format)
-        if highlighted { strong(name) } else { name }
-      })
+    // "author": (dffmt, value, reference, field, options, style) => {
+    //   let formatted-names = value.map(d => {
+    //     let highlighted = (d.family == "Koller")
+    //     let name = format-name(d, name-type: "author", format: options.name-format)
+    //     if highlighted { strong(name) } else { name }
+    //   })
 
-      concatenate-names(formatted-names, maxnames: 999)
-    },
+    //   concatenate-names(formatted-names, maxnames: 999)
+    // },
   )
 )
 
