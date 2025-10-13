@@ -1,6 +1,7 @@
 #import "@preview/tidy:0.4.3"
 #import "@preview/datify:0.1.4": custom-date-format
 #import "@preview/zebraw:0.5.5": *
+#import "lib.typ": * // current version of Pergamon
 
 #let darkblue = blue.darken(20%)
 #show link: set text(fill: darkblue)
@@ -11,7 +12,6 @@
 
 #let todo(x) = text(fill: red, [*(#x)*])
 #let issue(id) = link("https://github.com/alexanderkoller/pergamon/issues/" + str(id))[issue \##id]
-
 
 #let date = custom-date-format(datetime.today(), "DD Month YYYY", "en")
 #let version = toml("typst.toml").package.version
@@ -37,6 +37,9 @@
   "todo": todo,
   "unfinished": unfinished
 )
+
+// for the examples
+#add-bib-resource(read("bibs/bibliography.bib"))
 
 #align(center)[
   #text(size: 24pt)[*#bibtypst*]\
@@ -115,9 +118,22 @@ see also #link("https://github.com/alexanderkoller/pergamon/blob/main/example.pd
 )
 
 #figure(
-  box(stroke: 1pt)[#image("docs/materials/example-output.png", width: 100%)],
+  box(stroke: 1pt, inset: 6pt)[
+    #set align(left)
+    #let style = format-citation-numeric()
+
+    #refsection(format-citation: style.format-citation)[
+      ... some text here ... #cite("bender20:_climb_nlu")
+      #v(-1em)
+
+      #print-bibliography(
+       format-reference: format-reference(reference-label: style.reference-label), 
+       label-generator: style.label-generator
+      )
+    ]
+  ],
   placement: top,
-  caption: [Example bibliography typeset with #bibtypst.]
+  caption: [Example bibliography typeset with #bibtypst (`numeric` citation style).]
 ) <fig:example-output>
 
 This will generate the output shown in @fig:example-output. Let's go through the different
@@ -200,7 +216,24 @@ implementing them.
 
 
 #figure(
-  box(stroke: 1pt)[#image("docs/materials/modified-example-output.png", width: 100%)],
+  box(stroke: 1pt, inset: 6pt)[
+    #set align(left)
+    #let style = format-citation-numeric() // AAA
+
+    #refsection(format-citation: style.format-citation)[
+      ... some text here ... #cite("bender20:_climb_nlu")
+      #v(-1em)
+
+      #print-bibliography(
+       format-reference: format-reference(
+          reference-label: style.reference-label,
+          print-date-after-authors: true, 
+          format-quotes: it => it
+       ), 
+       label-generator: style.label-generator
+      )
+    ]
+  ],
   placement: top,
   caption: [Bibliography with the configuration of @sec:builtin-reference.]
 ) <fig:modified-example-output>
@@ -258,14 +291,44 @@ in square brackets rather than round ones, you can replace line 4 in the above e
 )
 
 #figure(
-  box(stroke: 1pt)[#image("docs/materials/example-alphabetic.png", width: 100%)],
+  box(stroke: 1pt, inset: 6pt)[
+    #set align(left)
+    #let style = format-citation-alphabetic()
+
+    #refsection(format-citation: style.format-citation)[
+      ... some text here ... #cite("bender20:_climb_nlu")
+      #v(-1em)
+
+      #print-bibliography(
+       format-reference: format-reference(
+          reference-label: style.reference-label,
+       ), 
+       label-generator: style.label-generator
+      )
+    ]
+  ],
   placement: top,
   caption: [Bibliography with the `alphabetic` citation style.]
 ) <fig:example-alphabetic>
 
 
 #figure(
-  box(stroke: 1pt)[#image("docs/materials/example-authoryear.png", width: 100%)],
+  box(stroke: 1pt, inset: 6pt)[
+    #set align(left)
+    #let style = format-citation-authoryear()
+
+    #refsection(format-citation: style.format-citation)[
+      ... some text here ... #cite("bender20:_climb_nlu")
+      #v(-1em)
+
+      #print-bibliography(
+       format-reference: format-reference(
+          reference-label: style.reference-label,
+       ), 
+       label-generator: style.label-generator
+      )
+    ]
+  ],
   placement: top,
   caption: [Bibliography with the `authoryear` citation style.]
 ) <fig:example-authoryear>
@@ -461,14 +524,45 @@ highlight my name in a reference, I could use the following call:
         if highlighted { strong(name) } else { name }
       })
 
-      formatted-names.join(", ", last: ", and ")
+      concatenate-names(formatted-names, maxnames: 999)
     }
   )
 )
 ```)
 
 #figure(
-  box(stroke: 1pt)[#image("docs/materials/highlighted-author.png", width: 100%)],
+  box(stroke: 1pt, inset: 6pt)[
+    #set align(left)
+    #let style = format-citation-authoryear()
+
+    #refsection(format-citation: style.format-citation)[
+      #hide[
+      ... some text here ... #cite("bender20:_climb_nlu")
+      ]
+      #v(-2em)
+
+      #print-bibliography(
+      title: none,
+       format-reference: format-reference(
+          reference-label: style.reference-label,
+          format-fields: (
+            // highlight my name in all references
+            "author": (dffmt, value, reference, field, options, style) => {
+              let formatted-names = value.map(d => {
+                let highlighted = (d.family == "Koller")
+                let name = format-name(d, name-type: "author", format: options.name-format)
+                if highlighted { strong(name) } else { name }
+              })
+
+              concatenate-names(formatted-names, maxnames: 999)
+            },
+          )
+       ), 
+       label-generator: style.label-generator
+      )
+    ]
+  ],
+  // box(stroke: 1pt)[#image("docs/materials/highlighted-author.png", width: 100%)],
   placement: top,
   caption: [Reference with highlighted author.]
 ) <fig:highlighted-author>
@@ -666,7 +760,32 @@ This will place a marker before each reference with the "highlight" keyword, and
 all other references unchanged.
 
 #figure(
-  box(stroke: 1pt)[#image("docs/materials/highlighting.png", width: 100%)],
+  box(stroke: 1pt, inset: 6pt)[
+    #set align(left)
+    #let style = format-citation-authoryear()
+
+    #refsection(format-citation: style.format-citation)[
+      #hide[
+        ... some text here ... #cite("bender20:_climb_nlu")
+      ]
+      #v(-2em)
+
+      #print-bibliography(
+       title: none,
+       format-reference: format-reference(
+          reference-label: style.reference-label,
+          highlight: (rendered, reference, index) => {
+            if "highlight" in reference.fields.at("keywords", default: ()) {
+              [#text(size: 8pt)[#emoji.star.box] #rendered]
+            } else {
+              rendered
+            }
+          }
+       ), 
+       label-generator: style.label-generator
+      )
+    ]
+  ],
   placement: top,
   caption: [Highlighting a reference.]
 ) <fig:highlighting>
