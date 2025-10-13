@@ -1,5 +1,5 @@
 
-
+#import "bibstrings.typ": default-bibstring
 
 #let matches-completely(s, re) = {
   let result = s.match(re)
@@ -25,11 +25,37 @@
 /// Concatenates an array of names. If there is only one name, it is returned
 /// unmodified. If there are two names, they are concatenated with the
 /// value `options.list-end-delim-two` ("and"). If there are three names, they
-/// are concatenated with the value `options.list-middle-delim` (", "), except
+/// are concatenated with the value `options.list-end-delim-two` (", "), except
 /// the last name is joined with `options.list-end-delim-many` (", and").
-#let concatenate-list(names, options, maxnames: 2, minnames: 1) = {
+/// 
+/// -> str | content
+#let concatenate-names(
+  /// An array of names. Each name can a string or content. If the names are strings,
+  /// the function will return a string; if at least one name is content, the
+  /// function will return content.
+  /// 
+  /// -> array
+  names, 
+
+  /// Options that control the concatenation. `concatenate-names` defines reasonable
+  /// default options for `list-end-delim-two`,
+  /// `list-end-delim-two`, `list-end-delim-many`, and `bibstring`.
+  /// You can override these options by passing them in a dictionary here.
+  /// 
+  /// -> dictionary
+  options: (:), 
+
+  /// Maximum number of names that is displayed before the name list is truncated
+  /// with "et al." See the `maxnames` parameter in @format-reference for details.
+  maxnames: 2, 
+
+  /// Minimum number of names that is guaranteed to be displayed. See the `minnames`
+  /// parameter in @format-reference for details.
+  minnames: 1
+  ) = {
   let etal = names.len() > maxnames and names.len() > minnames // print "et al.", at least one name dropped
   let num-names = if etal { calc.min(minnames, names.len()) } else { names.len() } // #names that will be printed
+  let options = (list-end-delim-two: " and ", list-middle-delim: ", ", list-end-delim-many: ", and ", bibstring: default-bibstring) + options
 
   if etal {
     let nn = names.slice(0, num-names).join(options.list-middle-delim)

@@ -28,6 +28,7 @@
     "author": "{given} {family}",
     "editor": "{g}. {family}"
   ),
+  print-date-after-authors: true,
   reference-label: fcite.reference-label,
   format-quotes: it => it,
   print-identifiers: ("doi", "url"),
@@ -35,7 +36,6 @@
   suppress-fields: ("*": ("month",)),
   eval-scope: ("todo": x => text(fill: red, x)),
   // suppress-fields: ("*": ("pages",), "inproceedings": ("editor", "publisher") ),
-  // print-date-after-authors: true,
   // additional-fields: ("award",)
   //  period: ",",
   additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),
@@ -49,47 +49,22 @@
   // Override bibstring entries like this:
   bibstring: ("in": "In"),
 
-  // This (together with the field formatters for volume and number below) addresses #46.
-  // volume-number-separator: " ",
+  format-fields: (
+    // highlight my name in all references
+    "author": (dffmt, value, reference, field, options, style) => {
+      let formatted-names = value.map(d => {
+        let highlighted = (d.family == "Koller")
+        let name = format-name(d, name-type: "author", format: options.name-format)
+        if highlighted { strong(name) } else { name }
+      })
 
-  // format-fields: (
-  //   // highlight my name in all references
-  //   "author": (dffmt, value, reference, field, options, style) => {
-  //     let formatted-names = value.map(d => {
-  //       let highlighted = (d.family == "Koller")
-  //       let name = format-name(d, name-type: "author", format: options.name-format)
-  //       if highlighted { strong(name) } else { name }
-  //     })
-
-         // TODO: cover the case of two authors, or just use concatenate-list
-  //     formatted-names.join(", ", last: ", and ")
-  //   },
-
-
-    // // This (together with the volume-number-separator above) addresses #46.
-    // "volume": (dffmt, value, reference, field, options, style) => {
-    //   if reference.entry_type == "article" {
-    //     [vol. #value]
-    //   } else {
-    //     dffmt(value, reference, field, options, style)
-    //   }
-    // },
-
-    // "number": (dffmt, value, reference, field, options, style) => {
-    //   if reference.entry_type == "article" {
-    //     [no. #value]
-    //   } else {
-    //     dffmt(value, reference, field, options, style)
-    //   }
-    // },
+      concatenate-names(formatted-names, maxnames: 999)
+    },
   )
 )
 
 
-/*
-maintitle - emph
-booktitle - emph
-*/
+
 
 #let sorting = "nyt"
 

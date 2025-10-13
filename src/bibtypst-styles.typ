@@ -2,7 +2,7 @@
 #import "templating.typ": *
 #import "bibstrings.typ": default-bibstring
 #import "printfield.typ": printfield, default-field-formats
-#import "bib-util.typ": fd, ifdef, type-aliases, nn, concatenate-list
+#import "bib-util.typ": fd, ifdef, type-aliases, nn, concatenate-names
 #import "names.typ": family-names
 #import "dates.typ": is-year-defined
 
@@ -930,7 +930,7 @@
     /// in #biblatex.
     /// 
     /// -> int
-    maxnames: 99,
+    maxnames: 9999,
 
     /// Minimum number of names that are displayed in name lists (author, editor, etc.).
     /// This can be used in conjunction with `maxnames` to create name lists like
@@ -945,7 +945,7 @@
     /// in #biblatex.
     /// 
     /// -> int
-    minnames: 99,
+    minnames: 9999,
 
   ) = {
     // construct fjoin functions for periods and commas
@@ -1427,7 +1427,7 @@
       none
     }
 
-    let authors-str = concatenate-list(parsed-authors, options, minnames: options.minnames, maxnames: options.maxnames)
+    let authors-str = concatenate-names(parsed-authors, options: options, minnames: options.minnames, maxnames: options.maxnames)
 
     let lbl = (authors-str, year, extradate)
     let lbl-repr = strfmt("{} {}{}", authors-str, year, extradate)

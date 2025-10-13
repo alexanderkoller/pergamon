@@ -1,6 +1,6 @@
 #import "@preview/nth:1.0.1": *
 #import "@preview/oxifmt:1.0.0": strfmt
-#import "bib-util.typ": fd, ifdef, concatenate-list
+#import "bib-util.typ": fd, ifdef, concatenate-names
 #import "templating.typ": *
 #import "names.typ": format-name
 #import "bib-util.typ": is-integer
@@ -54,7 +54,7 @@
 // "name-type" is the Bibtex field name, e.g. "author" or "editor".
 #let print-name(name-parts-array, name-type, options) = {
   let names = name-parts-array.map(d => format-name(d, name-type: name-type, format: options.name-format))
-  concatenate-list(names, options, minnames: options.minnames, maxnames: options.maxnames)
+  concatenate-names(names, options: options, minnames: options.minnames, maxnames: options.maxnames)
 }
 
 #let month-bibstring-keys = (
@@ -242,7 +242,7 @@
       none
     } else {
       let language-list = value.split(regex("\s+and\s+"))
-      concatenate-list(language-list, options) + " XXX"
+      concatenate-names(language-list, options: options, maxnames: 99) + " XXX"
     }
   }
   /*

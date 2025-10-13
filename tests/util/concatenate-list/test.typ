@@ -9,7 +9,7 @@
     bibstring: default-bibstring
 )
 
-#let cld(..names, maxnames: 2, minnames: 1, opt:(:)) = concatenate-list(names.pos(), default-options + opt, maxnames: maxnames, minnames: minnames)
+#let cld(..names, maxnames: 2, minnames: 1, opt:(:)) = concatenate-names(names.pos(), options: opt, maxnames: maxnames, minnames: minnames)
 
 ///// for the bibliography: maxnames=99
 
@@ -36,13 +36,13 @@
 #assert.eq("Kandra, Demberg and:Koller", cld("Kandra", "Demberg", "Koller", opt: (list-end-delim-many: " and:"), maxnames: 99))
 
 // et al.
-#assert.eq("Yao et al.", concatenate-list(("Yao", "Du", "Zhu", "Hahn", "Koller"), default-options))
+#assert.eq("Yao et al.", concatenate-names(("Yao", "Du", "Zhu", "Hahn", "Koller")))
 
 // two authors, maxnames=1
 #assert.eq("Bender et al.", cld("Bender", "Koller", maxnames: 1))
 
 // minnames=2
-#assert.eq("Yao, Du et al.", concatenate-list(("Yao", "Du", "Zhu", "Hahn", "Koller"), default-options, maxnames: 2, minnames: 2))
+#assert.eq("Yao, Du et al.", concatenate-names(("Yao", "Du", "Zhu", "Hahn", "Koller"), maxnames: 2, minnames: 2))
 
 // too many minnames
 #assert.eq("Bender and Koller", cld("Bender", "Koller", maxnames: 1, minnames: 10))
