@@ -7,3 +7,8 @@
 #import "src/content-to-string.typ": content-to-string
 #import "src/templating.typ": commas, periods, spaces, epsilons
 
+#let pergamon-dev = {
+  import "src/bibtypst-styles.typ": date, labelname
+
+  (date: date, labelname: labelname)
+}

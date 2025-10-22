@@ -1,5 +1,6 @@
 
 #import "lib.typ": *
+#let dev = pergamon-dev
 // #import "@preview/pergamon:0.2.0": *
 
 #let darkgreen = green.darken(20%)
@@ -40,7 +41,10 @@
   //  period: ",",
   format-functions: (
     "authors-with-year": (reference, options) => {
-      
+      periods(
+        (dev.labelname)(reference, options),
+        (dev.date)(reference, options)
+      )
     }
   ),
   additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),
