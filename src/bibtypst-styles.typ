@@ -36,13 +36,32 @@
   )
 }
 
-#let authors-with-year(reference, options) = {
+#let labelname(reference, options) = {
+  printfield(reference, "parsed-author", options)
+  // TODO - could be editor, translator, etc.
+  // reference.authors, // TODO - was \printnames{author}
+}
+
+
+
+#let with-default(fn-name, default-fn) = {
+  (reference, options) => {
+    let fn = options.format-functions.at(fn-name, default: none)
+
+    if fn == none {
+      default-fn(reference, options)
+    } else {
+      fn(reference, options)
+    }
+  }
+}
+
+#let authors-with-year = with-default("authors-with-year", (reference, options) => {
   spaces(
-    printfield(reference, "parsed-author", options),
-    // reference.authors, // TODO - was \printnames{author}
+    labelname(reference, options),
     ifen(options.print-date-after-authors, () => (options.format-parens)(date(reference, options)))
   )
-}
+})
 
 // biblatex.def author
 #let author(reference, options) = {
@@ -787,7 +806,10 @@
     /// @sec:styling-individual-references.
     /// 
     /// -> dictionary
-    format-fields: (),
+    format-fields: (:),
+
+    /// #todo[DOCUMENT ME]
+    format-functions: (:),
   
     /// Wraps text in round brackets. The argument needs to be a function
     /// that takes one argument (`str` or `content`) and returns `content`.
@@ -1032,6 +1054,7 @@
         format-brackets: format-brackets,
         format-quotes: format-quotes,
         field-formatters: field-formatters,
+        format-functions: format-functions,
         name-format: name-format,
         bibeidpunct: bibeidpunct,
         bibpagespunct: bibpagespunct,

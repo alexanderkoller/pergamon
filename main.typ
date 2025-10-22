@@ -38,6 +38,11 @@
   // suppress-fields: ("*": ("pages",), "inproceedings": ("editor", "publisher") ),
   // additional-fields: ("award",)
   //  period: ",",
+  format-functions: (
+    "authors-with-year": (reference, options) => {
+      
+    }
+  ),
   additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),
   highlight: (x, reference, index) => {
     if "highlight" in reference.fields.at("keywords", default: ()) {
@@ -130,6 +135,8 @@
     to test journal subtitles: #cite("clls")
 
     to test nodate: #cite("nodate")
+
+    to test books editor instead of author, \#88: #cite("Dorfles1969")
 
     #context { count-bib-entries() }
 
