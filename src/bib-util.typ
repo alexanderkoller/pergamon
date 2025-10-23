@@ -1,5 +1,5 @@
 
-#import "bibstrings.typ": default-bibstring
+#import "bibstrings.typ": default-long-bibstring
 
 #let matches-completely(s, re) = {
   let result = s.match(re)
@@ -55,7 +55,7 @@
   ) = {
   let etal = names.len() > maxnames and names.len() > minnames // print "et al.", at least one name dropped
   let num-names = if etal { calc.min(minnames, names.len()) } else { names.len() } // #names that will be printed
-  let options = (list-end-delim-two: " and ", list-middle-delim: ", ", list-end-delim-many: ", and ", bibstring: default-bibstring) + options
+  let options = (list-end-delim-two: " and ", list-middle-delim: ", ", list-end-delim-many: ", and ", bibstring: default-long-bibstring) + options
 
   if etal {
     let nn = names.slice(0, num-names).join(options.list-middle-delim)

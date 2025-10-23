@@ -39,14 +39,6 @@
   // suppress-fields: ("*": ("pages",), "inproceedings": ("editor", "publisher") ),
   // additional-fields: ("award",)
   //  period: ",",
-  format-functions: (
-    "authors-with-year": (reference, options) => {
-      periods(
-        (dev.labelname)(reference, options),
-        (dev.date)(reference, options)
-      )
-    }
-  ),
   additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),
   highlight: (x, reference, index) => {
     if "highlight" in reference.fields.at("keywords", default: ()) {
@@ -57,6 +49,7 @@
 
   // Override bibstring entries like this:
   bibstring: ("in": "In"),
+  bibstring-style: "short",
 
   format-fields: (
     // highlight my name in all references

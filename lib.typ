@@ -3,7 +3,6 @@
 #import "src/bibtypst-styles.typ": format-citation-authoryear, format-citation-alphabetic, format-citation-numeric, format-reference
 #import "src/names.typ": family-names, format-name
 #import "src/bib-util.typ": fd, ifdef, nn, concatenate-names
-#import "src/bibstrings.typ": default-bibstring
 #import "src/content-to-string.typ": content-to-string
 #import "src/templating.typ": commas, periods, spaces, epsilons
 

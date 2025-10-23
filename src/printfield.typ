@@ -202,7 +202,7 @@
 
     if bib-type in ("article", "inbook", "incollection", "inproceedings", "patent", "thesis", "unpublished") {
       options.at("format-quotes")(title)
-    } else if bib-type in ("suppbook", "suppcollection", "suppperiodical") {
+    } else if bib-type in ("suppbook", "suppcollection", "suppperiodical", "misc") {
       title
     } else {
       emph(title)

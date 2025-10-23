@@ -6,7 +6,7 @@
     list-middle-delim: ", ",
     list-end-delim-two: " and ",
     list-end-delim-many: ", and ",
-    bibstring: default-bibstring
+    bibstring: default-long-bibstring
 )
 
 #let cld(..names, maxnames: 2, minnames: 1, opt:(:)) = concatenate-names(names.pos(), options: opt, maxnames: maxnames, minnames: minnames)

@@ -1,6 +1,6 @@
 #import "bibtypst.typ": *
 #import "templating.typ": *
-#import "bibstrings.typ": default-bibstring
+#import "bibstrings.typ": default-long-bibstring, default-short-bibstring
 #import "printfield.typ": printfield, default-field-formats
 #import "bib-util.typ": fd, ifdef, type-aliases, nn, concatenate-names
 #import "names.typ": family-names
@@ -899,6 +899,12 @@
     /// -> bool
     print-isbn: false,
 
+    /// Selects whether the long or short versions of the bibstrings should be used
+    /// by default. Acceptable values are "long" and "short".
+    /// 
+    /// -> str
+    bibstring-style: "long",
+
     /// Overrides entries in the bibstring table. The bibstring table is a dictionary
     /// that maps language-independent
     /// IDs of bibliographic constants (e.g. "in") to  
@@ -1060,6 +1066,8 @@
         let default-formatter = field-formatters.at(field, default: (value, reference, field, options, style) => value)
         field-formatters.insert(field, formatter.with(default-formatter))
       }
+
+      let default-bibstring = if lower(bibstring-style) == "short" { default-short-bibstring } else { default-long-bibstring }
 
       let options = (
         link-titles: link-titles,
@@ -1362,6 +1370,8 @@
   /// See the documentation for @default-bibstring in @sec:package:utility for
   /// more information on the bibstring table.
   /// 
+  /// #todo[Check that this documentation is still there!]
+  /// 
   /// -> dictionary
   bibstring: (:),
 
@@ -1400,7 +1410,7 @@
     list-middle-delim: list-middle-delim,
     list-end-delim-two: list-end-delim-two,
     list-end-delim-many: list-end-delim-many,
-    bibstring: default-bibstring + bibstring,
+    bibstring: default-short-bibstring + bibstring, // default to "short"; accesses "et al." and "n.d."
     minnames: minnames,
     maxnames: maxnames
   )
