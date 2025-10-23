@@ -18,32 +18,9 @@
   }
 }
 
-// biblatex.def authorstrg
-#let authorstrg(reference, options) = {
-  printfield(reference, "authortype", options)
-  // TODO - implement all the "strg" stuff correctly
-}
 
-#let language(reference, options) = {
-  printfield(reference, "language", options)
-}
-
-
-#let date(reference, options) = {
-  epsilons(
-    printfield(reference, "parsed-date", options),
-    printfield(reference, "extradate", options)
-  )
-}
-
-#let labelname(reference, options) = {
-  printfield(reference, "parsed-author", options)
-  // TODO - could be editor, translator, etc.
-  // reference.authors, // TODO - was \printnames{author}
-}
-
-
-
+// If a formatting function with the name "fn-name" (str) is defined
+// in options, call that function; otherwise call the default-fn.
 #let with-default(fn-name, default-fn) = {
   (reference, options) => {
     let fn = options.format-functions.at(fn-name, default: none)
@@ -56,6 +33,33 @@
   }
 }
 
+// biblatex.def authorstrg
+#let authorstrg = with-default("authorstrg", (reference, options) => {
+  printfield(reference, "authortype", options)
+  // TODO - implement all the "strg" stuff correctly
+})
+
+
+#let language = with-default("language", (reference, options) => {
+  printfield(reference, "language", options)
+})
+
+
+#let date = with-default("date", (reference, options) => {
+  epsilons(
+    printfield(reference, "parsed-date", options),
+    printfield(reference, "extradate", options)
+  )
+})
+
+#let labelname = with-default("labelname", (reference, options) => {
+  printfield(reference, "parsed-author", options)
+  // TODO - could be editor, translator, etc.
+  // reference.authors, // TODO - was \printnames{author}
+})
+
+
+
 #let authors-with-year = with-default("authors-with-year", (reference, options) => {
   spaces(
     labelname(reference, options),
@@ -64,45 +68,45 @@
 })
 
 // biblatex.def author
-#let author(reference, options) = {
+#let author = with-default("author", (reference, options) => {
   fjoin(options.author-type-delim,
     authors-with-year(reference, options),
     authorstrg(reference, options)
   )
-}
+})
 
 // biblatex.def editor+others
-#let editor-others(reference, options) = {
+#let editor-others = with-default("editor-others", (reference, options) => {
   if options.use-editor and fd(reference, "editor", options) != none {
     // TODO - choose between bibstring.editor and bibstring.editors depending on length of editor list
     [#printfield(reference, "parsed-editor", options), #options.bibstring.editor]
   } else {
     none
   }
-}
+})
 
 // biblatex.def translator+others
-#let translator-others(reference, options) = {
+#let translator-others = with-default("translator-others", (reference, options) => {
   if options.use-translator and fd(reference, "translator", options) != none {
     // TODO - choose between bibstring.editor and bibstring.editors depending on length of editor list
     [#printfield(reference, "parsed-translator", options), #options.bibstring.translator]
   } else {
     none
   }
-}
+})
 
 // biblatex.def author/translator+others
-#let author-translator-others(reference, options) = {
+#let author-translator-others = with-default("author-translator-others", (reference, options) => {
   if options.use-author and fd(reference, "author", options) != none {
     authors-with-year(reference, options)
   } else {
     translator-others(reference, options)
   }
-}
+})
 
 
 // standard.bbx volume+number+eid
-#let volume-number-eid(reference, options) = {
+#let volume-number-eid = with-default("volume-number-eid", (reference, options) => {
   let volume = printfield(reference, "volume", options)
   let number = printfield(reference, "number", options)
 
@@ -111,30 +115,30 @@
   } else if number == none {
     volume
   } else if volume == none {
-    panic("Can't use 'number' without 'volume' (in " + reference.entry_key + "!")
+    panic("Can't use 'number' without 'volume' (in " + reference.entry_key + ")!")
   } else {
     volume + options.volume-number-separator + number
   }
 
   fjoin(options.bibeidpunct, a, fd(reference, "eid", options))
-}
+})
 
 
 
 
 
 // standard.bbx issue+date
-#let issue-date(reference, options) = {
+#let issue-date = with-default("issue-date", (reference, options) => {
   spaces(
     printfield(reference, "issue", options),
     ifen(not options.print-date-after-authors, () => date(reference, options)),
     format: options.format-parens
   )
-}
+})
 
 // biblatex.def issue
 // -- in contrast to the original, we include the preceding colon here
-#let issue(reference, options) = {
+#let issue = with-default("issue", (reference, options) => {
   let issuetitle = printfield(reference, "issuetitle", options)
   let issuesubtitle = printfield(reference, "issuesubtitle", options)
 
@@ -147,10 +151,10 @@
       printfield(reference, "issuetitleaddon", options)
     )
   }
-}
+})
 
 // standard.bbx journal+issuetitle
-#let journal-issue-title(reference, options) = {
+#let journal-issue-title = with-default("journal-issue-title", (reference, options) => {
   let jt = printfield(reference, "journaltitle", options)
   let jst = printfield(reference, "journalsubtitle", options)
 
@@ -170,10 +174,10 @@
       issue(reference, options)
     )
   }
-}
+})
 
 // biblatex.def withothers
-#let withothers(reference, options) = {
+#let withothers = with-default("withothers", (reference, options) => {
   (options.periods)(
     ifdef(reference, "commentator", options, commentator => spaces(options.bibstring.withcommentator, commentator)),
     ifdef(reference, "annotator", options, annotator => spaces(options.bibstring.withannotator, annotator)),
@@ -181,10 +185,10 @@
     ifdef(reference, "foreword", options, foreword => spaces(options.bibstring.withforeword, foreword)),
     ifdef(reference, "afterword", options, afterword => spaces(options.bibstring.withafterword, afterword))
   )
-}
+})
 
 // biblatex.def bytranslator+others
-#let bytranslator-others(reference, options) = {
+#let bytranslator-others = with-default("bytranslator-others", (reference, options) => {
   let translator = printfield(reference, "parsed-translator", options)
 
   (options.periods)(
@@ -192,10 +196,10 @@
     ifdef(reference, "translator", options, translator => spaces(options.bibstring.bytranslator, translator)),
     withothers(reference, options)
   )
-}
+})
 
 // biblatex.def byeditor+others
-#let byeditor-others(reference, options) = {
+#let byeditor-others = with-default("byeditor-others", (reference, options) => {
   let editor = printfield(reference, "editor", options)
 
   (options.periods)(
@@ -206,31 +210,31 @@
 
     bytranslator-others(reference, options)
   )
-}
+})
 
 // standard.bbx note+pages
-#let note-pages(reference, options) = {
+#let note-pages = with-default("note-pages", (reference, options) => {
   fjoin(options.bibpagespunct, printfield(reference, "note", options), printfield(reference, "pages", options))
-}
+})
 
 // standard.bbx doi+eprint+url
-#let doi-eprint-url(reference, options) = {
+#let doi-eprint-url = with-default("doi-eprint-url", (reference, options) => {
   (options.periods)(
     if options.print-doi { printfield(reference, "doi", options) } else { none },
     if options.print-eprint { printfield(reference, "eprint", options) } else { none },
     if options.print-url { printfield(reference, "url", options) } else { none },
   )
-}
+})
 
 // standard.bbx addendum+pubstate
-#let addendum-pubstate(reference, options) = {
+#let addendum-pubstate = with-default("addendum-pubstate", (reference, options) => {
   (options.periods)(
     printfield(reference, "addendum", options),
     printfield(reference, "pubstate", options)
   )
-}
+})
 
-#let maintitle(reference, options) = {
+#let maintitle = with-default("maintitle", (reference, options) => {
   (options.periods)(
     fjoin(options.subtitlepunct, 
       printfield(reference, "maintitle", options, style: "titlecase"), 
@@ -240,9 +244,9 @@
   )
 
   // missing:  {\printtext[maintitle]{
-}
+})
 
-#let booktitle(reference, options) = {
+#let booktitle = with-default("booktitle", (reference, options) => {
   (options.periods)(
     fjoin(options.subtitlepunct, 
       printfield(reference, "booktitle", options, style: "titlecase"), 
@@ -252,11 +256,11 @@
   )
 
   // missing:  {\printtext[booktitle]{
-}
+})
 
 
 // standard.bbx maintitle+booktitle
-#let maintitle-booktitle(reference, options) = {
+#let maintitle-booktitle = with-default("maintitle-booktitle", (reference, options) => {
   spaces(
     ifdef(reference, "maintitle", options, maintitle => {
       spaces(
@@ -269,10 +273,10 @@
     }),
     booktitle(reference, options)
   )
-}
+})
 
 // standard.bbx maintitle+title
-#let maintitle-title(reference, options) = {
+#let maintitle-title = with-default("maintitle-title", (reference, options) => {
   let maintitle = fd(reference, "maintitle", options)
   let title = fd(reference, "title", options)
   let print-maintitle = (maintitle != none) and (maintitle != title)
@@ -296,18 +300,18 @@
 
     fjoin(":", maintitle-str, printfield(reference, "title", options)
   )
-}
+})
 
 // TODO: "printeventdate" is referenced from event+venue+date,
 // but I can't figure out where it is defined or what it means.
 // It is _not_ the year, that comes later.
-#let print-event-date(reference, options) = {
+#let print-event-date = with-default("print-event-date", (reference, options) => {
   // printfield(reference, "year", options)
   none
-}
+})
 
 // standard.bbx event+venue+date
-#let event-venue-date(reference, options) = {
+#let event-venue-date = with-default("event-venue-date", (reference, options) => {
   let format-parens = options.at("format-parens")
 
   spaces(
@@ -322,20 +326,20 @@
       )
     )
   )
-}
+})
 
-#let volume-part-if-maintitle-undef(reference, options) = {
+#let volume-part-if-maintitle-undef = with-default("volume-part-if-maintitle-undef", (reference, options) => {
   if fd(reference, "maintitle", options) == none {
     epsilons(printfield(reference, "volume", options), printfield(reference, "part", options))
   } else {
     none
   }
-}
+})
 
 // standard.bbx series+number
-#let series-number(reference, options) = {
+#let series-number = with-default("series-number", (reference, options) => {
   spaces(printfield(reference, "series", options), printfield(reference, "number", options))
-}
+})
 
 #let xxx-location-date(reference, options, xxx) = {
   (options.commas)(
@@ -349,26 +353,27 @@
 }
 
 // standard.bbx publisher+location+date
-#let publisher-location-date(reference, options) = xxx-location-date(reference, options, "publisher")
+#let publisher-location-date = with-default("publisher-location-date", 
+    (reference, options) => xxx-location-date(reference, options, "publisher"))
 
 // standard.bbx organization+location+date
-#let organization-location-date(reference, options) = xxx-location-date(reference, options, "organization")
+#let organization-location-date = with-default("organization-location-date", (reference, options) => xxx-location-date(reference, options, "organization"))
 
 // standard.bbx institution+location+date
-#let institution-location-date(reference, options) = xxx-location-date(reference, options, "institution")
+#let institution-location-date = with-default("institution-location-date", (reference, options) => xxx-location-date(reference, options, "institution"))
 
 
 // chapter+pages
-#let chapter-pages(reference, options) = {
+#let chapter-pages = with-default("chapter-pages", (reference, options) => {
   fjoin(options.bibpagespunct,
     printfield(reference, "chapter", options),
     printfield(reference, "eid", options),
     printfield(reference, "pages", options)
   )
-}
+})
 
 // biblatex.def author/editor+others/translator+others
-#let author-editor-others-translator-others(reference, options) = {
+#let author-editor-others-translator-others = with-default("author-editor-others-translator-others", (reference, options) => {
   // TODO: implement the "useauthor" option
   first-of(
     author(reference, options),
@@ -390,7 +395,7 @@
 //      }
 //        {\usebibmacro{editor+others}}
 //        {\usebibmacro{translator+others}}}}
-}
+})
 
 // Panic if one of the specified fields is missing.
 // A field specification can either be the name of a field (str),
@@ -418,7 +423,7 @@
 }
 
 
-#let driver-article(reference, options) = {
+#let driver-article = with-default("driver-article", (reference, options) => {
     require-fields(reference, options, "author", "title", "journaltitle")
     // ("date", "year") don't have to be required - we just print "n.d." in that case
 
@@ -452,11 +457,11 @@
       //   {\usebibmacro{related:init}%
       //   \usebibmacro{related}}
     )
-}
+})
 
 
 
-#let driver-inproceedings(reference, options) = {
+#let driver-inproceedings = with-default("driver-inproceedings", (reference, options) => {
   require-fields(reference, options, "author", "title", "booktitle")
 
   (options.periods)(
@@ -484,10 +489,10 @@
     
     // TODO see [1] above
   )
-}
+})
 
 
-#let driver-incollection(reference, options) = {
+#let driver-incollection = with-default("driver-incollection", (reference, options) => {
   require-fields(reference, options, "author", "title", "editor", "booktitle")
 
   (options.periods)(
@@ -514,10 +519,10 @@
     
     // TODO see [1] above
   )
-}
+})
 
 
-#let driver-book(reference, options) = {
+#let driver-book = with-default("driver-book", (reference, options) => {
   // TODO - it's probably okay if there is an editor rather than an author
   require-fields(reference, options, "author", "title")
 
@@ -547,9 +552,9 @@
     
     // TODO see [1] above
   )
-}
+})
 
-#let driver-misc(reference, options) = {
+#let driver-misc = with-default("driver-misc", (reference, options) => {
   require-fields(reference, options, "author", "title")
 
   (options.periods)(
@@ -572,10 +577,10 @@
     
     // TODO see [1] above
   )
-}
+})
 
 
-#let driver-thesis(reference, options) = {
+#let driver-thesis = with-default("driver-thesis", (reference, options) => {
   require-fields(reference, options, "author", "title", "type", "institution")
 
   (options.periods)(
@@ -600,12 +605,11 @@
     
     // TODO see [1] above
   )
+})
 
-}
-
-#let driver-dummy(reference, options) = {
+#let driver-dummy = with-default("driver-dummy", (reference, options) => {
   [UNSUPPORTED REFERENCE (key=#reference.entry_key, bibtype=#reference.entry_type)]
-}
+})
 
 // TODO resolve type aliases (phdthesis -> thesis)
 
