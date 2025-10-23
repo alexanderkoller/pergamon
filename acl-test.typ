@@ -15,7 +15,11 @@
   name-format: "{given} {family}",
   reference-label: acl-cite.reference-label,
   format-quotes: it => it,
-  suppress-fields: ("*": ("month",)), // TODO: this needs to stay configurable, perhaps with default dictionary overriding
+  // TODO: this needs to stay configurable, perhaps with default dictionary overriding
+  suppress-fields: (
+    "*": ("month",),
+    "inproceedings": ("editor",),
+  ), 
   print-date-after-authors: true,
   format-functions: (
     "authors-with-year": (reference, options) => {
@@ -27,7 +31,10 @@
   ),
 
   // Override bibstring entries like this:
-  bibstring: ("in": "In"),
+  bibstring: (
+    "in": "In",
+    "pages": "pages"
+  ),
 )
 
 #let print-acl-bibliography() = {
@@ -58,7 +65,15 @@
 
 = Introduction
 
-#cite("bender20:_climb_nlu")
+Citep: #cite("bender20:_climb_nlu", "lindemann19:_compos_seman_parsin_acros_graph")
+
+Citet: #citet("hershcovichItMeaningThat2021")
+
+Citeg: #citeg("bonial-etal-2020-dialogue")
+
+Using bloated Bibtex from ACL anthology: #cite("stein-donatelli-2021-representing")
+
+
 
 
 #print-acl-bibliography()

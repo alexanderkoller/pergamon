@@ -422,19 +422,24 @@
     require-fields(reference, options, "author", "title", "journaltitle")
     // ("date", "year") don't have to be required - we just print "n.d." in that case
 
-    // For now, I am mapping both \newunit and \newblock to periods.
+    // I am mapping \newunit to commas and \newblock to periods.
+    // Perhaps this should be made configurable at some point.
     (options.periods)(
       author-translator-others(reference, options),
-      printfield(reference, "title", options),
-      language(reference, options),
+      (options.periods)(
+        printfield(reference, "title", options),
+        language(reference, options),
+      ),
       // TODO: \usebibmacro{byauthor}
       // TODO: \usebibmacro{bytranslator+others}
       //   - the "others" macros construct bibstring keys like "editorstrfo" to
       //     cover multiple roles of the same person at once
       printfield(reference, "version", options),
-      spaces(options.bibstring.in, journal-issue-title(reference, options)),
-      byeditor-others(reference, options),
-      note-pages(reference, options),
+      commas(
+        spaces(options.bibstring.in, journal-issue-title(reference, options)),
+        byeditor-others(reference, options),
+        note-pages(reference, options)
+      ),
       if options.print-isbn { printfield(reference, "issn", options) } else { none },
       doi-eprint-url(reference, options),
       addendum-pubstate(reference, options)
@@ -454,16 +459,12 @@
 #let driver-inproceedings(reference, options) = {
   require-fields(reference, options, "author", "title", "booktitle")
 
-  // LIMITATION: If the date (= year) is followed directly by the pages, Biblatex separates
-  // them with a comma rather than a period. I think is works because the \setunit in chapter+pages
-  // can retroactively modify the end-of-unit marker from publisher+location+date. Bibtypst
-  // can't do this without major changes to the way we concatenate strings, so we have to live 
-  // with periods for now. (Same for @articles.)
-
   (options.periods)(
     author-translator-others(reference, options),
-    printfield(reference, "title", options),
-    language(reference, options),
+    (options.commas)(
+      printfield(reference, "title", options),
+      language(reference, options),
+    ),
     // TODO:   \usebibmacro{byauthor}%
     spaces(options.bibstring.in, maintitle-booktitle(reference, options)),
     event-venue-date(reference, options),
@@ -472,8 +473,10 @@
     printfield(reference, "volumes", options),
     series-number(reference, options),
     printfield(reference, "note", options),
-    printfield(reference, "organization", options),
-    publisher-location-date(reference, options),
+    (options.commas)(
+      printfield(reference, "organization", options),
+      publisher-location-date(reference, options),
+    ),
     chapter-pages(reference, options),
     if options.print-isbn { printfield(reference, "isbn", options) } else { none },
     doi-eprint-url(reference, options),
@@ -489,14 +492,18 @@
 
   (options.periods)(
     author-translator-others(reference, options),
-    printfield(reference, "title", options),
-    language(reference, options),
+    (options.commas)(
+      printfield(reference, "title", options),
+      language(reference, options),
+    ),
     // TODO:   \usebibmacro{byauthor}%
     spaces(options.bibstring.in, maintitle-booktitle(reference, options)),
     byeditor-others(reference, options),
-    printfield(reference, "edition", options),
-    volume-part-if-maintitle-undef(reference, options),
-    printfield(reference, "volumes", options),
+    (options.commas)(
+      printfield(reference, "edition", options),
+      volume-part-if-maintitle-undef(reference, options),
+      printfield(reference, "volumes", options),
+    ),
     series-number(reference, options),
     printfield(reference, "note", options),
     publisher-location-date(reference, options),
@@ -516,18 +523,24 @@
 
   (options.periods)(
     author-editor-others-translator-others(reference, options),
-    maintitle-title(reference, options),
-    language(reference, options),
+    (options.commas)(
+      maintitle-title(reference, options),
+      language(reference, options),
+    ),
     // TODO:  \usebibmacro{byauthor}%
     byeditor-others(reference, options),
-    printfield(reference, "edition", options),
-    volume-part-if-maintitle-undef(reference, options),
-    printfield(reference, "volumes", options),
+    (options.commas)(
+      printfield(reference, "edition", options),
+      volume-part-if-maintitle-undef(reference, options),
+      printfield(reference, "volumes", options),
+    ),
     series-number(reference, options),
     printfield(reference, "note", options),
     publisher-location-date(reference, options),
-    chapter-pages(reference, options),
-    printfield(reference, "pagetotal", options),
+    (options.commas)(
+      chapter-pages(reference, options),
+      printfield(reference, "pagetotal", options),
+    ),
     if options.print-isbn { printfield(reference, "isbn", options) } else { none },
     doi-eprint-url(reference, options),
     addendum-pubstate(reference, options)
@@ -541,15 +554,19 @@
 
   (options.periods)(
     author-editor-others-translator-others(reference, options),
-    printfield(reference, "title", options),
-    language(reference, options),
+    (options.commas)(
+      printfield(reference, "title", options),
+      language(reference, options),
+    ),
     // TODO:  \usebibmacro{byauthor}%
     byeditor-others(reference, options),
     printfield(reference, "howpublished", options),
-    printfield(reference, "type", options),
-    printfield(reference, "version", options),
-    printfield(reference, "note", options),
-    organization-location-date(reference, options), // XX
+    (options.commas)(
+      printfield(reference, "type", options),
+      printfield(reference, "version", options),
+      printfield(reference, "note", options),
+    ),
+    organization-location-date(reference, options),
     doi-eprint-url(reference, options),
     addendum-pubstate(reference, options)
     
@@ -563,14 +580,20 @@
 
   (options.periods)(
     author(reference, options),
-    printfield(reference, "title", options),
-    language(reference, options),
+    (options.commas)(
+      printfield(reference, "title", options),
+      language(reference, options),
+    ),
     // TODO:  \usebibmacro{byauthor}%
     printfield(reference, "note", options),
-    printfield(reference, "type", options),
-    institution-location-date(reference, options),
-    chapter-pages(reference, options),
-    printfield(reference, "pagetotal", options),
+    (options.commas)(
+      printfield(reference, "type", options),
+      institution-location-date(reference, options),
+    ),
+    (options.commas)(
+      chapter-pages(reference, options),
+      printfield(reference, "pagetotal", options),
+    ),
     if options.print-isbn { printfield(reference, "isbn", options) } else { none },
     doi-eprint-url(reference, options),
     addendum-pubstate(reference, options)
