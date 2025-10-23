@@ -1405,7 +1405,7 @@
     } else if form == "g" {
       [#authors-str\'s #format-parens(year)]
     } else if form == "n" {
-      [#authors-str #year#extradate]
+      [#authors-str#author-year-separator#year#extradate]
     } else { // auto or "p"
       format-parens([#authors-str#author-year-separator#year#extradate])
     }

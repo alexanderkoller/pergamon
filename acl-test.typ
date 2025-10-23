@@ -4,15 +4,11 @@
 #import "lib.typ": *
 #let dev = pergamon-dev
 
-// #let darkblue = blue.darken(20%)
-
-// #show link: set text(fill: darkblue)
-
-// #set heading(numbering: "1.1")
 
 
-
-#let acl-cite = format-citation-authoryear()
+#let acl-cite = format-citation-authoryear(
+  author-year-separator: ", "
+)
 
 
 #let acl-ref = format-reference(
@@ -20,6 +16,7 @@
   reference-label: acl-cite.reference-label,
   format-quotes: it => it,
   suppress-fields: ("*": ("month",)), // TODO: this needs to stay configurable, perhaps with default dictionary overriding
+  print-date-after-authors: true,
   format-functions: (
     "authors-with-year": (reference, options) => {
       periods(
@@ -61,7 +58,7 @@
 
 = Introduction
 
-#citet("bender20:_climb_nlu")
+#cite("bender20:_climb_nlu")
 
 
 #print-acl-bibliography()
