@@ -40,33 +40,27 @@
 }
 
 
-// // standard.bbx volume+number+eid
-// #let volume-number-eid = with-default("volume-number-eid", (reference, options) => {
-  
-
-//   let a = if volume == none and number == none {
-//     none
-//   } else if number == none {
-//     volume
-//   } else if volume == none {
-//     panic("Can't use 'number' without 'volume' (in " + reference.entry_key + "!")
-//   } else {
-//     volume + options.volume-number-separator + number
-//   }
-
-//   fjoin(options.bibeidpunct, a, fd(reference, "eid", options))
-// })
-
 #let acl-ref = format-reference(
   name-format: "{given} {family}",
   reference-label: acl-cite.reference-label,
   format-quotes: it => it,
+  print-isbn: false,
   // TODO: this needs to stay configurable, perhaps with default dictionary overriding
   suppress-fields: (
     "*": ("month",),
     "inproceedings": ("editor",),
   ), 
+
   print-date-after-authors: true,
+
+  format-fields: (
+    "editor": (dffmt, value, reference, field, options, style) => {
+      let ed-str = (dev.print-name)(value, "editor", options)
+      let editorx = if value.len() > 1 { "editors" } else { "editor" }
+      strfmt("{}, {}", ed-str, editorx)
+    }
+  ),
+
   format-functions: (
     "authors-with-year": (reference, options) => {
       periods(
@@ -92,6 +86,41 @@
       )
     },
 
+    "driver-incollection": (reference, options) => {
+      (dev.require-fields)(reference, options, "author", "title", "editor", "booktitle")
+
+      (options.periods)(
+        (dev.author-translator-others)(reference, options),
+        (dev.printfield)(reference, "title", options),
+        spaces(
+          options.bibstring.in,
+          (options.commas)(
+            (dev.printfield)(reference, "editor", options),
+            (dev.maintitle-booktitle)(reference, options),
+            (dev.printfield)(reference, "pages", options)
+          )
+        ),
+        (dev.publisher-location-date)(reference, options),
+        
+        
+        // byeditor-others(reference, options),
+        // (options.commas)(
+        //   printfield(reference, "edition", options),
+        //   volume-part-if-maintitle-undef(reference, options),
+        //   printfield(reference, "volumes", options),
+        // ),
+        // series-number(reference, options),
+        // printfield(reference, "note", options),
+        // 
+        // chapter-pages(reference, options),
+        // if options.print-isbn { printfield(reference, "isbn", options) } else { none },
+        // doi-eprint-url(reference, options),
+        // addendum-pubstate(reference, options)
+        
+        // TODO see [1] above
+      )
+    },
+
     "driver-article": (reference, options) => {
         (dev.require-fields)(reference, options, "author", "title", "journaltitle")
 
@@ -113,6 +142,11 @@
     "in": "In",
     "pages": "pages"
   ),
+
+
+
+  // TODO: Things like this should be addable by the user:
+  eval-scope: (todo: x => x)
 )
 
 #let print-acl-bibliography() = {
@@ -141,6 +175,7 @@
 
 
 
+
 = Introduction
 
 Citep: #cite("bender20:_climb_nlu", "lindemann19:_compos_seman_parsin_acros_graph")
@@ -151,7 +186,9 @@ Citeg: #citeg("bonial-etal-2020-dialogue")
 
 Using bloated Bibtex from ACL anthology: #cite("stein-donatelli-2021-representing")
 
+A book: #cite("Dorfles1969")
 
+An incollection: #cite("brownschmidt_2018_perspectivetaking")
 
 
 #print-acl-bibliography()
