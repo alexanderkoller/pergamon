@@ -58,6 +58,17 @@
       let ed-str = (dev.print-name)(value, "editor", options)
       let editorx = if value.len() > 1 { "editors" } else { "editor" }
       strfmt("{}, {}", ed-str, editorx)
+    },
+
+    "title": (dffmt, value, reference, field, options, style) => {
+      let bib-type = reference.entry_type
+      let title = (dev.link-title)(reference, options)
+
+      if bib-type == "misc" {
+        title
+      } else {
+        dffmt(value, reference, field, options, style)
+      }
     }
   ),
 
@@ -101,23 +112,6 @@
           )
         ),
         (dev.publisher-location-date)(reference, options),
-        
-        
-        // byeditor-others(reference, options),
-        // (options.commas)(
-        //   printfield(reference, "edition", options),
-        //   volume-part-if-maintitle-undef(reference, options),
-        //   printfield(reference, "volumes", options),
-        // ),
-        // series-number(reference, options),
-        // printfield(reference, "note", options),
-        // 
-        // chapter-pages(reference, options),
-        // if options.print-isbn { printfield(reference, "isbn", options) } else { none },
-        // doi-eprint-url(reference, options),
-        // addendum-pubstate(reference, options)
-        
-        // TODO see [1] above
       )
     },
 
@@ -190,5 +184,6 @@ A book: #cite("Dorfles1969")
 
 An incollection: #cite("brownschmidt_2018_perspectivetaking")
 
+A misc: #cite("hill2020human")
 
 #print-acl-bibliography()

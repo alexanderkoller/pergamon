@@ -9,11 +9,12 @@
 
 #let pergamon-dev = {
   import "src/bibtypst-styles.typ": *
-  import "src/printfield.typ": printfield, print-name
+  import "src/printfield.typ": *
 
   (
     printfield: printfield,
     print-name: print-name,
+    link-title: link-title,
     authorstrg: authorstrg,
     language: language,
     date: date, 

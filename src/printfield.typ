@@ -6,22 +6,41 @@
 #import "bib-util.typ": is-integer
 #import "dates.typ": is-year-defined
 
+#let make-eprint-url(eprint, eprint-type) = {
+  if eprint-type == none {
+    return none
+  } else if lower(eprint-type) == "hdl" {
+    "http://hdl.handle.net/" + eprint
+  } else if lower(eprint-type) == "arxiv" {
+      "https://arxiv.org/abs/" + eprint
+  } else if lower(eprint-type) == "jstor" {
+      "http://www.jstor.org/stable/" + eprint
+  } else if lower(eprint-type) == "pubmed" {
+      "http://www.ncbi.nlm.nih.gov/pubmed/" + eprint
+  } else if (lower(eprint-type) == "googlebooks" or lower(eprint-type) == "google books") {
+      "http://books.google.com/books?id=" + eprint
+  } else {
+    none
+  }
+}
 
 #let eprint(reference, options) = {
   let eprint-type = fd(reference, "eprinttype", options)
 
   ifdef(reference, "eprint", options, eprint => {
+    let url = make-eprint-url(eprint, eprint-type)
+
     if eprint-type != none and lower(eprint-type) == "hdl" {
-      [HDL: #link("http://hdl.handle.net/" + eprint, eprint)]
+      [HDL: #link(url, eprint)]
     } else if eprint-type != none and lower(eprint-type) == "arxiv" {
       let suffix = ifdef(reference, "eprintclass", options, eprintclass => options.at("format-brackets")(eprintclass))
-      [arXiv: #link("https://arxiv.org/abs/" + eprint, spaces(eprint, suffix))]
+      [arXiv: #link(url, spaces(eprint, suffix))]
     } else if eprint-type != none and lower(eprint-type) == "jstor" {
-      [JSTOR: #link("http://www.jstor.org/stable/" + eprint, eprint)]
+      [JSTOR: #link(url, eprint)]
     } else if eprint-type != none and lower(eprint-type) == "pubmed" {
-      [PMID: #link("http://www.ncbi.nlm.nih.gov/pubmed/" + eprint, eprint)]
+      [PMID: #link(url, eprint)]
     } else if eprint-type != none and (lower(eprint-type) == "googlebooks" or lower(eprint-type) == "google books") {
-      [Google Books: #link("http://books.google.com/books?id=" + eprint, eprint)]
+      [Google Books: #link(url, eprint)]
     } else {
       let suffix = ifdef(reference, "eprintclass", options, eprintclass => options.at("format-brackets")(eprintclass))
       let eprint-type = if eprint-type == none { "eprint" } else { eprint-type }
@@ -45,7 +64,12 @@
   } else if "url" in reference.fields {
     link(reference.fields.url)[#title]
   } else {
-    title
+    let eprint-url = make-eprint-url(fd(reference, "eprint", options), fd(reference, "eprinttype", options))
+    if eprint-url != none {
+      link(eprint-url)[#title]
+    } else {
+      title
+    }
   }
 }
 
