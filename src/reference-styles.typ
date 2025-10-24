@@ -3,8 +3,6 @@
 #import "bibstrings.typ": default-long-bibstring, default-short-bibstring
 #import "printfield.typ": printfield, default-field-formats
 #import "bib-util.typ": fd, ifdef, type-aliases, nn, concatenate-names
-// #import "names.typ": family-names
-// #import "dates.typ": is-year-defined
 
 
 

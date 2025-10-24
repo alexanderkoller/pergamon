@@ -234,6 +234,13 @@
   /// -> dictionary
   bibstring: (:),
 
+  /// Selects whether the long or short versions of the bibstrings should be used
+  /// by default. This controls the rendering of "et al." and "n.d.".
+  /// Acceptable values are "long" and "short".
+  /// 
+  /// -> str
+  bibstring-style: "short",
+
   /// Maximum number of names that are displayed in name lists (author, editor, etc.).
   /// If the actual number of names exceeds `maxnames`, only the first `maxnames`
   /// names are shown and `bibstring.andothers` ("et al.") is appended.
@@ -265,11 +272,12 @@
 
 
 ) = {
+  let default-bibstring = if bibstring-style == "short" { default-short-bibstring } else {default-long-bibstring }
   let options = (
     list-middle-delim: list-middle-delim,
     list-end-delim-two: list-end-delim-two,
     list-end-delim-many: list-end-delim-many,
-    bibstring: default-short-bibstring + bibstring, // default to "short"; accesses "et al." and "n.d."
+    bibstring: default-bibstring + bibstring,
     minnames: minnames,
     maxnames: maxnames
   )
