@@ -380,7 +380,9 @@ to the other citation styles; they will simply ignore them.
 
 Instead of using the builtin styles, you can also define your own #bibtypst style
 -- either a reference style or a citation style or both. It is recommended to look at the
-default styles in #link("https://github.com/alexanderkoller/pergamon/blob/main/src/bibtypst-styles.typ")[bibtypst-styles.typ] to get a clearer picture.
+default styles in #link("https://github.com/alexanderkoller/pergamon/blob/main/src/citation-styles.typ")[citation-styles.typ]
+and #link("https://github.com/alexanderkoller/pergamon/blob/main/src/reference-styles.typ")[reference-styles.typ]
+ to get a clearer picture.
 
 Implementing a reference style amounts to defining a Typst function that can be passed 
 as the `format-reference` argument to `print-bibliography`. Such a function receives 
@@ -930,13 +932,22 @@ These are functions implementing the base functionality of #bibtypst, such as `c
 )
 
 
-== The builtin styles
+== Builtin reference style
 <sec:package:builtin-reference>
 
-Here we explain the builtin reference and citation styles.
+Here we explain the builtin reference style.
 #v(1em)
 
-#let style-docs = tidy.parse-module(read("src/bibtypst-styles.typ"), scope: scope)
+#let style-docs = tidy.parse-module(read("src/reference-styles.typ"), scope: scope)
+#tidy.show-module(style-docs, style: tidy.styles.default, show-outline: false, break-param-descriptions: true)
+
+
+== Builtin citation styles 
+
+Here we explain the builtin citation styles.
+#v(1em)
+
+#let style-docs = tidy.parse-module(read("src/citation-styles.typ"), scope: scope)
 #tidy.show-module(style-docs, style: tidy.styles.default, show-outline: false, break-param-descriptions: true)
 
 

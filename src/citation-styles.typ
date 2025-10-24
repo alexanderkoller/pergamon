@@ -226,17 +226,16 @@
   /// Will typically match the `bibstring` argument of
   /// @format-reference.
   ///
-  /// See the documentation for @default-bibstring in @sec:package:utility for
+  /// See the documentation for @default-long-bibstring in @sec:package:utility for
   /// more information on the bibstring table.
-  /// 
-  /// #todo[Check that this documentation is still there!]
   /// 
   /// -> dictionary
   bibstring: (:),
 
   /// Selects whether the long or short versions of the bibstrings should be used
   /// by default. This controls the rendering of "et al." and "n.d.".
-  /// Acceptable values are "long" and "short".
+  /// Acceptable values are "long" and "short". See the documentation
+  /// of @default-long-bibstring for details.
   /// 
   /// -> str
   bibstring-style: "short",

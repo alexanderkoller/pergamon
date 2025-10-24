@@ -898,7 +898,8 @@
     print-isbn: false,
 
     /// Selects whether the long or short versions of the bibstrings should be used
-    /// by default. Acceptable values are "long" and "short".
+    /// by default. Acceptable values are "long" and "short". See the documentation
+    /// of @default-long-bibstring for details.
     /// 
     /// -> str
     bibstring-style: "long",
@@ -910,7 +911,7 @@
     /// The ID-form pairs you specify in the `bibstring` argument will overwrite
     /// the default entries.
     /// 
-    /// See the documentation for @default-bibstring in @sec:package:utility for
+    /// See the documentation for @default-long-bibstring in @sec:package:utility for
     /// more information on the bibstring table.
     /// -> dictionary
     bibstring: (:),
