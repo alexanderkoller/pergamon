@@ -34,7 +34,7 @@
   format-quotes: it => it,
   print-identifiers: ("doi", "url"),
   // print-doi: true,
-  suppress-fields: ("*": ("month",)),
+  suppress-fields: ("*": ("month", "day",)),
   eval-scope: ("todo": x => text(fill: red, x)),
   // suppress-fields: ("*": ("pages",), "inproceedings": ("editor", "publisher") ),
   // additional-fields: ("award",)
@@ -134,6 +134,8 @@
     to test nodate: #cite("nodate")
 
     to test books editor instead of author, \#88: #cite("Dorfles1969")
+
+    to test \#91: #cite("Ruwitch2025AISlop")
 
     #context { count-bib-entries() }
 

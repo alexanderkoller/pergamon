@@ -88,12 +88,16 @@
  
 #let print-date(date-dict, options) = {
   let month-entry = date-dict.at("month", default: none)
+  let day-entry = date-dict.at("day", default: none)
 
-  // Special treatment for "month": It could not be suppressed in parse-date
+  // Special treatment for "month" and "day": It could not be suppressed in parse-date
   // (that was too early, we didn't have the format-reference options yet),
   // so we have to do it here. :/
   if "month" in options.suppressed-fields {
     month-entry = none
+    day-entry = none // don't show day without month
+  } else if "day" in options.suppressed-fields {
+    day-entry = none
   }
 
   let month-str = if month-entry != none {
@@ -106,8 +110,8 @@
     none
   }
 
-  if "day" in date-dict {
-    strfmt("{} {} {}", date-dict.day, month-str, date-dict.year)
+  if day-entry != none {
+    strfmt("{} {} {}", day-entry, month-str, date-dict.year)
   } else if month-str != none {
     strfmt("{} {}", month-str, date-dict.year)
   } else if "year" in date-dict {
