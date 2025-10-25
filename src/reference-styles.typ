@@ -741,16 +741,14 @@
     use-author: true,
 
     /// If `true`, prints the reference's translator if it is defined.
-    /// Note that support for "authors" that are not the author is currently
-    /// weak. See #link("https://github.com/alexanderkoller/bibtypst/issues/28")[issue 28]
-    /// to track progress on this.
+    /// See also `name-fields` in @print-bibliography.
+    /// 
     /// -> bool
     use-translator: true,
 
     /// If `true`, prints the reference's editor if it is defined.
-    /// Note that support for "authors" that are not the author is currently
-    /// weak. See #link("https://github.com/alexanderkoller/bibtypst/issues/28")[issue 28]
-    /// to track progress on this.
+    /// See also `name-fields` in @print-bibliography.
+    /// 
     /// -> bool
     use-editor: true,
 
