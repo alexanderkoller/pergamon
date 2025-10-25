@@ -664,6 +664,11 @@
     /// -> str | none
     title: "References",
 
+    /// Whether the title of the bibliography should appear in the document's #link("https://typst.app/docs/reference/model/outline/")[outline].
+    /// 
+    /// -> bool
+    outlined: true,
+
     /// #bibtex fields that contain names and should be parsed as such. For each `X` in this array,
     /// #bibtypst will enrich the reference dictionary with a field `parsed-X` that contains an array of
     /// name-part dictionaries, such as `("family": "Smith", "given": "John")`. See
@@ -791,7 +796,7 @@
 
   // "References" heading
   if title != none {
-    heading(title, numbering: none)
+    heading(title, numbering: none, outlined: outlined)
   }
 
   // layout the cells in a grid

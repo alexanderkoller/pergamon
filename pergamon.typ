@@ -130,6 +130,7 @@ see also #link("https://github.com/alexanderkoller/pergamon/blob/main/example.pd
       #v(-1em)
 
       #print-bibliography(
+       outlined: false,
        format-reference: format-reference(reference-label: style.reference-label), 
        label-generator: style.label-generator
       )
@@ -221,7 +222,7 @@ implementing them.
 #figure(
   box(stroke: 1pt, inset: 6pt)[
     #set align(left)
-    #let style = format-citation-numeric() // AAA
+    #let style = format-citation-numeric()
 
     #refsection(format-citation: style.format-citation)[
       ... some text here ... #cite("bender20:_climb_nlu")
@@ -233,6 +234,7 @@ implementing them.
           print-date-after-authors: true, 
           format-quotes: it => it
        ), 
+       outlined: false,
        label-generator: style.label-generator
       )
     ]
@@ -306,6 +308,7 @@ in square brackets rather than round ones, you can replace line 4 in the above e
        format-reference: format-reference(
           reference-label: style.reference-label,
        ), 
+       outlined: false,
        label-generator: style.label-generator
       )
     ]
@@ -328,6 +331,7 @@ in square brackets rather than round ones, you can replace line 4 in the above e
        format-reference: format-reference(
           reference-label: style.reference-label,
        ), 
+       outlined: false,
        label-generator: style.label-generator
       )
     ]
@@ -967,6 +971,17 @@ The following functions may be helpful in the advanced usage and customization o
 
 
 = Changelog
+
+==== Changes in 0.5.0
+- Introduced the `format-function` argument, which allows flexible control
+  over how #pergamon formats larger blocks of references. This permits
+  far-reaching modifications of the standard reference style, without
+  having to reimplement the style from scratch.
+- Greatly improved support for contributors who are not the author. 
+  For instance, books that have only an editor and not an author are now
+  rendered correctly.
+- Added an option to select between long and short bibstrings.
+- Fixed a number of bugs.
 
 ==== Changes in 0.4.0 (2025-10-13)
 - Introduced the `format-field` argument, which allows flexible control 
