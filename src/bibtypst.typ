@@ -484,6 +484,10 @@
     }
   }
 
+  if fd(ref, "labelname", (:)) == none {
+    panic("Could not determine labelname for bibliography key '" + reference.entry_key + "'")
+  }
+
   // populate sortstr field (to be used in "n" sorting key)
   for fieldname in namefield-sort-order {
     let value = fd(ref, fieldname, (:))
@@ -667,6 +671,12 @@
     /// 
     /// If the field `X` is not defined in the #bibtex entry, #bibtypst will still insert
     /// a field `parsed-X`; in this case, it will have the value `none`.
+    /// 
+    /// Note that to fully replicate the options `useauthor` / `useeditor` / `usetranslator`
+    /// in #biblatex, you will need to both (a) specify the corresponding option in @format-reference
+    /// and (b) remove the field from the `name-fields` parameter here. This is because
+    /// `name-fields` is used to determine the reference's `labelname`, long before `format-reference`
+    /// gets to typeset the reference itself. 
     /// 
     /// -> array
     name-fields: ("afterword",

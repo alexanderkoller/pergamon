@@ -182,29 +182,55 @@
   )
 })
 
+// "Translated by X"
 // biblatex.def bytranslator+others
 #let bytranslator-others = with-default("bytranslator-others", (reference, options) => {
-  let translator = printfield(reference, "parsed-translator", options)
+  let translator = {
+    if fd(reference, "translator", (:)) != none and options.use-translator and reference.fields.labelnamesource != "translator" {
+      let translatorname = printfield(reference, "translator", options)
+      spaces(options.bibstring.bytranslator, translatorname)
+      // TODO bibstring.byeditor should be expanded as in byeditor+othersstrg
+    }
+  }
 
   (options.periods)(
-    // TODO bibstring.bytranslator should be expanded as in bytranslator+othersstrg
-    ifdef(reference, "translator", options, translator => spaces(options.bibstring.bytranslator, translator)),
+    translator,
     withothers(reference, options)
   )
 })
 
+// "Edited by X"
 // biblatex.def byeditor+others
 #let byeditor-others = with-default("byeditor-others", (reference, options) => {
-  let editor = printfield(reference, "editor", options)
+  let editor = {
+    if fd(reference, "editor", (:)) != none and options.use-editor and reference.fields.labelnamesource != "editor" {
+      let editorname = printfield(reference, "editor", options)
+      spaces(options.bibstring.byeditor, editorname)
+      // TODO bibstring.byeditor should be expanded as in byeditor+othersstrg
+    }
+  }
 
-  (options.periods)(
-    // TODO bibstring.byeditor should be expanded as in byeditor+othersstrg
-    ifdef(reference, "editor", options, reference => spaces(options.bibstring.byeditor, editor)),
-
+  (options.periods)( // TODO: check how they are actually joined
+    editor,
     // TODO: support editora etc.,  \usebibmacro{byeditorx}%
-
     bytranslator-others(reference, options)
   )
+})
+
+// "By X"
+// biblatex.def byauthor
+#let byauthor = with-default("byauthor", (reference, options) => {
+  let author = {
+    if fd(reference, "author", (:)) != none and options.use-author and reference.fields.labelnamesource != "author" {
+      let name = printfield(reference, "author", options)
+      spaces(options.bibstring.byauthor, name)
+      // TODO bibstring.byeditor should be expanded as in byeditor+othersstrg
+    }
+  }
+
+  // TODO: add \usebibmacro{bytypestrg}{author}{author}
+  // (same as in the other by-X functions)
+  author
 })
 
 // standard.bbx note+pages
@@ -432,10 +458,8 @@
         printfield(reference, "title", options),
         language(reference, options),
       ),
-      // TODO: \usebibmacro{byauthor}
-      // TODO: \usebibmacro{bytranslator+others}
-      //   - the "others" macros construct bibstring keys like "editorstrfo" to
-      //     cover multiple roles of the same person at once
+      byauthor(reference, options),
+      bytranslator-others(reference, options),
       printfield(reference, "version", options),
       commas(
         spaces(options.bibstring.in, journal-issue-title(reference, options)), // may print date
@@ -469,7 +493,7 @@
       printfield(reference, "title", options),
       language(reference, options),
     ),
-    // TODO:   \usebibmacro{byauthor}%
+    byauthor(reference, options),
     spaces(options.bibstring.in, maintitle-booktitle(reference, options)),
     event-venue-date(reference, options),
     byeditor-others(reference, options),
@@ -502,7 +526,7 @@
       printfield(reference, "title", options),
       language(reference, options),
     ),
-    // TODO:   \usebibmacro{byauthor}%
+    byauthor(reference, options),
     spaces(options.bibstring.in, maintitle-booktitle(reference, options)),
     byeditor-others(reference, options),
     (options.commas)(
@@ -534,7 +558,7 @@
       maintitle-title(reference, options),
       language(reference, options),
     ),
-    // TODO:  \usebibmacro{byauthor}%
+    byauthor(reference, options),
     byeditor-others(reference, options),
     (options.commas)(
       printfield(reference, "edition", options),
@@ -567,7 +591,7 @@
       printfield(reference, "title", options),
       language(reference, options),
     ),
-    // TODO:  \usebibmacro{byauthor}%
+    byauthor(reference, options),
     byeditor-others(reference, options),
     printfield(reference, "howpublished", options),
     (options.commas)(
@@ -595,7 +619,7 @@
       printfield(reference, "title", options),
       language(reference, options),
     ),
-    // TODO:  \usebibmacro{byauthor}%
+    byauthor(reference, options),
     printfield(reference, "note", options),
     (options.commas)(
       printfield(reference, "type", options),
