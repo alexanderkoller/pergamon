@@ -72,9 +72,10 @@
 
 // biblatex.def editor+others
 #let editor-others = with-default("editor-others", (reference, options) => {
-  if options.use-editor and fd(reference, "editor", options) != none {
-    // TODO - choose between bibstring.editor and bibstring.editors depending on length of editor list
-    [#printfield(reference, "parsed-editor", options), #options.bibstring.editor]
+  let editor = fd(reference, "parsed-editor", options)
+  if options.use-editor and editor != none {
+    let suffix = if editor.len() > 1 { options.bibstring.editors } else { options.bibstring.editor }
+    [#printfield(reference, "parsed-editor", options), #suffix]
   } else {
     none
   }
@@ -82,9 +83,10 @@
 
 // biblatex.def translator+others
 #let translator-others = with-default("translator-others", (reference, options) => {
-  if options.use-translator and fd(reference, "translator", options) != none {
-    // TODO - choose between bibstring.editor and bibstring.editors depending on length of editor list
-    [#printfield(reference, "parsed-translator", options), #options.bibstring.translator]
+  let translator = fd(reference, "parsed-translator", options)
+  if options.use-translator and translator != none {
+    let suffix = if translator.len() > 1 { options.bibstring.translators } else { options.bibstring.translator }
+    [#printfield(reference, "parsed-translator", options), #suffix]
   } else {
     none
   }

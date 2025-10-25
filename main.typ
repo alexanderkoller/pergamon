@@ -49,7 +49,7 @@
 
   // Override bibstring entries like this:
   bibstring: ("in": "In"),
-  bibstring-style: "short",
+  bibstring-style: "long",
 
   format-fields: (
     // highlight my name in all references
