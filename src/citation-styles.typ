@@ -105,8 +105,7 @@
   }
 
   let label-generator(index, reference) = {
-    // TODO - handle the case with no authors
-    let lastnames = family-names(reference.fields.parsed-author)
+    let lastnames = family-names(reference.fields.labelname)
 
     let abbreviation = if lastnames.len() == 1 {
       lastnames.at(0).slice(0, labelalpha)
@@ -339,7 +338,7 @@
 
 
   let label-generator(index, reference) = {
-    let parsed-authors = family-names(reference.fields.parsed-author)
+    let labelname = family-names(reference.fields.labelname)
     let year-defined = is-year-defined(reference)
     let year = if reference.fields.parsed-date != none and "year" in reference.fields.parsed-date {
       str(reference.fields.parsed-date.year)
@@ -353,7 +352,7 @@
       none
     }
 
-    let authors-str = concatenate-names(parsed-authors, options: options, minnames: options.minnames, maxnames: options.maxnames)
+    let authors-str = concatenate-names(labelname, options: options, minnames: options.minnames, maxnames: options.maxnames)
 
     let lbl = (authors-str, year, extradate)
     let lbl-repr = strfmt("{} {}{}", authors-str, year, extradate)

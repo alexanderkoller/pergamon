@@ -19,7 +19,6 @@
     language: language,
     date: date, 
     labelname: labelname,
-    authors-with-year: authors-with-year,
     author: author,
     editor-others: editor-others,
     translator-others: translator-others,

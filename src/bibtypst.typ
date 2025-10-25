@@ -395,8 +395,7 @@
       }
     } else if sort-key == "n" {
       // author name
-      // reference => reference.lastname-first-authors
-      reference => reference.fields.sortstr-author
+      reference => reference.fields.sortstr // TEST ME
     } else if sort-key == "t" {
       // paper title
       reference => reference.fields.title.trim()

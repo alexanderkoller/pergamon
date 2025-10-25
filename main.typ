@@ -24,11 +24,11 @@
 #let marker = text(size: 8pt)[#emoji.star] 
 
 #let fref = format-reference(
-  // name-format: "{given} {family}",
-  name-format: (
-    "author": "{given} {family}",
-    "editor": "{g}. {family}"
-  ),
+  name-format: "{given} {family}",
+  // name-format: (
+  //   "author": "{given} {family}",
+  //   "editor": "{g}. {family}"
+  // ),
   print-date-after-authors: true,
   reference-label: fcite.reference-label,
   format-quotes: it => it,
@@ -82,7 +82,7 @@
     // overwritten by the show rule that is defined in refsection's source code.
     // It colors the citation links based on whether the reference is to a PI publication.
     #show link: it => if-citation(it, value => {
-      let color = if "Koller" in family-names(value.reference.fields.parsed-author) { darkgreen } else { darkblue }
+      let color = if "Koller" in family-names(value.reference.fields.labelname) { darkgreen } else { darkblue }
       set text(fill: color)
       it
     })

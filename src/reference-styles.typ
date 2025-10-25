@@ -56,19 +56,26 @@
   // reference.authors, // TODO - was \printnames{author}
 })
 
-
-
-#let authors-with-year = with-default("authors-with-year", (reference, options) => {
+// add date+extradate to the name; the name could be generated from author, editor+others, etc.
+#let maybe-with-date(reference, options, name) = {
   spaces(
-    labelname(reference, options),
+    name,
     ifen(options.print-date-after-authors, () => (options.format-parens)(date(reference, options)))
   )
-})
+}
+
+// #let authors-with-year = with-default("authors-with-year", (reference, options) => {
+//   spaces(
+//     labelname(reference, options),
+//     ifen(options.print-date-after-authors, () => (options.format-parens)(date(reference, options)))
+//   )
+// })
 
 // biblatex.def author
 #let author = with-default("author", (reference, options) => {
   fjoin(options.author-type-delim,
-    authors-with-year(reference, options),
+    printfield(reference, "author", options),
+    // authors-with-year(reference, options),
     authorstrg(reference, options)
   )
 })
@@ -96,7 +103,7 @@
 // biblatex.def author/translator+others
 #let author-translator-others = with-default("author-translator-others", (reference, options) => {
   if options.use-author and fd(reference, "author", options) != none {
-    authors-with-year(reference, options)
+    author(reference, options)
   } else {
     translator-others(reference, options)
   }
@@ -428,7 +435,9 @@
     // I am mapping \newunit to commas and \newblock to periods.
     // Perhaps this should be made configurable at some point.
     (options.periods)(
-      author-translator-others(reference, options),
+      maybe-with-date(reference, options,
+        author-translator-others(reference, options)
+      ),
       (options.periods)(
         printfield(reference, "title", options),
         language(reference, options),
@@ -439,7 +448,7 @@
       //     cover multiple roles of the same person at once
       printfield(reference, "version", options),
       commas(
-        spaces(options.bibstring.in, journal-issue-title(reference, options)),
+        spaces(options.bibstring.in, journal-issue-title(reference, options)), // may print date
         byeditor-others(reference, options),
         note-pages(reference, options)
       ),
@@ -463,7 +472,9 @@
   require-fields(reference, options, "author", "title", "booktitle")
 
   (options.periods)(
-    author-translator-others(reference, options),
+    maybe-with-date(reference, options,
+      author-translator-others(reference, options)
+    ),
     (options.commas)(
       printfield(reference, "title", options),
       language(reference, options),
@@ -494,7 +505,9 @@
   require-fields(reference, options, "author", "title", "editor", "booktitle")
 
   (options.periods)(
-    author-translator-others(reference, options),
+    maybe-with-date(reference, options,
+      author-translator-others(reference, options)
+    ),
     (options.commas)(
       printfield(reference, "title", options),
       language(reference, options),
@@ -521,11 +534,12 @@
 
 
 #let driver-book = with-default("driver-book", (reference, options) => {
-  // TODO - it's probably okay if there is an editor rather than an author
-  require-fields(reference, options, "author", "title")
+  require-fields(reference, options, ("author", "editor", "translator"), "title")
 
   (options.periods)(
-    author-editor-others-translator-others(reference, options),
+    maybe-with-date(reference, options,
+      author-editor-others-translator-others(reference, options)
+    ),
     (options.commas)(
       maintitle-title(reference, options),
       language(reference, options),
@@ -553,10 +567,12 @@
 })
 
 #let driver-misc = with-default("driver-misc", (reference, options) => {
-  require-fields(reference, options, "author", "title")
+  require-fields(reference, options, ("author", "editor", "translator"), "title")
 
   (options.periods)(
-    author-editor-others-translator-others(reference, options),
+    maybe-with-date(reference, options,
+      author-editor-others-translator-others(reference, options)
+    ),
     (options.commas)(
       printfield(reference, "title", options),
       language(reference, options),
@@ -582,7 +598,9 @@
   require-fields(reference, options, "author", "title", "type", "institution")
 
   (options.periods)(
-    author(reference, options),
+    maybe-with-date(reference, options,
+      author(reference, options)
+    ),
     (options.commas)(
       printfield(reference, "title", options),
       language(reference, options),
