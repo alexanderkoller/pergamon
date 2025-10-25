@@ -43,33 +43,23 @@
 })
 
 
-#let date = with-default("date", (reference, options) => {
+#let date-with-extradate = with-default("date", (reference, options) => {
   epsilons(
     printfield(reference, "parsed-date", options),
     printfield(reference, "extradate", options)
   )
 })
 
-#let labelname = with-default("labelname", (reference, options) => {
-  printfield(reference, "parsed-author", options)
-  // TODO - could be editor, translator, etc.
-  // reference.authors, // TODO - was \printnames{author}
+// Adds date+extradate to a name if print-date-after-authors is true.
+// The name could be generated from author, editor+others, etc.
+#let maybe-with-date = with-default("maybe-with-date", (reference, options) => {
+  name => {
+    spaces(
+      name,
+      ifen(options.print-date-after-authors, () => (options.format-parens)(date-with-extradate(reference, options)))
+    )
+  }
 })
-
-// add date+extradate to the name; the name could be generated from author, editor+others, etc.
-#let maybe-with-date(reference, options, name) = {
-  spaces(
-    name,
-    ifen(options.print-date-after-authors, () => (options.format-parens)(date(reference, options)))
-  )
-}
-
-// #let authors-with-year = with-default("authors-with-year", (reference, options) => {
-//   spaces(
-//     labelname(reference, options),
-//     ifen(options.print-date-after-authors, () => (options.format-parens)(date(reference, options)))
-//   )
-// })
 
 // biblatex.def author
 #let author = with-default("author", (reference, options) => {
@@ -136,7 +126,7 @@
 #let issue-date = with-default("issue-date", (reference, options) => {
   spaces(
     printfield(reference, "issue", options),
-    ifen(not options.print-date-after-authors, () => date(reference, options)),
+    ifen(not options.print-date-after-authors, () => date-with-extradate(reference, options)),
     format: options.format-parens
   )
 })
@@ -353,7 +343,7 @@
       printfield(reference, "location", options), // Biblatex: printlist{location}
       printfield(reference, xxx, options)
     ),
-    ifen(not options.print-date-after-authors, () => date(reference, options))
+    ifen(not options.print-date-after-authors, () => date-with-extradate(reference, options))
   )
 }
 
@@ -435,7 +425,7 @@
     // I am mapping \newunit to commas and \newblock to periods.
     // Perhaps this should be made configurable at some point.
     (options.periods)(
-      maybe-with-date(reference, options,
+      maybe-with-date(reference, options)(
         author-translator-others(reference, options)
       ),
       (options.periods)(
@@ -472,7 +462,7 @@
   require-fields(reference, options, "author", "title", "booktitle")
 
   (options.periods)(
-    maybe-with-date(reference, options,
+    maybe-with-date(reference, options)(
       author-translator-others(reference, options)
     ),
     (options.commas)(
@@ -505,7 +495,7 @@
   require-fields(reference, options, "author", "title", "editor", "booktitle")
 
   (options.periods)(
-    maybe-with-date(reference, options,
+    maybe-with-date(reference, options)(
       author-translator-others(reference, options)
     ),
     (options.commas)(
@@ -537,7 +527,7 @@
   require-fields(reference, options, ("author", "editor", "translator"), "title")
 
   (options.periods)(
-    maybe-with-date(reference, options,
+    maybe-with-date(reference, options)(
       author-editor-others-translator-others(reference, options)
     ),
     (options.commas)(
@@ -570,7 +560,7 @@
   require-fields(reference, options, ("author", "editor", "translator"), "title")
 
   (options.periods)(
-    maybe-with-date(reference, options,
+    maybe-with-date(reference, options)(
       author-editor-others-translator-others(reference, options)
     ),
     (options.commas)(
@@ -598,7 +588,7 @@
   require-fields(reference, options, "author", "title", "type", "institution")
 
   (options.periods)(
-    maybe-with-date(reference, options,
+    maybe-with-date(reference, options)(
       author(reference, options)
     ),
     (options.commas)(

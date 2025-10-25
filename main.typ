@@ -137,6 +137,8 @@
 
     to test \#91: #cite("Ruwitch2025AISlop")
 
+    paper with byeditor: #cite("brownschmidt_2018_perspectivetaking")
+
     #context { count-bib-entries() }
 
     // #set par(hanging-indent: 1em)

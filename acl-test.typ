@@ -54,11 +54,11 @@
   print-date-after-authors: true,
 
   format-fields: (
-    "editor": (dffmt, value, reference, field, options, style) => {
-      let ed-str = (dev.print-name)(value, "editor", options)
-      let editorx = if value.len() > 1 { "editors" } else { "editor" }
-      strfmt("{}, {}", ed-str, editorx)
-    },
+    // "editor": (dffmt, value, reference, field, options, style) => {
+    //   let ed-str = (dev.print-name)(value, "editor", options)
+    //   let editorx = if value.len() > 1 { "editors" } else { "editor" }
+    //   strfmt("{}, {}", ed-str, editorx)
+    // },
 
     "title": (dffmt, value, reference, field, options, style) => {
       let bib-type = reference.entry_type
@@ -84,7 +84,8 @@
       (dev.require-fields)(reference, options, "author", "title", "booktitle")
 
       (options.periods)(
-        (dev.author-translator-others)(reference, options), // includes date
+        (dev.author-translator-others)(reference, options),
+        (dev.date-with-extradate)(reference, options),
         (dev.printfield)(reference, "title", options),
         (options.commas)(
           spaces(options.bibstring.in, (dev.maintitle-booktitle)(reference, options)),
@@ -97,11 +98,13 @@
       )
     },
 
+    // TODO: include "edited by"
     "driver-incollection": (reference, options) => {
       (dev.require-fields)(reference, options, "author", "title", "editor", "booktitle")
 
       (options.periods)(
         (dev.author-translator-others)(reference, options),
+        (dev.date-with-extradate)(reference, options),
         (dev.printfield)(reference, "title", options),
         spaces(
           options.bibstring.in,
@@ -120,6 +123,7 @@
 
         (options.periods)(
           (dev.author-translator-others)(reference, options),
+          (dev.date-with-extradate)(reference, options),
           (dev.printfield)(reference, "title", options),
           epsilons(
             emph((dev.printfield)(reference, "journaltitle", options)),
@@ -128,8 +132,57 @@
           (dev.doi-eprint-url)(reference, options),
           (dev.addendum-pubstate)(reference, options)
         )
+    },
+
+    "driver-book": (reference, options) => {
+      (dev.require-fields)(reference, options, ("author", "editor", "translator"), "title")
+
+      (options.periods)(
+        (dev.author-editor-others-translator-others)(reference, options),
+        (dev.date-with-extradate)(reference, options),
+        (dev.maintitle-title)(reference, options),
+        (dev.byeditor-others)(reference, options),
+        (options.commas)(
+          (dev.printfield)(reference, "edition", options),
+          (dev.volume-part-if-maintitle-undef)(reference, options),
+          (dev.printfield)(reference, "volumes", options),
+        ),
+        (dev.series-number)(reference, options),
+        (dev.printfield)(reference, "note", options),
+        (dev.publisher-location-date)(reference, options),
+        (options.commas)(
+          (dev.chapter-pages)(reference, options),
+          (dev.printfield)(reference, "pagetotal", options),
+        ),
+        if options.print-isbn { printfield(reference, "isbn", options) } else { none },
+        (dev.doi-eprint-url)(reference, options),
+        (dev.addendum-pubstate)(reference, options)
+      )
+    },
+
+
+    "driver-misc": (reference, options) => {
+      (dev.require-fields)(reference, options, ("author", "editor", "translator"), "title")
+
+      (options.periods)(
+        (dev.author-editor-others-translator-others)(reference, options),
+        (dev.date-with-extradate)(reference, options),
+        (dev.printfield)(reference, "title", options),
+        // TODO:  \usebibmacro{byauthor}%
+        (dev.byeditor-others)(reference, options),
+        (dev.printfield)(reference, "howpublished", options),
+        (options.commas)(
+          (dev.printfield)(reference, "type", options),
+          (dev.printfield)(reference, "version", options),
+          (dev.printfield)(reference, "note", options),
+        ),
+        (dev.organization-location-date)(reference, options),
+        (dev.doi-eprint-url)(reference, options),
+        (dev.addendum-pubstate)(reference, options)
+      )
     }
-    ),
+
+  ),
 
   // Override bibstring entries like this:
   bibstring: (
