@@ -81,12 +81,10 @@ Typst code, rather than CSL.
 - References retain nonstandard #bibtex fields (#link("https://github.com/typst/hayagriva/issues/240")[unlike in Hayagriva]),
   making it e.g. possible to split bibliographies based on keywords.
 
-At the same time, #bibtypst is very new and has a number of important limitations compared to
-the builtin system.
-
-- #bibtypst currently supports only bibliographies in #bibtex format, not the Hayagriva YAML format. 
-- Only a handful of styles are supported at this point, in contrast to the large number of available CSL styles. #bibtypst comes with implementations of the #biblatex styles `numeric`, `alphabetic`, and `authoryear`.
-- #bibtypst still requires a lot of testing and tweaking.
+I have used #pergamon for a number of nontrivial bibliographic scenarios, but I
+welcome your comments so that I can make it work more generally. #biblatex is a
+very complex library to replicate, and I would like to prioritize features that
+people actually care about.
 
 #link("https://en.wikipedia.org/wiki/Pergamon")[Pergamon] was an ancient Greek city state in Asia Minor.
 Its library was second only to the Library of Alexandria around 200 BC.
