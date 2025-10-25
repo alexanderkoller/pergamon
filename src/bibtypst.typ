@@ -454,6 +454,9 @@
   return sorted
 }
 
+// order in which sortstr fields are used for "n" sorting
+#let namefield-sort-order = ("sortstr-sortname", "sortstr-author", "sortstr-editor", "sortstr-translator")
+
 #let preprocess-reference(reference, name-fields, labelname-fields) = {
   let ref = parse-reference-names(reference, name-fields)
 
@@ -479,6 +482,15 @@
         ref.fields.insert("labelnamesource", fieldname)
         break
       }
+    }
+  }
+
+  // populate sortstr field (to be used in "n" sorting key)
+  for fieldname in namefield-sort-order {
+    let value = fd(ref, fieldname, (:))
+    if value != none {
+      ref.fields.insert("sortstr", value)
+      break
     }
   }
 
@@ -523,7 +535,6 @@
 
   if show-all {
     for reference in bib.values() {
-      // let ref = preprocess-reference(reference, name-fields)
       bibl-unsorted.push(reference)
     }
   } else {
@@ -533,8 +544,6 @@
 
       if key in bib { // skip references to labels that are not bib keys
         let bib-entry = bib.at(key)
-        // bib-entry = preprocess-reference(bib-entry, name-fields)
-        // [#bib-entry]
         bibl-unsorted.push(bib-entry)
       }
     }
@@ -675,6 +684,7 @@
         "introduction",
         "shortauthor",
         "shorteditor",
+        "sortname",
         "translator"),
 
     /// #todo[DOCUMENT ME -- cf Biblatex DeclareLabelname]
