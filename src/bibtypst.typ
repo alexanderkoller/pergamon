@@ -1,7 +1,7 @@
 
 #import "@preview/oxifmt:1.0.0": strfmt
 #import "@preview/citegeist:0.2.0": load-bibliography
-#import "bib-util.typ": collect-deduplicate
+#import "bib-util.typ": collect-deduplicate, fd
 #import "names.typ": parse-reference-names
 #import "dates.typ": parse-date, make-date-tuple
 
@@ -454,8 +454,33 @@
   return sorted
 }
 
-#let preprocess-reference(reference, name-fields) = {
+#let preprocess-reference(reference, name-fields, labelname-fields) = {
   let ref = parse-reference-names(reference, name-fields)
+
+  // determine labelname
+  let labelname-field = fd(ref, "labelnamefield", (:))
+  if labelname-field != none {
+    // if labelnamefield specified, try to populate labelname from it
+    let parsed-fieldname = "parsed-" + labelname-field
+    let value = fd(ref, parsed-fieldname, (:))
+    if value != none {
+      ref.fields.insert("labelname", value)
+      ref.fields.insert("labelnamesource", labelname-field)
+    }
+  }
+
+  if fd(ref, "labelname", (:)) == none {
+    // if populating from labelnamefield didn't work, try the labelname-fields
+    for fieldname in labelname-fields {
+      let parsed-fieldname = "parsed-" + fieldname
+      let value = fd(ref, parsed-fieldname, (:))
+      if value != none {
+        ref.fields.insert("labelname", value)
+        ref.fields.insert("labelnamesource", fieldname)
+        break
+      }
+    }
+  }
 
   // definitely parse "date" field with fallback "year"
   let parsed-date = parse-date(reference, "date", fallback-year-field: "year", fallback-month-field: "month")
@@ -652,6 +677,15 @@
         "shorteditor",
         "translator"),
 
+    /// #todo[DOCUMENT ME -- cf Biblatex DeclareLabelname]
+    labelname-fields: (
+      "shortauthor",
+      "author",
+      "shorteditor",
+      "editor",
+      "translator"
+    ),
+
     /// Starts the numbering of entries in this bibliography after the number
     /// specified in this argument. Let's say you typeset two bibliographies in
     /// your document, and the first one has 15 entries. You can pass `15` in 
@@ -685,7 +719,7 @@
 
   if show-all {
     for reference in bib.values() {
-      let ref = preprocess-reference(reference, name-fields)
+      let ref = preprocess-reference(reference, name-fields, labelname-fields)
       bibl-unsorted.push(ref)
     }
   } else {
@@ -695,7 +729,7 @@
 
       if key in bib { // skip references to labels that are not bib keys
         let bib-entry = bib.at(key)
-        bib-entry = preprocess-reference(bib-entry, name-fields)
+        bib-entry = preprocess-reference(bib-entry, name-fields, labelname-fields)
         // [#bib-entry]
         bibl-unsorted.push(bib-entry)
       }
