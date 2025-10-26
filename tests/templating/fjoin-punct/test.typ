@@ -13,3 +13,8 @@
 
 #assert.eq("foo.", content-to-string(fjoin(".", [foo], finish-with-connector: true)))
 #assert.eq("foo.", content-to-string(fjoin(".", [foo.], finish-with-connector: true, skip-if: ".")))
+
+// capitalize
+#assert.eq("Operating System. research report", fjoin(".", "Operating System", "research report"))
+#assert.eq(str, type(fjoin(".", "Operating System", "research report")))
+#assert.eq("Operating System. Research report", fjoin(".", "Operating System", "research report", capitalize-after: ".!?"))

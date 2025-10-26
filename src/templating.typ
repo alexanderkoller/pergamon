@@ -15,11 +15,12 @@
 //   }
 // }
 
-#let fjoin(connector, format: it => it, add-space: true, skip-if: previous-character => false, finish-with-connector: false, ..xx) = {
+#let fjoin(connector, format: it => it, add-space: true, skip-if: previous-character => false, finish-with-connector: false, capitalize-after: "", ..xx) = {
   let xs = xx.pos()
   let parts = () // acts as a stringbuffer, so fjoin can run in linear time
   let empty = true
   let rightmost-nonempty-index = -1
+  let connector-capitalizes = connector in capitalize-after
 
   if type(skip-if) == str {
     skip-if = previous-character => previous-character in skip-if
@@ -35,7 +36,16 @@
   // do the actual formatting
   for (i, x) in xs.enumerate() {
     if x != none {
-      parts.push(x)
+      let capitalized = if i > 0 and connector-capitalizes and type(x) == str {
+        upper(x.at(0)) + x.slice(1)
+      } else if type(x) != str {
+        // "NONSTRING"
+        x
+      } else {
+        x
+      }
+
+      parts.push(capitalized)
       empty = false
 
       if i < rightmost-nonempty-index {

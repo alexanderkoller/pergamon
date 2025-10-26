@@ -1399,6 +1399,7 @@
 
   ) = {
     // construct fjoin functions for periods and commas
+    let sentence-final-punctuation = ".!?"
     let make-fjoin-function(separator) = {
       if type(separator) == function {
         // In contrast to the official documentation, you can also pass the
@@ -1406,11 +1407,11 @@
         // so let's keep it a secret.
         separator
       } else if type(separator) == str {
-        (..x) => fjoin(separator, ..x, skip-if: separator)
+        (..x) => fjoin(separator, ..x, skip-if: separator, capitalize-after: sentence-final-punctuation)
       } else if type(separator) == array {
-        (..x) => fjoin(separator.at(0), ..x, skip-if: separator.at(1))
+        (..x) => fjoin(separator.at(0), ..x, skip-if: separator.at(1), capitalize-after: sentence-final-punctuation)
       } else {
-        (..x) => fjoin(".", ..x, skip-if: ".")
+        (..x) => fjoin(".", ..x, skip-if: ".", capitalize-after: sentence-final-punctuation)
       }
     }
 
