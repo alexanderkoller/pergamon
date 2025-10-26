@@ -269,8 +269,9 @@
     if value == none {
       none
     } else {
-      let language-list = value.split(regex("\s+and\s+"))
-      concatenate-names(language-list, options: options, maxnames: 99) + " XXX"
+      let language-list = value.split(regex("\s+and\s+")).map({ id => options.bibstring.at(id, default: id) })
+
+      concatenate-names(language-list, options: options, maxnames: 99)
     }
   }
   /*
