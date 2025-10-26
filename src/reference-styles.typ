@@ -463,7 +463,7 @@
       byauthor(reference, options),
       bytranslator-others(reference, options),
       printfield(reference, "version", options),
-      commas(
+      (options.commas)(
         spaces(options.bibstring.in, journal-issue-title(reference, options)), // may print date
         byeditor-others(reference, options),
         note-pages(reference, options)
@@ -717,7 +717,7 @@
         maintitle-booktitle(reference, options),
         byeditor-others(reference, options),
       ),
-      commas(
+      (options.commas)(
         printfield(reference, "edition", options),
         volume-part-if-maintitle-undef(reference, options),
         printfield(reference, "volumes", options),
@@ -749,7 +749,7 @@
       byeditor(reference, options),
       printfield(reference, "edition", options),
       series-number(reference, options),
-      commas(
+      (options.commas)(
         printfield(reference, "type", options),
         printfield(reference, "version", options),
         printfield(reference, "note", options),
@@ -780,7 +780,7 @@
       ),
       byauthor(reference, options),
       byeditor-others(reference, options),
-      commas(
+      (options.commas)(
         printfield(reference, "version", options),
         printfield(reference, "note", options),
       ),
