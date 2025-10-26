@@ -53,33 +53,17 @@
 
   print-date-after-authors: true,
 
-  format-fields: (
-    // "editor": (dffmt, value, reference, field, options, style) => {
-    //   let ed-str = (dev.print-name)(value, "editor", options)
-    //   let editorx = if value.len() > 1 { "editors" } else { "editor" }
-    //   strfmt("{}, {}", ed-str, editorx)
-    // },
-
-    "title": (dffmt, value, reference, field, options, style) => {
-      let bib-type = reference.entry_type
-      let title = (dev.link-title)(reference, options)
-
-      if bib-type == "misc" {
-        title
-      } else {
-        dffmt(value, reference, field, options, style)
-      }
-    }
-  ),
-
   format-functions: (
-    "authors-with-year": (reference, options) => {
-      periods(
-        (dev.labelname)(reference, options),
-        (dev.date)(reference, options)
-      )
+    "maybe-with-date": (reference, options) => {
+      name => {
+        periods(
+          name,
+          (dev.date-with-extradate)(reference, options)
+        )
+      }
     },
 
+    // reordered location and organization
     "driver-inproceedings": (reference, options) => {
       (dev.require-fields)(reference, options, "author", "title", "booktitle")
 
@@ -118,6 +102,8 @@
       )
     },
 
+    // different formatting of volume and number
+    // TODO: check eid
     "driver-article": (reference, options) => {
         (dev.require-fields)(reference, options, "author", "title", "journaltitle")
 
@@ -133,67 +119,17 @@
           (dev.addendum-pubstate)(reference, options)
         )
     },
-
-    "driver-book": (reference, options) => {
-      (dev.require-fields)(reference, options, ("author", "editor", "translator"), "title")
-
-      (options.periods)(
-        (dev.author-editor-others-translator-others)(reference, options),
-        (dev.date-with-extradate)(reference, options),
-        (dev.maintitle-title)(reference, options),
-        (dev.byeditor-others)(reference, options),
-        (options.commas)(
-          (dev.printfield)(reference, "edition", options),
-          (dev.volume-part-if-maintitle-undef)(reference, options),
-          (dev.printfield)(reference, "volumes", options),
-        ),
-        (dev.series-number)(reference, options),
-        (dev.printfield)(reference, "note", options),
-        (dev.publisher-location-date)(reference, options),
-        (options.commas)(
-          (dev.chapter-pages)(reference, options),
-          (dev.printfield)(reference, "pagetotal", options),
-        ),
-        if options.print-isbn { printfield(reference, "isbn", options) } else { none },
-        (dev.doi-eprint-url)(reference, options),
-        (dev.addendum-pubstate)(reference, options)
-      )
-    },
-
-
-    "driver-misc": (reference, options) => {
-      (dev.require-fields)(reference, options, ("author", "editor", "translator"), "title")
-
-      (options.periods)(
-        (dev.author-editor-others-translator-others)(reference, options),
-        (dev.date-with-extradate)(reference, options),
-        (dev.printfield)(reference, "title", options),
-        // TODO:  \usebibmacro{byauthor}%
-        (dev.byeditor-others)(reference, options),
-        (dev.printfield)(reference, "howpublished", options),
-        (options.commas)(
-          (dev.printfield)(reference, "type", options),
-          (dev.printfield)(reference, "version", options),
-          (dev.printfield)(reference, "note", options),
-        ),
-        (dev.organization-location-date)(reference, options),
-        (dev.doi-eprint-url)(reference, options),
-        (dev.addendum-pubstate)(reference, options)
-      )
-    }
-
   ),
 
   // Override bibstring entries like this:
   bibstring: (
     "in": "In",
-    "pages": "pages"
   ),
 
 
 
   // TODO: Things like this should be addable by the user:
-  eval-scope: (todo: x => x)
+  eval-scope: (todo: x => text(fill: red, x))
 )
 
 #let print-acl-bibliography() = {
