@@ -273,7 +273,17 @@
 
       concatenate-names(language-list, options: options, maxnames: 99)
     }
+  },
+
+  "location": (value, reference, field, options, style) => {
+    if value == none {
+      none
+    } else {
+      let location-list = value.split(regex("\s+and\s+")).map({ id => options.bibstring.at(id, default: id) })
+      concatenate-names(location-list, options: options, maxnames: 99)
+    }
   }
+
   /*
   TODO currently unsupported:
 

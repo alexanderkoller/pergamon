@@ -12,11 +12,12 @@
 #add-bib-resource(read("bibs/biblatex-examples.bib"))
 
 
-#let stresstest(citation-style, style-name) = {
+#let stresstest(citation-style, style-name, bibstring-style: "long") = {
   let fcite = citation-style
   let fref = format-reference(
     print-date-after-authors: true,
     reference-label: fcite.reference-label,
+    bibstring-style: bibstring-style
   )
 
   refsection(format-citation: fcite.format-citation)[
@@ -40,3 +41,4 @@
 #stresstest(format-citation-authoryear(), "Author-Year")
 #stresstest(format-citation-alphabetic(), "Alphabetic")
 #stresstest(format-citation-numeric(), "Numeric")
+#stresstest(format-citation-authoryear(), "Author-Year (short bibstrings)", bibstring-style: "short")
