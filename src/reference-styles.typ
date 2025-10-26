@@ -121,6 +121,14 @@
 })
 
 
+#let type-number-location = with-default("type-number-location", (reference, options) => {
+  let loc = if fd(reference, "location", options) != none { (options.format-parens)(printfield(reference, "location", options)) } else { none }
+  spaces(
+    printfield(reference, "type", options),
+    printfield(reference, "number", options),
+    loc
+  )
+})
 
 
 
@@ -234,6 +242,12 @@
   // (same as in the other by-X functions)
   author
 })
+
+// "By X"
+// biblatex.def name alias, cf. biblatex.def line 1000
+#let bybookauthor = with-default("bybookauthor", (reference, options) => byauthor(reference, options))
+
+#let byholder = with-default("byholder", (reference, options) => printfield(reference, "holder", options))
 
 // standard.bbx note+pages
 #let note-pages = with-default("note-pages", (reference, options) => {
@@ -658,8 +672,7 @@
       printfield(reference, "howpublished", options),
       printfield(reference, "type", options),
       printfield(reference, "note", options),
-      // TODO: location+date
-      location-publisher-date(reference, options),
+      publisher-location-date(reference, options),
       chapter-pages(reference, options),
       printfield(reference, "pagetotal", options),
       doi-eprint-url(reference, options),
@@ -712,7 +725,6 @@
       ),
       byauthor(reference, options),
       (options.periods)( // TODO periods makes no sense here
-        // TODO bybookauthor
         spaces(options.bibstring.in, bybookauthor(reference, options)),
         maintitle-booktitle(reference, options),
         byeditor-others(reference, options),
@@ -724,7 +736,7 @@
       ),
       series-number(reference, options),
       note-pages(reference, options),
-      location-publisher-date(reference, options),
+      publisher-location-date(reference, options),
       chapter-pages(reference, options),
       if options.print-isbn { printfield(reference, "isbn", options) } else { none },
       doi-eprint-url(reference, options),
@@ -755,7 +767,7 @@
         printfield(reference, "note", options),
       ),
       printfield(reference, "organization", options),
-      location-publisher-date(reference, options),
+      publisher-location-date(reference, options),
       (options.commas)(
         chapter-pages(reference, options),
         printfield(reference, "pagetotal", options),
@@ -806,8 +818,8 @@
         language(reference, options),
       ),
       byauthor(reference, options),
-      type-number-location(reference, options), // TODO implement
-      byholder(reference, options), // TODO implement
+      type-number-location(reference, options),
+      byholder(reference, options),
       printfield(reference, "note", options),
       printfield(reference, "date", options),
       doi-eprint-url(reference, options),
