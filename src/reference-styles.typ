@@ -456,7 +456,7 @@
       maybe-with-date(reference, options)(
         author-translator-others(reference, options)
       ),
-      (options.periods)(
+      (options.commas)(
         printfield(reference, "title", options),
         language(reference, options),
       ),
@@ -518,7 +518,7 @@
 
 
 #let driver-incollection = with-default("driver-incollection", (reference, options) => {
-  require-fields(reference, options, "author", "title", "editor", "booktitle")
+  require-fields(reference, options, "author", "title", "booktitle")
 
   (options.periods)(
     maybe-with-date(reference, options)(
@@ -639,19 +639,359 @@
   )
 })
 
-#let driver-dummy = with-default("driver-dummy", (reference, options) => {
-  [UNSUPPORTED REFERENCE (key=#reference.entry_key, bibtype=#reference.entry_type)]
+
+
+// @booklet - A work that is printed and bound, but without a named publisher or sponsoring institution
+#let driver-booklet = with-default("driver-booklet", (reference, options) => {
+    require-fields(reference, options, ("author", "editor"), "title")
+    
+    (options.periods)(
+      maybe-with-date(reference, options)(
+        author-editor-others-translator-others(reference, options),
+      ),
+      (options.commas)(
+        printfield(reference, "title", options),
+        language(reference, options),
+      ),
+      byauthor(reference, options),
+      byeditor-others(reference, options),
+      printfield(reference, "howpublished", options),
+      printfield(reference, "type", options),
+      printfield(reference, "note", options),
+      // TODO: location+date
+      location-publisher-date(reference, options),
+      chapter-pages(reference, options),
+      printfield(reference, "pagetotal", options),
+      doi-eprint-url(reference, options),
+      addendum-pubstate(reference, options)
+    )
 })
 
-// TODO resolve type aliases (phdthesis -> thesis)
 
+#let driver-collection = with-default("driver-collection", (reference, options) => {
+  require-fields(reference, options, ("author", "editor", "translator"), "title")
+
+  (options.periods)(
+    maybe-with-date(reference, options)(
+      editor-others(reference, options)
+    ),
+    (options.commas)(
+      maintitle-title(reference, options),
+      language(reference, options),
+    ),
+    byeditor-others(reference, options),
+    (options.commas)(
+      printfield(reference, "edition", options),
+      volume-part-if-maintitle-undef(reference, options),
+      printfield(reference, "volumes", options),
+    ),
+    series-number(reference, options),
+    printfield(reference, "note", options),
+    publisher-location-date(reference, options),
+    (options.commas)(
+      chapter-pages(reference, options),
+      printfield(reference, "pagetotal", options),
+    ),
+    if options.print-isbn { printfield(reference, "isbn", options) } else { none },
+    doi-eprint-url(reference, options),
+    addendum-pubstate(reference, options)
+  )
+})
+
+// @inbook - A part of a book which forms a self-contained unit with its own title
+#let driver-inbook = with-default("driver-inbook", (reference, options) => {
+    require-fields(reference, options, "author", "title", "booktitle")
+    
+    (options.periods)(
+      maybe-with-date(reference, options)(
+        author-translator-others(reference, options)
+      ),
+      (options.commas)(
+        printfield(reference, "title", options),
+        language(reference, options),
+      ),
+      byauthor(reference, options),
+      (options.periods)( // TODO periods makes no sense here
+        // TODO bybookauthor
+        spaces(options.bibstring.in, bybookauthor(reference, options)),
+        maintitle-booktitle(reference, options),
+        byeditor-others(reference, options),
+      ),
+      commas(
+        printfield(reference, "edition", options),
+        volume-part-if-maintitle-undef(reference, options),
+        printfield(reference, "volumes", options),
+      ),
+      series-number(reference, options),
+      note-pages(reference, options),
+      location-publisher-date(reference, options),
+      chapter-pages(reference, options),
+      if options.print-isbn { printfield(reference, "isbn", options) } else { none },
+      doi-eprint-url(reference, options),
+      addendum-pubstate(reference, options)
+    )
+})
+
+// @manual - Technical documentation
+#let driver-manual = with-default("driver-manual", (reference, options) => {
+    require-fields(reference, options, ("author", "editor"), "title")
+    
+    (options.periods)(
+      maybe-with-date(reference, options)(
+        // TODO author+editor
+        author-editor(reference, options)
+      ),
+      (options.commas)(
+        printfield(reference, "title", options),
+        language(reference, options),
+      ),
+      byauthor(reference, options),
+      byeditor(reference, options),
+      printfield(reference, "edition", options),
+      series-number(reference, options),
+      commas(
+        printfield(reference, "type", options),
+        printfield(reference, "version", options),
+        printfield(reference, "note", options),
+      ),
+      printfield(reference, "organization", options),
+      location-publisher-date(reference, options),
+      (options.commas)(
+        chapter-pages(reference, options),
+        printfield(reference, "pagetotal", options),
+      ),
+      if options.print-isbn { printfield(reference, "isbn", options) } else { none },
+      doi-eprint-url(reference, options),
+      addendum-pubstate(reference, options)
+    )
+})
+
+// @online - An online resource
+#let driver-online = with-default("driver-online", (reference, options) => {
+    require-fields(reference, options, ("author", "editor", "translator"), "title", ("url", "doi", "eprint"))
+    
+    (options.periods)(
+      maybe-with-date(reference, options)(
+        author-editor-others-translator-others(reference, options)
+      ),
+      (options.commas)(
+        printfield(reference, "title", options),
+        language(reference, options),
+      ),
+      byauthor(reference, options),
+      byeditor-others(reference, options),
+      commas(
+        printfield(reference, "version", options),
+        printfield(reference, "note", options),
+      ),
+      printfield(reference, "organization", options),
+      printfield(reference, "date", options),
+      doi-eprint-url(reference, options),
+      addendum-pubstate(reference, options)
+
+      // TODO What typesets the urldate?
+    )
+})
+
+// @patent - A patent or patent request
+#let driver-patent = with-default("driver-patent", (reference, options) => {
+    require-fields(reference, options, "author", "title", "number")
+    
+    (options.periods)(
+      maybe-with-date(reference, options)(
+        author(reference, options)
+      ),
+      (options.commas)(
+        printfield(reference, "title", options),
+        language(reference, options),
+      ),
+      byauthor(reference, options),
+      type-number-location(reference, options), // TODO implement
+      byholder(reference, options), // TODO implement
+      printfield(reference, "note", options),
+      printfield(reference, "date", options),
+      doi-eprint-url(reference, options),
+      addendum-pubstate(reference, options)
+    )
+})
+
+// @periodical - A complete issue of a periodical
+#let driver-periodical = with-default("driver-periodical", (reference, options) => {
+    require-fields(reference, options, "editor")
+    
+    (options.periods)(
+      maybe-with-date(reference, options)(
+        editor(reference, options)
+      ),
+      (options.commas)(
+        title-issuetitle(reference, options), // TODO implement
+        language(reference, options),
+      ),
+      byeditor(reference, options),
+      printfield(reference, "note", options),
+      if options.print-isbn { printfield(reference, "issn", options) } else { none },
+      doi-eprint-url(reference, options),
+      addendum-pubstate(reference, options)
+    )
+})
+
+
+#let driver-proceedings = with-default("driver-proceedings", (reference, options) => {
+    require-fields(reference, options, "title")
+    // editor can be optional - proceedings without editors exist
+    
+    (options.periods)(
+      maybe-with-date(reference, options)(
+        editor-others(reference, options)
+      ),
+      (options.commas)(
+        maintitle-title(reference, options),
+        language(reference, options),
+      ),
+      event-venue-date(reference, options),
+      byeditor-others(reference, options),
+      (options.commas)(
+        volume-part-if-maintitle-undef(reference, options),
+        printfield(reference, "volumes", options),
+      ),
+      series-number(reference, options),
+      printfield(reference, "note", options),
+      (options.commas)(
+        printlist(reference, "organization", options),
+        publisher-location-date(reference, options)
+      ),
+      (options.commas)(
+        chapter-pages(reference, options),
+        printfield(reference, "pagetotal", options),
+      ),
+      if options.print-isbn { printfield(reference, "isbn", options) } else { none },
+      doi-eprint-url(reference, options),
+      addendum-pubstate(reference, options)
+    )
+})
+
+#let driver-report = with-default("driver-report", (reference, options) => {
+    require-fields(reference, options, "author", "title", "type", "institution")
+    
+    (options.periods)(
+      maybe-with-date(reference, options)(
+        author(reference, options)
+      ),
+      (options.commas)(
+        printfield(reference, "title", options),
+        language(reference, options),
+      ),
+      byauthor(reference, options),
+      spaces(
+        printfield(reference, "type", options),
+        printfield(reference, "number", options)
+      ),
+      (options.commas)(
+        printfield(reference, "version", options),
+        printfield(reference, "note", options),
+      ),
+      institution-location-date(reference, options),
+      (options.commas)(
+        chapter-pages(reference, options),
+        printfield(reference, "pagetotal", options),
+      ),
+      if options.print-isbn { printfield(reference, "isrn", options) } else { none },
+      doi-eprint-url(reference, options),
+      addendum-pubstate(reference, options)
+    )
+})
+
+#let driver-unpublished = with-default("driver-unpublished", (reference, options) => {
+    require-fields(reference, options, "author", "title")
+    
+    (options.periods)(
+      maybe-with-date(reference, options)(
+        author(reference, options)
+      ),
+      (options.commas)(
+        printfield(reference, "title", options),
+        language(reference, options),
+      ),
+      byauthor(reference, options),
+      printfield(reference, "howpublished", options),
+      printfield(reference, "type", options),
+      event-venue-date(reference, options),
+      printfield(reference, "note", options),
+      location-date(reference, options),
+      doi-eprint-url(reference, options),
+      addendum-pubstate(reference, options)
+    )
+})
+
+#let driver-dataset = with-default("driver-dataset", (reference, options) => {
+    require-fields(reference, options, ("author", "editor", "translator"), "title")
+    
+    (options.periods)(
+      maybe-with-date(reference, options)(
+        author-editor-others-translator-others(reference, options)
+      ),
+      (options.commas)(
+        printfield(reference, "title", options),
+        language(reference, options),
+      ),
+      byauthor(reference, options),
+      byeditor-others(reference, options),
+      (options.commas)(
+        printfield(reference, "type", options),
+        printfield(reference, "edition", options),
+        printfield(reference, "version", options),
+      ),
+      series-number(reference, options),
+      printfield(reference, "note", options),
+      (options.commas)(
+        printlist(reference, "organization", options),
+        publisher-location-date(reference, options)
+      ),
+      doi-eprint-url(reference, options),
+      addendum-pubstate(reference, options)
+    )
+})
+
+#let driver-dummy = with-default("driver-dummy", (reference, options) => {
+  // "misc" defined as catch-all driver in standard.bbx, line 752
+  driver-misc(reference, options)
+})
+
+// We only need to declare drivers for the basic Biblatex entry types;
+// the others are mapped down using the `type-aliases` mechanism in
+// format-reference (e.g. www -> online, phdthesis -> thesis(type: phd).
 #let bibliography-drivers = (
   "article": driver-article,
-  "inproceedings": driver-inproceedings,
-  "incollection": driver-incollection,
   "book": driver-book,
+  "booklet": driver-booklet,
+  "collection": driver-collection,
+  "inbook": driver-inbook,
+  "incollection": driver-incollection,
+  "inproceedings": driver-inproceedings,
+  "dataset": driver-dataset,
+  "manual": driver-manual,
   "misc": driver-misc,
-  "thesis": driver-thesis
+  "online": driver-online,
+  "patent": driver-patent,
+  "periodical": driver-periodical,
+  "proceedings": driver-proceedings,
+  "report": driver-report,
+  "thesis": driver-thesis,
+  "unpublished": driver-unpublished,
+
+  // bibliography aliases, standard.bbx lines 740 ff.
+  "mvbook": driver-book,
+  "bookinbook": driver-inbook,
+  "suppbook": driver-inbook,
+  "mvcollection": driver-collection,
+  "suppcollection": driver-incollection,
+  "mvproceedings": driver-proceedings,
+  "reference": driver-collection,
+  "mvreference": driver-collection,
+  "inreference": driver-incollection,
+  "suppperiodical": driver-article,
+  "review": driver-article,
+  "software": driver-misc
 )
 
 

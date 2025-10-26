@@ -87,8 +87,8 @@
 )
 
 
-// Map legacy Bibtex entry types to their "modern" Biblatex names.
 #let type-aliases = (
+  // Map legacy Bibtex entry types to their "modern" Biblatex names.
   "conference": reference => { reference.insert("entry_type", "inproceedings"); return reference },
   "electronic": reference => { reference.insert("entry_type", "online"); return reference },
   "www": reference => { reference.insert("entry_type", "online"); return reference },
@@ -110,9 +110,8 @@
     reference.insert("entry_type", "report")
     reference.fields.insert("type", "techreport")
     return reference
-  },
+  },  
 )
-
 
 
 #let fd(reference, field, options, format: x => x) = {

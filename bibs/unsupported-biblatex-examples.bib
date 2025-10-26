@@ -1,0 +1,501 @@
+// Throughout this file, I am using "//" to indicate comments.
+// This is not actually a valid way to comment things in Bibtex --
+// it's just for my own sanity.
+
+// This file contains those Bibtex entries from biblatex-examples.bib
+// that would currently cause examples/biblatex-stresstest.typ to crash.
+// My goal is to move them over to biblatex-examples.bib, bit by bit.
+
+@string{anch-ie = {Angew.~Chem. Int.~Ed.}}
+@string{cup     = {Cambridge University Press}}
+@string{dtv     = {Deutscher Taschenbuch-Verlag}}
+@string{hup     = {Harvard University Press}}
+@string{jams    = {J.~Amer. Math. Soc.}}
+@string{jchph   = {J.~Chem. Phys.}}
+@string{jomch   = {J.~Organomet. Chem.}}
+@string{pup     = {Princeton University Press}}
+
+// unsupported - requires crossref
+@incollection{westfahl:space,
+  author       = {Westfahl, Gary},
+  title        = {The True Frontier},
+  subtitle     = {Confronting and Avoiding the Realities of Space in {American}
+                  Science Fiction Films},
+  pages        = {55-65},
+  crossref     = {westfahl:frontier},
+  langid       = {english},
+  langidopts   = {variant=american},
+  indextitle   = {True Frontier, The},
+  annotation   = {A cross-referenced article from a \texttt{collection}. This is
+                  an \texttt{incollection} entry with a \texttt{crossref}
+                  field. Note the \texttt{subtitle} and \texttt{indextitle}
+                  fields},
+}
+
+// unsupported - set
+@set{set,
+  entryset     = {herrmann,aksin,yoon},
+  annotation   = {A \texttt{set} with three members.},
+}
+
+// unsupported - set
+@set{stdmodel,
+  entryset     = {glashow,weinberg,salam},
+  annotation   = {A \texttt{set} with three members discussing the standard
+                  model of particle physics.},
+}
+
+// unsupported - journaltitle reference causes citegeist "unreachable" error
+@article{aksin,
+  author       = {Aks{\i}n, {\"O}zge and T{\"u}rkmen, Hayati and Artok, Levent
+                  and {\c{C}}etinkaya, Bekir and Ni, Chaoying and
+                  B{\"u}y{\"u}kg{\"u}ng{\"o}r, Orhan and {\"O}zkal, Erhan},
+  title        = {Effect of immobilization on catalytic characteristics of
+                  saturated {Pd-N}-heterocyclic carbenes in {Mizoroki-Heck}
+                  reactions},
+  journaltitle = jomch,
+  date         = 2006,
+  volume       = 691,
+  number       = 13,
+  pages        = {3027-3036},
+  indextitle   = {Effect of immobilization on catalytic characteristics},
+}
+
+// unsupported - journaltitle reference causes citegeist "unreachable" error
+@article{bertram,
+  author       = {Bertram, Aaron and Wentworth, Richard},
+  title        = {Gromov invariants for holomorphic maps on {Riemann} surfaces},
+  journaltitle = jams,
+  date         = 1996,
+  volume       = 9,
+  number       = 2,
+  pages        = {529-571},
+  langid       = {english},
+  langidopts   = {variant=american},
+  shorttitle   = {Gromov invariants},
+  annotation   = {An \texttt{article} entry with a \texttt{volume} and a
+                  \texttt{number} field},
+}
+
+// unsupported - journaltitle reference causes citegeist "unreachable" error
+@article{herrmann,
+  author       = {Herrmann, Wolfgang A. and {\"O}fele, Karl and Schneider,
+                  Sabine K.  and Herdtweck, Eberhardt and Hoffmann, Stephan D.},
+  title        = {A carbocyclic carbene as an efficient catalyst ligand for {C--C}
+                  coupling reactions},
+  journaltitle = anch-ie,
+  date         = 2006,
+  volume       = 45,
+  number       = 23,
+  pages        = {3859-3862},
+  indextitle   = {Carbocyclic carbene as an efficient catalyst, A},
+}
+
+// unsupported - journaltitle reference causes citegeist "unreachable" error
+@article{kastenholz,
+  author       = {Kastenholz, M. A. and H{\"u}nenberger, Philippe H.},
+  title        = {Computation of methodology\hyphen independent ionic solvation
+                  free energies from molecular simulations},
+  journaltitle = jchph,
+  date         = 2006,
+  subtitle     = {{I}. {The} electrostatic potential in molecular liquids},
+  volume       = 124,
+  eid          = 124106,
+  doi          = {10.1063/1.2172593},
+  langid       = {english},
+  langidopts   = {variant=american},
+  indextitle   = {Computation of ionic solvation free energies},
+  annotation   = {An \texttt{article} entry with an \texttt{eid} and a
+                  \texttt{doi} field. Note that the \textsc{doi} is transformed
+                  into a clickable link if \texttt{hyperref} support has been
+                  enabled},
+  abstract     = {The computation of ionic solvation free energies from
+                  atomistic simulations is a surprisingly difficult problem that
+                  has found no satisfactory solution for more than 15 years. The
+                  reason is that the charging free energies evaluated from such
+                  simulations are affected by very large errors. One of these is
+                  related to the choice of a specific convention for summing up
+                  the contributions of solvent charges to the electrostatic
+                  potential in the ionic cavity, namely, on the basis of point
+                  charges within entire solvent molecules (M scheme) or on the
+                  basis of individual point charges (P scheme). The use of an
+                  inappropriate convention may lead to a charge-independent
+                  offset in the calculated potential, which depends on the
+                  details of the summation scheme, on the quadrupole-moment
+                  trace of the solvent molecule, and on the approximate form
+                  used to represent electrostatic interactions in the
+                  system. However, whether the M or P scheme (if any) represents
+                  the appropriate convention is still a matter of on-going
+                  debate. The goal of the present article is to settle this
+                  long-standing controversy by carefully analyzing (both
+                  analytically and numerically) the properties of the
+                  electrostatic potential in molecular liquids (and inside
+                  cavities within them).},
+}
+
+// unsupported - publisher reference causes citegeist "unreachable" error
+@book{aristotle:anima,
+  author       = {Aristotle},
+  title        = {De Anima},
+  date         = 1907,
+  editor       = {Hicks, Robert Drew},
+  publisher    = cup,
+  location     = {Cambridge},
+  keywords     = {primary},
+  langid       = {english},
+  langidopts   = {variant=british},
+  annotation   = {A \texttt{book} entry with an \texttt{author} and an
+                  \texttt{editor}},
+}
+
+// unsupported - publisher reference causes citegeist "unreachable" error
+@mvbook{aristotle:rhetoric,
+  author       = {Aristotle},
+  title        = {The Rhetoric of {Aristotle} with a commentary by the late {Edward
+                  Meredith Cope}},
+  date         = 1877,
+  editor       = {Cope, Edward Meredith},
+  commentator  = {Cope, Edward Meredith},
+  volumes      = 3,
+  publisher    = cup,
+  keywords     = {primary},
+  langid       = {english},
+  langidopts   = {variant=british},
+  sorttitle    = {Rhetoric of Aristotle},
+  indextitle   = {Rhetoric of {Aristotle}, The},
+  shorttitle   = {Rhetoric},
+  annotation   = {A commented edition. Note the concatenation of the
+                  \texttt{editor} and \texttt{commentator} fields as well as the
+                  \texttt{volumes}, \texttt{sorttitle}, and \texttt{indextitle}
+                  fields},
+}
+
+// unsupported - publisher reference causes citegeist "unreachable" error
+@mvbook{nietzsche:ksa,
+  author       = {Nietzsche, Friedrich},
+  title        = {S{\"a}mtliche Werke},
+  date         = 1988,
+  editor       = {Colli, Giorgio and Montinari, Mazzino},
+  edition      = 2,
+  volumes      = 15,
+  publisher    = dtv # { and Walter de Gruyter},
+  location     = {M{\"u}nchen and Berlin and New York},
+  langid       = {german},
+  sorttitle    = {Werke-00-000},
+  indexsorttitle= {Samtliche Werke},
+  subtitle     = {Kritische Studienausgabe},
+  annotation   = {The critical edition of Nietzsche's works. This is a
+                  \texttt{mvbook} entry referring to a 15-volume work as a
+                  whole. Note the \texttt{volumes} field and the format of the
+                  \texttt{publisher} and \texttt{location} fields in the
+                  database file. Also note the \texttt{sorttitle} and
+                  field which is used to fine-tune the
+                  sorting order of the bibliography. We want this item listed
+                  first in the bibliography},
+}
+
+
+// unsupported - publisher reference causes citegeist "unreachable" error
+@book{nietzsche:ksa1,
+  author       = {Nietzsche, Friedrich},
+  title        = {Die Geburt der Trag{\"o}die. Unzeitgem{\"a}{\ss}e
+                  Betrachtungen I--IV. Nachgelassene Schriften 1870--1973},
+  date         = 1988,
+  editor       = {Colli, Giorgio and Montinari, Mazzino},
+  maintitle    = {S{\"a}mtliche Werke},
+  mainsubtitle = {Kritische Studienausgabe},
+  volume       = 1,
+  edition      = 2,
+  publisher    = dtv # { and Walter de Gruyter},
+  location     = {M{\"u}nchen and Berlin and New York},
+  langid       = {german},
+  sorttitle    = {Werke-01-000},
+  indexsorttitle= {Samtliche Werke I},
+  bookauthor   = {Nietzsche, Friedrich},
+  indextitle   = {S{\"a}mtliche Werke I},
+  shorttitle   = {S{\"a}mtliche Werke I},
+  annotation   = {A single volume from the critical edition of Nietzsche's
+                  works. This \texttt{book} entry explicitly refers to the first
+                  volume only. Note the \texttt{title} and \texttt{maintitle}
+                  fields. Also note the \texttt{sorttitle}
+                  field. We want this entry to be listed after the entry
+                  referring to the entire edition},
+}
+
+// unsupported - publisher reference causes citegeist "unreachable" error
+@book{nussbaum,
+  author       = {Nussbaum, Martha},
+  title        = {Aristotle's \mkbibquote{De Motu Animalium}},
+  date         = 1978,
+  publisher    = pup,
+  location     = {Princeton},
+  keywords     = {secondary},
+  langid       = {english},
+  langidopts   = {variant=american},
+  sorttitle    = {Aristotle's De Motu Animalium},
+  indexsorttitle= {Aristotle's De Motu Animalium},
+  annotation   = {A \texttt{book} entry. Note the \texttt{sorttitle} and
+                  \texttt{indexsorttitle} fields and the markup of the quotes in
+                  the database file},
+}
+
+
+// BUG - bybookauthor undefined
+@inbook{kant:kpv,
+  title        = {Kritik der praktischen Vernunft},
+  date         = 1968,
+  author       = {Kant, Immanuel},
+  booktitle    = {Kritik der praktischen Vernunft. Kritik der Urtheilskraft},
+  bookauthor   = {Kant, Immanuel},
+  maintitle    = {Kants Werke. Akademie Textausgabe},
+  volume       = 5,
+  publisher    = {Walter de Gruyter},
+  location     = {Berlin},
+  pages        = {1-163},
+  shorthand    = {KpV},
+  langid       = {german},
+  shorttitle   = {Kritik der praktischen Vernunft},
+  annotation   = {An edition of Kant's \emph{Collected Works}, volume five. This
+                  is an \texttt{inbook} entry which explicitly refers to the
+                  \emph{Critique of Practical Reason} only, not to the entire
+                  fifth volume. Note the \texttt{author} and \texttt{bookauthor}
+                  fields in the database file. By default, the
+                  \texttt{bookauthor} is omitted if the values of the
+                  \texttt{author} and \texttt{bookauthor} fields are identical},
+}
+
+// BUG - bybookauthor undefined
+@inbook{kant:ku,
+  title        = {Kritik der Urtheilskraft},
+  date         = 1968,
+  author       = {Kant, Immanuel},
+  booktitle    = {Kritik der praktischen Vernunft. Kritik der Urtheilskraft},
+  bookauthor   = {Kant, Immanuel},
+  maintitle    = {Kants Werke. Akademie Textausgabe},
+  volume       = 5,
+  publisher    = {Walter de Gruyter},
+  location     = {Berlin},
+  pages        = {165-485},
+  shorthand    = {KU},
+  langid       = {german},
+  annotation   = {An edition of Kant's \emph{Collected Works}, volume five. This
+                  is an \texttt{inbook} entry which explicitly refers to the
+                  \emph{Critique of Judgment} only, not to the entire fifth
+                  volume},
+}
+
+// BUG - bybookauthor undefined
+@inbook{nietzsche:historie,
+  title        = {Unzeitgem{\"a}sse Betrachtungen. Zweites St{\"u}ck},
+  date         = 1988,
+  author       = {Nietzsche, Friedrich},
+  booktitle    = {Die Geburt der Trag{\"o}die. Unzeitgem{\"a}{\ss}e
+                  Betrachtungen I--IV. Nachgelassene Schriften 1870--1973},
+  bookauthor   = {Nietzsche, Friedrich},
+  editor       = {Colli, Giorgio and Montinari, Mazzino},
+  subtitle     = {Vom Nutzen und Nachtheil der Historie f{\"u}r das Leben},
+  maintitle    = {S{\"a}mtliche Werke},
+  mainsubtitle = {Kritische Studienausgabe},
+  volume       = 1,
+  publisher    = dtv # { and Walter de Gruyter},
+  location     = {M{\"u}nchen and Berlin and New York},
+  pages        = {243-334},
+  langid       = {german},
+  sorttitle    = {Werke-01-243},
+  indexsorttitle= {Vom Nutzen und Nachtheil der Historie fur das Leben},
+  indextitle   = {Vom Nutzen und Nachtheil der Historie f{\"u}r das Leben},
+  shorttitle   = {Vom Nutzen und Nachtheil der Historie},
+  annotation   = {A single essay from the critical edition of Nietzsche's works.
+                  This \texttt{inbook} entry explicitly refers to an essay found
+                  in the first volume. Note the \texttt{title},
+                  \texttt{booktitle}, and \texttt{maintitle} fields. Also note
+                  the \texttt{sorttitle} field. We want
+                  this entry to be listed after the entry referring to the
+                  entire first volume},
+}
+
+// unsupported - publisher reference causes citegeist "unreachable" error
+@incollection{pines,
+  author       = {Pines, Shlomo},
+  editor       = {Twersky, Isadore},
+  title        = {The Limitations of Human Knowledge According to {Al-Farabi}, {ibn
+                  Bajja}, and {Maimonides}},
+  date         = 1979,
+  booktitle    = {Studies in Medieval {Jewish} History and Literature},
+  publisher    = hup,
+  location     = {Cambridge, Mass.},
+  pages        = {82-109},
+  keywords     = {secondary},
+  langid       = {english},
+  langidopts   = {variant=american},
+  indextitle   = {Limitations of Human Knowledge According to {Al-Farabi}, {ibn
+                  Bajja}, and {Maimonides}, The},
+  shorttitle   = {Limitations of Human Knowledge},
+  annotation   = {A typical \texttt{incollection} entry. Note the
+                  \texttt{indextitle} field},
+}
+
+// unsupported - publisher reference causes citegeist "unreachable" error
+@inproceedings{moraux,
+  author       = {Moraux, Paul},
+  editor       = {Lloyd, G. E. R. and Owen, G. E. L.},
+  title        = {Le \emph{De Anima} dans la tradition gr{\`e}cque},
+  date         = 1979,
+  booktitle    = {Aristotle on Mind and the Senses},
+  subtitle     = {Quelques aspects de l'interpretation du trait{\'e}, de
+                  Theophraste {\`a} Themistius},
+  booktitleaddon= {Proceedings of the Seventh Symposium Aristotelicum},
+  eventdate    = 1975,
+  publisher    = cup,
+  location     = {Cambridge},
+  pages        = {281-324},
+  keywords     = {secondary},
+  langid       = {french},
+  indexsorttitle= {De Anima dans la tradition grecque},
+  indextitle   = {\emph{De Anima} dans la tradition gr{\`e}cque, Le},
+  shorttitle   = {\emph{De Anima} dans la tradition gr{\`e}cque},
+  annotation   = {This is a typical \texttt{inproceedings} entry. Note the
+                  \texttt{booksubtitle}, \texttt{shorttitle},
+                  \texttt{indextitle}, and \texttt{indexsorttitle} fields. Also
+                  note the \texttt{eventdate} field.},
+}
+
+
+// BUG - Could not determine labelname for bibliography key 'cms'
+@manual{cms,
+  title        = {The {Chicago} Manual of Style},
+  date         = 2003,
+  subtitle     = {The Essential Guide for Writers, Editors, and Publishers},
+  edition      = 15,
+  publisher    = {University of Chicago Press},
+  location     = {Chicago, Ill.},
+  isbn         = {0-226-10403-6},
+  label        = {CMS},
+  langid       = {english},
+  langidopts   = {variant=american},
+  sorttitle    = {Chicago Manual of Style},
+  indextitle   = {Chicago Manual of Style, The},
+  shorttitle   = {Chicago Manual of Style},
+  annotation   = {This is a \texttt{manual} entry without an \texttt{author} or
+                  \texttt{editor}. Note the \texttt{label} field in the database
+                  file which is provided for author-year citation styles. Also
+                  note the \texttt{sorttitle} and \texttt{indextitle} fields. By
+                  default, all entries without an \texttt{author} or
+                  \texttt{editor} are alphabetized by \texttt{title} but we want
+                  this entry to be alphabetized under \enquote*{C} rather than
+                  \enquote*{T}. There's also an \texttt{isbn} field},
+}
+
+// BUG - Could not determine labelname for bibliography key 'ctan'
+@online{ctan,
+  title        = {CTAN},
+  date         = 2006,
+  url          = {http://www.ctan.org},
+  subtitle     = {The {Comprehensive TeX Archive Network}},
+  urldate      = {2006-10-01},
+  label        = {CTAN},
+  langid       = {english},
+  langidopts   = {variant=american},
+  annotation   = {This is an \texttt{online} entry. The \textsc{url}, which is
+                  given in the \texttt{url} field, is transformed into a
+                  clickable link if \texttt{hyperref} support has been
+                  enabled. Note the format of the \texttt{urldate} field
+                  (\texttt{yyyy-mm-dd}) in the database file. Also note the
+                  \texttt{label} field which may be used as a fallback by
+                  citation styles which need an \texttt{author} and\slash or a
+                  \texttt{year}},
+}
+
+
+
+// BUG - type-number-location not yet implemented
+@patent{almendro,
+  author       = {Almendro, Jos{\'e} L. and Mart{\'i}n, Jacinto and S{\'a}nchez,
+                  Alberto and Nozal, Fernando},
+  title        = {Elektromagnetisches Signalhorn},
+  number       = {EU-29702195U},
+  date         = 1998,
+  location     = {countryfr and countryuk and countryde},
+  langid       = {german},
+  annotation   = {This is a \texttt{patent} entry with a \texttt{location}
+                  field. The number is given in the \texttt{number} field. Note
+                  the format of the \texttt{location} field in the database
+                  file. Compare \texttt{laufenberg}, \texttt{sorace}, and
+                  \texttt{kowalik}},
+}
+
+// BUG - type-number-location not yet implemented
+@patent{kowalik,
+  author       = {Kowalik, F. and Isard, M.},
+  title        = {Estimateur d'un d{\'e}faut de fonctionnement d'un modulateur
+                  en quadrature et {\'e}tage de modulation l'utilisant},
+  number       = 9500261,
+  date         = {1995-01-11},
+  type         = {patreqfr},
+  langid       = {french},
+  indextitle   = {Estimateur d'un d{\'e}faut de fonctionnement},
+  annotation   = {This is a \texttt{patent} entry for a French patent request
+                  with a full date. The number is given in the \texttt{number}
+                  field. Note the format of the \texttt{type} and \texttt{date}
+                  fields in the database file. Compare \texttt{almendro},
+                  \texttt{laufenberg}, and \texttt{sorace}},
+}
+
+// BUG - type-number-location not yet implemented
+@patent{laufenberg,
+  author       = {Laufenberg, Xaver and Eynius, Dominique and Suelzle, Helmut
+                  and Usbeck, Stephan and Spaeth, Matthias and Neuser-Hoffmann,
+                  Miriam and Myrzik, Christian and Schmid, Manfred and Nietfeld,
+                  Franz and Thiel, Alexander and Braun, Harald and Ebner,
+                  Norbert},
+  title        = {Elektrische Einrichtung und Betriebsverfahren},
+  number       = 1700367,
+  date         = {2006-09-13},
+  holder       = {{Robert Bosch GmbH} and {Daimler Chrysler AG} and {Bayerische
+                  Motoren Werke AG}},
+  type         = {patenteu},
+  langid       = {german},
+  annotation   = {This is a \texttt{patent} entry with a \texttt{holder} field.
+                  Note the format of the \texttt{type} and \texttt{location}
+                  fields in the database file. Compare \texttt{almendro},
+                  \texttt{sorace}, and \texttt{kowalik}},
+  abstract     = {The invention relates to an electric device comprising a
+                  generator, in particular for use in the vehicle electric
+                  system of a motor vehicle and a controller for controlling the
+                  generator voltage. The device is equipped with a control zone,
+                  in which the voltage is controlled and zones, in which the
+                  torque is controlled. The invention also relates to methods
+                  for operating a device of this type.},
+  file         = {http://v3.espacenet.com/textdoc?IDX=EP1700367},
+}
+
+// BUG - type-number-location not yet implemented
+@patent{sorace,
+  author       = {Sorace, Ronald E. and Reinhardt, Victor S. and Vaughn, Steven
+                  A.},
+  title        = {High-Speed Digital-to-{RF} Converter},
+  number       = 5668842,
+  date         = {1997-09-16},
+  holder       = {{Hughes Aircraft Company}},
+  type         = {patentus},
+  langid       = {english},
+  langidopts   = {variant=american},
+  annotation   = {This is a \texttt{patent} entry with a \texttt{holder} field.
+                  Note the format of the \texttt{type} and \texttt{date} fields
+                  in the database file. Compare \texttt{almendro},
+                  \texttt{laufenberg}, and \texttt{kowalik}},
+}
+
+// BUG - Could not determine labelname for bibliography key 'jcg'
+@periodical{jcg,
+  title        = {Computers and Graphics},
+  year         = 2011,
+  issuetitle   = {Semantic {3D} Media and Content},
+  volume       = 35,
+  number       = 4,
+  issn         = {0097-8493},
+  annotation   = {This is a \texttt{periodical} entry with an \texttt{issn}
+                  field.},
+}
+
+
