@@ -330,12 +330,37 @@
   fjoin(options.bibpagespunct, printfield(reference, "note", options), printfield(reference, "pages", options))
 })
 
+// biblatex.def url+urldate
+// In contrast to Biblatex, we distinguish two cases:
+// - If we actually print an URL, we typeset "URL (accessed on DATE)", like Biblatex.
+// - If there is an URL and we linked the title to it, we typeset "Accessed on DATE" here.
+#let url-urldate = with-default("url-urldate", (reference, options) => {
+  let urldate = fd(reference, "urldate", options)
+  let url = fd(reference, "url", options)
+
+  if url != none {
+    if options.print-url {
+      // "URL (accessed on DATE)"
+      spaces(
+        printfield(reference, "url", options),
+        (options.format-parens)(printfield(reference, "urldate", options))
+      )
+    } else if options.link-titles {
+      // "Accessed on DATE"
+      printfield(reference, "urldate", options)
+    }
+  } else {
+    none
+  }
+})
+
 // standard.bbx doi+eprint+url
 #let doi-eprint-url = with-default("doi-eprint-url", (reference, options) => {
   (options.periods)(
     if options.print-doi { printfield(reference, "doi", options) } else { none },
     if options.print-eprint { printfield(reference, "eprint", options) } else { none },
-    if options.print-url { printfield(reference, "url", options) } else { none },
+    url-urldate(reference, options)
+    // if options.print-url { printfield(reference, "url", options) } else { none },
   )
 })
 
@@ -827,8 +852,6 @@
       printfield(reference, "date", options),
       doi-eprint-url(reference, options),
       addendum-pubstate(reference, options)
-
-      // TODO What typesets the urldate?
     )
 })
 

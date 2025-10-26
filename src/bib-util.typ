@@ -128,7 +128,6 @@
   }
 }
 
-
 #let ifdef(reference, field, options, fn) = {
   let value = fd(reference, field, options)
 

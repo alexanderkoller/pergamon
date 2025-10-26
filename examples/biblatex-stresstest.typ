@@ -19,7 +19,7 @@
     print-date-after-authors: true,
     reference-label: fcite.reference-label,
     print-isbn: true,
-    print-url: true,
+    // print-url: true,
     // eval-mode: none,
     print-doi: true,
     bibstring-style: bibstring-style

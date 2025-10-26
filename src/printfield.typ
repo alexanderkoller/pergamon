@@ -222,7 +222,7 @@
   },
 
   "urldate": (value, reference, field, options, style) => {
-    options.at("format-parens")([#options.bibstring.urlseen #value])
+    spaces(options.bibstring.urlseen, value)
   },
 
   "version": (value, reference, field, options, style) => {
