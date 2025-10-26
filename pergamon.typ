@@ -450,6 +450,15 @@ will still be available, allowing you to precompute any information you find use
   caption: [Citation forms.]
 ) <fig:citation-forms>
 
+
+
+== Customizing the existing styles
+
+#unfinished[
+  TODO: Add documentation for `format-function` and `format-field` here.
+]
+
+
 = Advanced usage 
 
 #v(-1em)
@@ -980,7 +989,7 @@ The following functions may be helpful in the advanced usage and customization o
 - Greatly improved support for contributors who are not the author. 
   For instance, books that have only an editor and not an author are now
   rendered correctly.
-- Added an option to select between long and short bibstrings.
+- Added an option to choose between long and short bibstrings.
 - Fixed a number of bugs.
 
 ==== Changes in 0.4.0 (2025-10-13)
