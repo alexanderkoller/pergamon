@@ -43,7 +43,7 @@
 })
 
 
-#let date-with-extradate = with-default("date", (reference, options) => {
+#let date-with-extradate = with-default("date-with-extradate", (reference, options) => {
   epsilons(
     printfield(reference, "parsed-date", options),
     printfield(reference, "extradate", options)
