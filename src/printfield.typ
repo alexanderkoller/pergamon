@@ -239,6 +239,12 @@
     print-date(value, options)
   },
 
+  "eventdate": "parsed-eventdate",
+
+  "parsed-eventdate": (value, reference, field, options, style) => {
+    print-date(value, options)
+  },
+
   "extradate": (value, reference, field, options, style) => {
     if is-year-defined(reference) {      
       numbering("a", value+1)

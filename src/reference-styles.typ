@@ -415,13 +415,6 @@
   )
 })
 
-// TODO: "printeventdate" is referenced from event+venue+date,
-// but I can't figure out where it is defined or what it means.
-// It is _not_ the year, that comes later.
-#let print-event-date = with-default("print-event-date", (reference, options) => {
-  // printfield(reference, "year", options)
-  none
-})
 
 // standard.bbx event+venue+date
 #let event-venue-date = with-default("event-venue-date", (reference, options) => {
@@ -435,7 +428,7 @@
     format-parens(
       (options.commas)(
         printfield(reference, "venue", options),
-        print-event-date(reference, options)
+        printfield(reference, "eventdate", options)
       )
     )
   )
@@ -459,7 +452,7 @@
     fjoin(
       ":",
       printfield(reference, "location", options), // Biblatex: printlist{location}
-      printfield(reference, xxx, options)
+      if xxx != none { printfield(reference, xxx, options) } else { none }
     ),
     ifen(not options.print-date-after-authors, () => date-with-extradate(reference, options))
   )
@@ -475,6 +468,7 @@
 // standard.bbx institution+location+date
 #let institution-location-date = with-default("institution-location-date", (reference, options) => xxx-location-date(reference, options, "institution"))
 
+#let location-date = with-default("location-date", (reference, options) => xxx-location-date(reference, options, none))
 
 // chapter+pages
 #let chapter-pages = with-default("chapter-pages", (reference, options) => {

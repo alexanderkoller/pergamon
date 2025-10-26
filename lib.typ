@@ -37,7 +37,6 @@
     booktitle: booktitle,
     maintitle-booktitle: maintitle-booktitle,
     maintitle-title: maintitle-title,
-    print-event-date: print-event-date,
     event-venue-date: event-venue-date,
     volume-part-if-maintitle-undef: volume-part-if-maintitle-undef,
     series-number: series-number,
