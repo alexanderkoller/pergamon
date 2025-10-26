@@ -1,6 +1,7 @@
 #import "lib.typ": *
 
 #show link: set text(fill: blue)
+#set par(justify: true)
 #set heading(numbering: "1.1")
 
 #show heading.where(level: 1): it => block(
@@ -17,6 +18,9 @@
   let fref = format-reference(
     print-date-after-authors: true,
     reference-label: fcite.reference-label,
+    print-isbn: true,
+    print-url: true,
+    print-doi: true,
     bibstring-style: bibstring-style
   )
 

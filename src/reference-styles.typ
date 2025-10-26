@@ -63,11 +63,25 @@
 
 // biblatex.def author
 #let author = with-default("author", (reference, options) => {
-  fjoin(options.author-type-delim,
-    printfield(reference, "author", options),
-    // authors-with-year(reference, options),
-    authorstrg(reference, options)
-  )
+  if fd(reference, "author", options) != none and options.use-author {
+    fjoin(options.author-type-delim,
+      printfield(reference, "author", options),
+      authorstrg(reference, options)
+    )
+  } else {
+    none
+  }
+})
+
+
+
+// biblatex.def author/editor
+#let author-editor = with-default("author-editor", (reference, options) => {
+  if fd(reference, "author", options) != none and options.use-author {
+    author(reference, options)
+  } else {
+    editor(reference, options)
+  }
 })
 
 // biblatex.def editor+others
@@ -80,6 +94,15 @@
     none
   }
 })
+
+
+// biblatex.def editor
+#let editor = with-default("editor", (reference, options) => {
+  // TODO - I am pointing this back to editor+others for now, but we should
+  // probably disentangle the two once support for "+others" improves.
+  editor-others(reference, options)
+})
+
 
 // biblatex.def translator+others
 #let translator-others = with-default("translator-others", (reference, options) => {
@@ -181,6 +204,32 @@
   }
 })
 
+// biblatex.def periodical
+#let periodical = with-default("periodical", (reference, options) => {
+  (options.commas)(
+    (options.format-issuetitle)(
+      fjoin(options.subtitlepunct,
+        printfield(reference, "title", options, style: "titlecase"),
+        printfield(reference, "subtitle", options, style: "titlecase")
+      )
+    ),
+    printfield(reference, "titleaddon", options)
+  )
+})
+
+// standard.bbx title+issuetitle
+#let title-issuetitle = with-default("title-issuetitle", (reference, options) => {
+  spaces(
+    (options.commas)(
+      periodical(reference, options),
+      printfield(reference, "series", options)
+    ),
+    volume-number-eid(reference, options),
+    issue-date(reference, options),
+    issue(reference, options)
+  )
+})
+
 // biblatex.def withothers
 #let withothers = with-default("withothers", (reference, options) => {
   (options.periods)(
@@ -264,6 +313,17 @@
 #let bybookauthor = with-default("bybookauthor", (reference, options) => byauthor(reference, options))
 
 #let byholder = with-default("byholder", (reference, options) => printfield(reference, "holder", options))
+
+#let byeditor = with-default("byeditor", (reference, options) => {
+  if fd(reference, "editor", options) != none and options.use-editor and reference.fields.labelnamesource != "editor" {
+    let name = printfield(reference, "editor", options)
+    // TODO use \usebibmacro{bytypestrg}{editor}{editor}, not bibstring.byeditor
+    spaces(options.bibstring.byeditor, name)
+  } else {
+    // TODO fall back to editorx
+    none
+  }
+})
 
 // standard.bbx note+pages
 #let note-pages = with-default("note-pages", (reference, options) => {
@@ -427,27 +487,11 @@
 
 // biblatex.def author/editor+others/translator+others
 #let author-editor-others-translator-others = with-default("author-editor-others-translator-others", (reference, options) => {
-  // TODO: implement the "useauthor" option
   first-of(
     author(reference, options),
     editor-others(reference, options),
     translator-others(reference, options)
   )
-
-// \newbibmacro*{author/editor+others/translator+others}{%
-//   \ifboolexpr{
-//     test \ifuseauthor
-//     and
-//     not test {\ifnameundef{author}}
-//   }
-//     {\usebibmacro{author}}
-//     {\ifboolexpr{
-//        test \ifuseeditor
-//        and
-//        not test {\ifnameundef{editor}}
-//      }
-//        {\usebibmacro{editor+others}}
-//        {\usebibmacro{translator+others}}}}
 })
 
 // Panic if one of the specified fields is missing.
@@ -475,6 +519,13 @@
   }
 }
 
+#let title-with-language = with-default("title-with-language", (reference, options) => {
+  (options.periods)(
+    printfield(reference, "title", options),
+    printfield(reference, "language", options)
+  )
+})
+
 
 #let driver-article = with-default("driver-article", (reference, options) => {
     require-fields(reference, options, "author", "title", "journaltitle")
@@ -486,10 +537,7 @@
       maybe-with-date(reference, options)(
         author-translator-others(reference, options)
       ),
-      (options.commas)(
-        printfield(reference, "title", options),
-        language(reference, options),
-      ),
+      title-with-language(reference, options),
       byauthor(reference, options),
       bytranslator-others(reference, options),
       printfield(reference, "version", options),
@@ -521,10 +569,7 @@
     maybe-with-date(reference, options)(
       author-translator-others(reference, options)
     ),
-    (options.commas)(
-      printfield(reference, "title", options),
-      language(reference, options),
-    ),
+    title-with-language(reference, options),
     byauthor(reference, options),
     spaces(options.bibstring.in, maintitle-booktitle(reference, options)),
     event-venue-date(reference, options),
@@ -554,10 +599,7 @@
     maybe-with-date(reference, options)(
       author-translator-others(reference, options)
     ),
-    (options.commas)(
-      printfield(reference, "title", options),
-      language(reference, options),
-    ),
+    title-with-language(reference, options),
     byauthor(reference, options),
     spaces(options.bibstring.in, maintitle-booktitle(reference, options)),
     byeditor-others(reference, options),
@@ -586,10 +628,7 @@
     maybe-with-date(reference, options)(
       author-editor-others-translator-others(reference, options)
     ),
-    (options.commas)(
-      maintitle-title(reference, options),
-      language(reference, options),
-    ),
+    title-with-language(reference, options),
     byauthor(reference, options),
     byeditor-others(reference, options),
     (options.commas)(
@@ -619,10 +658,7 @@
     maybe-with-date(reference, options)(
       author-editor-others-translator-others(reference, options)
     ),
-    (options.commas)(
-      printfield(reference, "title", options),
-      language(reference, options),
-    ),
+    title-with-language(reference, options),
     byauthor(reference, options),
     byeditor-others(reference, options),
     printfield(reference, "howpublished", options),
@@ -647,10 +683,7 @@
     maybe-with-date(reference, options)(
       author(reference, options)
     ),
-    (options.commas)(
-      printfield(reference, "title", options),
-      language(reference, options),
-    ),
+    title-with-language(reference, options),
     byauthor(reference, options),
     printfield(reference, "note", options),
     (options.commas)(
@@ -679,10 +712,7 @@
       maybe-with-date(reference, options)(
         author-editor-others-translator-others(reference, options),
       ),
-      (options.commas)(
-        printfield(reference, "title", options),
-        language(reference, options),
-      ),
+      title-with-language(reference, options),
       byauthor(reference, options),
       byeditor-others(reference, options),
       printfield(reference, "howpublished", options),
@@ -704,10 +734,7 @@
     maybe-with-date(reference, options)(
       editor-others(reference, options)
     ),
-    (options.commas)(
-      maintitle-title(reference, options),
-      language(reference, options),
-    ),
+    title-with-language(reference, options),
     byeditor-others(reference, options),
     (options.commas)(
       printfield(reference, "edition", options),
@@ -735,10 +762,7 @@
       maybe-with-date(reference, options)(
         author-translator-others(reference, options)
       ),
-      (options.commas)(
-        printfield(reference, "title", options),
-        language(reference, options),
-      ),
+      title-with-language(reference, options),
       byauthor(reference, options),
       (options.periods)( // TODO periods makes no sense here
         spaces(options.bibstring.in, bybookauthor(reference, options)),
@@ -766,13 +790,9 @@
     
     (options.periods)(
       maybe-with-date(reference, options)(
-        // TODO author+editor
         author-editor(reference, options)
       ),
-      (options.commas)(
-        printfield(reference, "title", options),
-        language(reference, options),
-      ),
+      title-with-language(reference, options),
       byauthor(reference, options),
       byeditor(reference, options),
       printfield(reference, "edition", options),
@@ -802,10 +822,7 @@
       maybe-with-date(reference, options)(
         author-editor-others-translator-others(reference, options)
       ),
-      (options.commas)(
-        printfield(reference, "title", options),
-        language(reference, options),
-      ),
+      title-with-language(reference, options),
       byauthor(reference, options),
       byeditor-others(reference, options),
       (options.commas)(
@@ -829,10 +846,7 @@
       maybe-with-date(reference, options)(
         author(reference, options)
       ),
-      (options.commas)(
-        printfield(reference, "title", options),
-        language(reference, options),
-      ),
+      title-with-language(reference, options),
       byauthor(reference, options),
       type-number-location(reference, options),
       byholder(reference, options),
@@ -851,8 +865,8 @@
       maybe-with-date(reference, options)(
         editor(reference, options)
       ),
-      (options.commas)(
-        title-issuetitle(reference, options), // TODO implement
+      (options.periods)(
+        title-issuetitle(reference, options),
         language(reference, options),
       ),
       byeditor(reference, options),
@@ -872,10 +886,7 @@
       maybe-with-date(reference, options)(
         editor-others(reference, options)
       ),
-      (options.commas)(
-        maintitle-title(reference, options),
-        language(reference, options),
-      ),
+      title-with-language(reference, options),
       event-venue-date(reference, options),
       byeditor-others(reference, options),
       (options.commas)(
@@ -905,10 +916,7 @@
       maybe-with-date(reference, options)(
         author(reference, options)
       ),
-      (options.commas)(
-        printfield(reference, "title", options),
-        language(reference, options),
-      ),
+      title-with-language(reference, options),
       byauthor(reference, options),
       spaces(
         printfield(reference, "type", options),
@@ -936,10 +944,7 @@
       maybe-with-date(reference, options)(
         author(reference, options)
       ),
-      (options.commas)(
-        printfield(reference, "title", options),
-        language(reference, options),
-      ),
+      title-with-language(reference, options),
       byauthor(reference, options),
       printfield(reference, "howpublished", options),
       printfield(reference, "type", options),
@@ -958,21 +963,18 @@
       maybe-with-date(reference, options)(
         author-editor-others-translator-others(reference, options)
       ),
-      (options.commas)(
-        printfield(reference, "title", options),
-        language(reference, options),
-      ),
+      title-with-language(reference, options),
       byauthor(reference, options),
       byeditor-others(reference, options),
-      (options.commas)(
-        printfield(reference, "type", options),
-        printfield(reference, "edition", options),
-        printfield(reference, "version", options),
-      ),
+      // type/edition/version are separated by \newunit in the Biblatex source,
+      // but they are separated by periods in the actual Biblatex output - not sure why
+      printfield(reference, "type", options),
+      printfield(reference, "edition", options),
+      printfield(reference, "version", options),
       series-number(reference, options),
       printfield(reference, "note", options),
       (options.commas)(
-        printlist(reference, "organization", options),
+        printfield(reference, "organization", options),
         publisher-location-date(reference, options)
       ),
       doi-eprint-url(reference, options),

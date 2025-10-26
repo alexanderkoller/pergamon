@@ -971,6 +971,8 @@ The following functions may be helpful in the advanced usage and customization o
 = Changelog
 
 ==== Changes in 0.5.0
+- Implemented the complete set of entry types in Biblatex.
+- Languages and countries are now rendered correctly through bibstrings.
 - Introduced the `format-function` argument, which allows flexible control
   over how #pergamon formats larger blocks of references. This permits
   far-reaching modifications of the standard reference style, without

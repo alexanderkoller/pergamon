@@ -141,15 +141,15 @@
   },
 
   "issn": (value, reference, field, options, style) => {
-    spaces("ISSN", value)
+    spaces("ISSN:", value)
   },
 
   "isbn": (value, reference, field, options, style) => {
-    spaces("ISBN", value)
+    spaces("ISBN:", value)
   },
 
   "isrn": (value, reference, field, options, style) => {
-    spaces("ISRN", value)
+    spaces("ISRN:", value)
   },
 
   "pages": (value, reference, field, options, style) => {
