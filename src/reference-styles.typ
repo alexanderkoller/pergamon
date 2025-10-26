@@ -192,13 +192,29 @@
   )
 })
 
+#let render-origlanguage(reference, bibstring-id, options) = {
+  let origlanguage = fd(reference, "origlanguage", options)
+  let value = options.bibstring.at(bibstring-id)
+
+  if origlanguage == none {
+    // no origlanguage defined in bib entry => delete the <fromlang> string
+    value.replace("<fromlang> ", "")
+  } else {
+    // otherwise, expand <fromlang> into the actual origlanguages
+    let language-list = origlanguage.split(regex("\s+and\s+")).map({ id => options.bibstring.at("from" + id, default: "from the " + id) })
+    value.replace("<fromlang>", concatenate-names(language-list, options: options, maxnames: 99))
+  }
+}
+
+
 // "Translated by X"
 // biblatex.def bytranslator+others
 #let bytranslator-others = with-default("bytranslator-others", (reference, options) => {
   let translator = {
     if fd(reference, "translator", (:)) != none and options.use-translator and reference.fields.labelnamesource != "translator" {
       let translatorname = printfield(reference, "translator", options)
-      spaces(options.bibstring.bytranslator, translatorname)
+      let by-string = render-origlanguage(reference, "bytranslator", options)
+      spaces(by-string, translatorname)
       // TODO bibstring.byeditor should be expanded as in byeditor+othersstrg
     }
   }
