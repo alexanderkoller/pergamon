@@ -47,10 +47,12 @@
 
   /// Maximum number of names that is displayed before the name list is truncated
   /// with "et al." See the `maxnames` parameter in @format-reference for details.
+  /// -> int
   maxnames: 2, 
 
   /// Minimum number of names that is guaranteed to be displayed. See the `minnames`
   /// parameter in @format-reference for details.
+  /// -> int
   minnames: 1
   ) = {
   let etal = names.len() > maxnames and names.len() > minnames // print "et al.", at least one name dropped

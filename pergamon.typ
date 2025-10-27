@@ -977,6 +977,66 @@ The following functions may be helpful in the advanced usage and customization o
 #tidy.show-module(x, style: tidy.styles.default, show-outline: false)
 
 
+= Differences from #biblatex
+
+I call #pergamon "#biblatex _inspired_" because #biblatex is a huge library, and I will probably never
+manage to achieve full feature parity with #biblatex. Nonetheless, #pergamon covers a large part of the 
+functionality and configurability of #biblatex, and the feature gap closes with each release.
+
+To get a sense of where we stand with respect to supporting #biblatex features, you can have a look
+at #link("biblatex-stresstest.typ")[https://github.com/alexanderkoller/pergamon/blob/main/examples/biblatex-stresstest.typ].
+It renders the #link("biblatex-examples.bib")[https://github.com/plk/biblatex/blob/dev/bibtex/bib/biblatex/biblatex-examples.bib]
+from the official #biblatex Github repository, augmented with examples for a few additional entry types.
+You can compare:
+
+
+// #v(-1em)
+== String declarations in #bibtex files 
+
+#pergamon supports `@string` declarations in #bibtex files, but it requires that you use
+a slightly different syntax than in standard #biblatex. 
+
+In #biblatex, you declare strings as follows:
+
+#zebraw(lang: false,
+```bibtex
+@string{anch-ie = {Angew.~Chem. Int.~Ed.}}
+@string{cup     = {Cambridge University Press}}
+@string{dtv     = {Deutscher Taschenbuch-Verlag}}
+```
+)
+
+By contrast, declare them as follows in #pergamon:
+
+#zebraw(lang: false,
+```bibtex
+@string{
+  anch-ie = {Angew.~Chem. Int.~Ed.},
+  cup     = {Cambridge University Press},
+  dtv     = {Deutscher Taschenbuch-Verlag},
+}
+```)
+
+This is because #pergamon uses the #link("https://github.com/typst/biblatex")[Typst Biblatex crate]
+to parse #bibtex files, and that crate requires the syntax variant.
+
+
+
+== Known limitations
+
+- #pergamon supports `year` and `date` declarations. However, it currently does not support
+  approximate dates (#issue(56)), negative years (#issue(57)), date ranges (#issue(55)),
+  or non-numeric years (#issue(111)).
+- #pergamon supports the `author`, `editor`, and `translator` fields, but there is currently
+  no support for `editora` and similar fields (#issue(104)). Furthermore, when the same
+  person has multiple roles, these are printed separately and not aggregated (#issue(103)).
+- #pergamon currently requires all #bibtex entries to specify an author, editor, or
+  translator; there is no support for the `label` or `shorthand` fields (#issue(115)).
+- It is a known bug that #pergamon does not automatically uppercase words at the beginning
+  of a sentences (#issue(95)).
+- `set`, `crossref`, `related`, and `pageref` are not yet supported.
+
+
 = Changelog
 
 ==== Changes in 0.5.0
