@@ -984,10 +984,17 @@ manage to achieve full feature parity with #biblatex. Nonetheless, #pergamon cov
 functionality and configurability of #biblatex, and the feature gap closes with each release.
 
 To get a sense of where we stand with respect to supporting #biblatex features, you can have a look
-at #link("biblatex-stresstest.typ")[https://github.com/alexanderkoller/pergamon/blob/main/examples/biblatex-stresstest.typ].
-It renders the #link("biblatex-examples.bib")[https://github.com/plk/biblatex/blob/dev/bibtex/bib/biblatex/biblatex-examples.bib]
+at #link("https://github.com/alexanderkoller/pergamon/blob/main/examples/biblatex-stresstest.typ")[biblatex-stresstest.typ].
+It renders the #link("https://github.com/plk/biblatex/blob/dev/bibtex/bib/biblatex/biblatex-examples.bib")[biblatex-examples.bib]
 from the official #biblatex Github repository, augmented with examples for a few additional entry types.
 You can compare:
+
+- #link("https://github.com/alexanderkoller/pergamon/blob/main/examples/biblatex-stresstest.pdf")[biblatex-stresstest.pdf], the
+  result of compiling biblatex-stresstest.typ with Typst (i.e. the bibliography as rendered by #pergamon);
+- #link("https://github.com/alexanderkoller/pergamon/blob/main/examples/stresstest-compiled-with-biblatex.pdf")[stresstest-compiled-with-biblatex.pdf],
+  the result of rendering the same bibliography with #biblatex (using #link("https://github.com/alexanderkoller/pergamon/blob/main/biblatex-playground/stresstest-compiled-with-biblatex.tex")[this tex file]).
+
+Note that a handful of bib entries cause #pergamon to crash; these are in #link("https://github.com/alexanderkoller/pergamon/blob/main/bibs/unsupported-biblatex-examples.bib")[unsupported-biblatex-examples]. These all involve the use of `crossref`, `set`, or `label` in bib entries without authors or editors.
 
 
 // #v(-1em)
@@ -1033,7 +1040,10 @@ to parse #bibtex files, and that crate requires the syntax variant.
 - #pergamon currently requires all #bibtex entries to specify an author, editor, or
   translator; there is no support for the `label` or `shorthand` fields (#issue(115)).
 - It is a known bug that #pergamon does not automatically uppercase words at the beginning
-  of a sentences (#issue(95)).
+  of a sentence (#issue(95)).
+- The _numeric_ citation style in #pergamon does not automatically continue its numbering
+  across multiple bibliographies in the same refsection, as #biblatex does with the `defernumbers`
+  option. I am working on this feature under #issue(86).
 - `set`, `crossref`, `related`, and `pageref` are not yet supported.
 
 
