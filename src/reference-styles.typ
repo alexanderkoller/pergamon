@@ -1252,7 +1252,29 @@
     /// -> dictionary
     format-fields: (:),
 
-    /// #todo[DOCUMENT ME]
+    /// Overrides the way that the complex formatting in the reference style
+    /// is handled. 
+    /// 
+    /// The default #pergamon reference style relies on a variety
+    /// of functions with signature `(reference, options) → content` to render
+    /// pieces of the reference in the bibliography. For instance, the function
+    /// `driver-article` typesets a #bibtex entry of type `article`.
+    /// 
+    /// By passing a dictionary
+    /// with an entry `function-name: function` in this parameter, you can
+    /// override the default implementations of these formatting functions.
+    /// To find the function names that can be overriden, look for functions
+    /// that start with `with-default` in #link("https://github.com/alexanderkoller/pergamon/blob/main/src/reference-styles.typ")[reference-styles.typ].
+    /// 
+    /// The `format-functions` parameter allows you to deeply customize the
+    /// way #pergamon displays references, without having to implement your
+    /// own reference style from scratch. It applies to larger spans of
+    /// content in the references -- in contrast to `format-fields`, which
+    /// affects the formatting of individual #bibtex fields. 
+    /// See @sec:customizing-style for examples.
+    /// 
+    /// -> dictionary
+    /// 
     format-functions: (:),
   
     /// Wraps text in round brackets. The argument needs to be a function

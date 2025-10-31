@@ -701,7 +701,22 @@
         "sortname",
         "translator"),
 
-    /// #todo[DOCUMENT ME -- cf Biblatex DeclareLabelname]
+    /// #bibtex fields that will be considered when determining the entry's labelname.
+    /// The labelname is the field that will be used when generating the labels for
+    /// the _authoryear_ and _alphabetic_ citation styles. Labelnames are computed as follows:
+    /// 
+    /// - If the #bibtex entry specified a field with the name `labelnamefield`, then the
+    ///   #bibtex field specified under `labelnamefield` is used.
+    /// - Otherwise, the first field name in `labelname-fields` that is defined in the
+    ///   #bibtex entry is used.
+    /// - If none of these fields is defined, #pergamon will throw an error.
+    ///   
+    /// In either of these cases, the name of the #bibtex field from which the labelname
+    /// is taken is stored in the #bibtex field `labelnamesource`.
+    /// 
+    /// #pergamon assumes that the labelname field contains a list of names.
+    /// 
+    /// -> array
     labelname-fields: (
       "shortauthor",
       "author",

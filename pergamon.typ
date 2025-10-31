@@ -2,6 +2,7 @@
 #import "@preview/datify:0.1.4": custom-date-format
 #import "@preview/zebraw:0.5.5": *
 #import "lib.typ": * // current version of Pergamon
+#let dev = pergamon-dev
 
 #let darkblue = blue.darken(20%)
 #show link: set text(fill: darkblue)
@@ -377,10 +378,98 @@ to the other citation styles; they will simply ignore them.
 
 
 
-== Implementing custom styles 
+== Customizing the reference style
+<sec:customizing-style>
+
+You can deeply customize how the default reference style in #pergamon typesets the individual references.
+The default style defines a variety of functions in #link("https://github.com/alexanderkoller/pergamon/blob/main/src/reference-styles.typ")[reference-styles.typ]
+ that typeset pieces of the reference; for instance,
+the function `journal-issue-title` displays the title and issue of a journal and connects them correctly with
+commas and periods. At the extreme end of the spectrum, the function `driver-X` renders a complete
+#bibtex entry of type `X` (e.g. `driver-article` renders journal article references).
+You can use the parameter `format-functions` in `format-reference` (see @sec:package:builtin-reference) to override 
+these formatting functions.
+
+
+
+#figure(
+  box(stroke: 1pt, inset: 6pt)[
+    #set align(left)
+    #let style = format-citation-authoryear()
+
+    #refsection(format-citation: style.format-citation)[
+      ... some text here ... #cite("bender20:_climb_nlu")
+      #v(-1em)
+
+      #print-bibliography(
+       format-reference: format-reference(
+          reference-label: style.reference-label,
+          print-date-after-authors: true,
+          format-functions: (
+            "maybe-with-date": (reference, options) => {
+              name => {
+                periods(
+                  name,
+                  (dev.date-with-extradate)(reference, options)
+                )
+              }
+            },
+          )
+       ), 
+       outlined: false,
+       label-generator: style.label-generator
+      )
+    ]
+  ],
+  placement: top,
+  caption: [Bibliography with modified format-functions.]
+) <fig:example-acl>
+
+
+An example is shown in @fig:example-acl; this reference style replicates that of the #link("https://www.aclweb.org/portal/acl")[ACL conferences],
+which typesets the year after the author, separated by periods. To achieve this format, you can override the formatting function `maybe-with-date`
+as shown below:
+
+#zebraw(lang: false,
+```typ
+#import "@preview/pergamon:0.5.0": *
+#let dev = pergamon-dev
+
+#print-bibliography(
+  format-reference: format-reference(
+    reference-label: style.reference-label,
+    print-date-after-authors: true,
+    format-functions: (
+      "maybe-with-date": (reference, options) => {
+        name => {
+          periods(
+            name,
+            (dev.date-with-extradate)(reference, options)
+      )}},
+  )), 
+  label-generator: style.label-generator
+)
+```)
+
+This is actually one of the more complex formatting functions. Like all formatting functions, it takes the `reference` and the usual 
+`options` as argument. However, most other formatting functions just return some Typst content. By contrast, the drivers for the
+entry types call `maybe-with-date` as a function that takes the rendered author name as input and returns content. By default,
+`maybe-with-date` attaches the year and extradate to the author name, separated by parentheses, if the option `print-date-after-authors` 
+is specified. The code above replaces this default implementation of `maybe-with-date` with a function that takes the author name as 
+argument and attaches the date and extradate with a period. The drivers for the entry types will now call this function instead of 
+the default one.
+
+The formatting functions that can be overridden are exactly those that start with `with-default` in #link("https://github.com/alexanderkoller/pergamon/blob/main/src/reference-styles.typ")[reference-styles.typ]. That file will also give you hints on which formatting function you have to override for the effect you want.
+You can access the other formatting functions through the dictionary `pergamon-dev`, which you can access after importing #pergamon
+(see the code above). 
+
+
+
+== Implementing your own styles from scratch 
 <sec:custom-styles>
 
-Instead of using the builtin styles, you can also define your own #bibtypst style
+If the customization options of the `format-functions` parameter are not enough for you,
+you can also define your own #bibtypst style
 -- either a reference style or a citation style or both. It is recommended to look at the
 default styles in #link("https://github.com/alexanderkoller/pergamon/blob/main/src/citation-styles.typ")[citation-styles.typ]
 and #link("https://github.com/alexanderkoller/pergamon/blob/main/src/reference-styles.typ")[reference-styles.typ]
@@ -451,12 +540,6 @@ will still be available, allowing you to precompute any information you find use
 ) <fig:citation-forms>
 
 
-
-== Customizing the existing styles
-
-#unfinished[
-  TODO: Add documentation for `format-function` and `format-field` here.
-]
 
 
 = Advanced usage 
