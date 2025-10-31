@@ -1132,7 +1132,7 @@ to parse #bibtex files, and that crate requires the syntax variant.
 
 = Changelog
 
-==== Changes in 0.5.0
+==== Changes in 0.5.0 (2025-10-31)
 - Implemented the complete set of entry types in Biblatex.
 - Languages and countries are now rendered correctly through bibstrings.
 - Introduced the `format-function` argument, which allows flexible control
