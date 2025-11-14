@@ -200,22 +200,12 @@ and then we will sketch how to define your own custom styles.
 == Builtin reference style
 <sec:builtin-reference>
 
-The builtin reference style is defined by the `format-reference` function. This reference style aims to replicate the
-builtin reference style of #biblatex, but note that not all features of #biblatex are implemented at this point.
+The builtin reference style is defined by the `format-reference` function. This reference style aims to replicate
+the default style of #biblatex.
 
-The builtin reference style can currently render the following #biblatex entry types:
-
-- `@article`
-- `@book`
-- `@incollection`
-- `@inproceedings`
-- `@misc`
-- `@thesis`
-
+The builtin reference style can currently render all #biblatex entry types (article, inproceedings, etc.) except for `set`.
 These are explained in more detail in Section 2.1.1 of the #link("https://ctan.org/pkg/biblatex")[#biblatex documentation].
-#bibtex entries of a different type are typeset as a references in a dummy format which displays the entry type and #bibtex key.
-The aim is to eventually support all #biblatex styles; see #issue(1) to track the progress, and feel free to submit pull requests
-implementing them.
+Entry type aliases are resolved as in #biblatex (e.g. `software` to `misc`).
 
 
 #figure(

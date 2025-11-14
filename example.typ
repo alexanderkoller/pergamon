@@ -1,5 +1,5 @@
 
-#import "@preview/pergamon:0.3.2": *
+#import "@local/pergamon:0.5.0": *
 
 
 // In this example document, we are putting the whole bibliography source
