@@ -38,6 +38,10 @@ if [[ "$2" == "--update-readme" ]]; then
     echo "Updating README to version $VERSION."
     sed -i '.bak' -e "s/pergamon-.*.pdf/pergamon-$VERSION.pdf/" -e "s/preview\/pergamon:[^\"]*/preview\/pergamon:$VERSION/" README.md
 
+    # Update version in example.typ
+    echo "Updating example.typ to version $VERSION."
+    sed -i '.bak' -e "s/preview\/pergamon:[^\"]*/preview\/pergamon:$VERSION/" example.typ
+
     # Use this opportunity to ensure the current docs are staged
     git add $DOCS_DIR/pergamon-$VERSION.pdf
 fi
