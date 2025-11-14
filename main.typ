@@ -34,7 +34,10 @@
   format-quotes: it => it,
   print-identifiers: ("doi", "url"),
   // print-doi: true,
-  suppress-fields: ("*": ("month", "day",)),
+  suppress-fields: (
+    "*": ("month", "day",),
+    "inproceedings": ("editor", "publisher", "pages", "location")
+  ),
   eval-scope: ("todo": x => text(fill: red, x)),
   // suppress-fields: ("*": ("pages",), "inproceedings": ("editor", "publisher") ),
   // additional-fields: ("award",)

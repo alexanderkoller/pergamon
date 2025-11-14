@@ -260,7 +260,7 @@
 // biblatex.def bytranslator+others
 #let bytranslator-others = with-default("bytranslator-others", (reference, options) => {
   let translator = {
-    if fd(reference, "translator", (:)) != none and options.use-translator and reference.fields.labelnamesource != "translator" {
+    if fd(reference, "translator", options) != none and options.use-translator and reference.fields.labelnamesource != "translator" {
       let translatorname = printfield(reference, "translator", options)
       let by-string = render-origlanguage(reference, "bytranslator", options)
       spaces(by-string, translatorname)
@@ -278,7 +278,7 @@
 // biblatex.def byeditor+others
 #let byeditor-others = with-default("byeditor-others", (reference, options) => {
   let editor = {
-    if fd(reference, "editor", (:)) != none and options.use-editor and reference.fields.labelnamesource != "editor" {
+    if fd(reference, "editor", options) != none and options.use-editor and reference.fields.labelnamesource != "editor" {
       let editorname = printfield(reference, "editor", options)
       spaces(options.bibstring.byeditor, editorname)
       // TODO bibstring.byeditor should be expanded as in byeditor+othersstrg
@@ -296,7 +296,7 @@
 // biblatex.def byauthor
 #let byauthor = with-default("byauthor", (reference, options) => {
   let author = {
-    if fd(reference, "author", (:)) != none and options.use-author and reference.fields.labelnamesource != "author" {
+    if fd(reference, "author", options) != none and options.use-author and reference.fields.labelnamesource != "author" {
       let name = printfield(reference, "author", options)
       spaces(options.bibstring.byauthor, name)
       // TODO bibstring.byeditor should be expanded as in byeditor+othersstrg
