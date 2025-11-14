@@ -12,6 +12,10 @@
 #let refsection-id = state("refsection-id", none)
 #let refsection-counter = state("refsection-counter", 0)
 
+#let pergamon-start-index = state("pergamon-start-index", 0)
+
+
+
 /// Parses #bibtex references and makes them available to #bibtypst.
 /// Due to architectural limitations in Typst, #bibtypst cannot read 
 /// #bibtex from a file. You will therefore typically call `read` yourself, like this:
@@ -211,6 +215,9 @@
   if format-citation != auto {
     current-citation-formatter.update(it => format-citation)
   }
+
+  // reset the reference counter
+  pergamon-start-index.update(_ => 0)
 
   // [!Refsection counter is  #context { refsection-counter.get() }! ]
 
@@ -742,7 +749,8 @@
     resume-after: 0
   ) = context {
 
-  let start-index = resume-after
+  // let start-index = resume-after
+  let start-index = pergamon-start-index.get()
   let bib = bibliography.get()
   let refsection-id-here = refsection-id.get()
 
@@ -778,12 +786,12 @@
   bibl-unsorted = bibl-unsorted.filter(filter)
   let sorted = label-sort-deduplicate(bibl-unsorted, label-generator, sorting-function, start-index)
   let n = sorted.len()
-  let formatted-references = sorted.enumerate(start: start-index).map(it => format-reference(it.at(0), it.at(1)))   // TODOC
+  let formatted-references = sorted.enumerate(start: start-index).map(it => format-reference(it.at(0), it.at(1)))
   // -> array(array(content))
   let num-columns = if formatted-references.len() == 0 { 0 } else { formatted-references.at(0).len() }
   let cells = ()
 
-  // pergamon-start-index.update(start-index + bibl-unsorted.len())
+  pergamon-start-index.update(old => old + 1) // !!! TODO !!! This should be old + n, but won't converge.
 
   // collect cells
   for index in range(sorted.len()) {

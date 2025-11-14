@@ -1,5 +1,6 @@
 
-#import "@preview/pergamon:0.5.0": *
+// #import "@preview/pergamon:0.5.0": *
+#import "lib.typ": *
 
 
 // In this example document, we are putting the whole bibliography source
@@ -129,8 +130,18 @@
 
   #print-bibliography(
     format-reference: format-reference(reference-label: style2.reference-label),
-    label-generator: style2.label-generator
+    label-generator: style2.label-generator,
+    title: [References (only books)],
+    filter: reference => reference.entry_type == "book"
   )
+
+  #print-bibliography(
+    format-reference: format-reference(reference-label: style2.reference-label),
+    label-generator: style2.label-generator,
+    title: [References (everything else)],
+    filter: reference => reference.entry_type != "book"
+  )
+
 ]
 
 
