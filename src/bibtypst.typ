@@ -731,7 +731,13 @@
     /// second bibliography is zero-based). The only default citation style that cares
     /// about indices is _numeric_.
     /// 
-    /// #todo[DOCUMENT AUTO]
+    /// If you have
+    /// multiple calls to `print-bibliography` within the same `refsection`, 
+    /// you can pass `auto` to `resume-after` to seamlessly continue the numbering
+    /// across bibliographies within the same refsection. Note that this requires
+    /// slightly complex state management, and using the `auto` argument will
+    /// require Typst to perform four iterations to make the layout converge
+    /// (rather than three for other uses of Pergamon).
     /// 
     /// -> int | auto
     resume-after: 0
