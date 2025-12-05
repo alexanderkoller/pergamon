@@ -1114,13 +1114,15 @@ to parse #bibtex files, and that crate requires the syntax variant.
   translator; there is no support for the `label` or `shorthand` fields (#issue(115)).
 - It is a known bug that #pergamon does not automatically uppercase words at the beginning
   of a sentence (#issue(95)).
-- The _numeric_ citation style in #pergamon does not automatically continue its numbering
-  across multiple bibliographies in the same refsection, as #biblatex does with the `defernumbers`
-  option. I am working on this feature under #issue(86).
 - `set`, `crossref`, `related`, and `pageref` are not yet supported.
 
 
 = Changelog
+
+==== Changes in 0.6.0 (2025-12-06)
+- Reduced the number of iterations until layout convergence from five to three.
+- Added the `resume-after: auto` parameter to support continuous numbering of references across bibliographies.
+- Fixed a number of bugs.
 
 ==== Changes in 0.5.0 (2025-10-31)
 - Implemented the complete set of entry types in Biblatex.
