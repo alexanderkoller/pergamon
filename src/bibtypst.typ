@@ -11,6 +11,8 @@
 
 #let refsection-id = state("refsection-id", "ref")
 
+#let rendered-citation-count = state("rendered-citation-count", 0)
+
 /// Parses #bibtex references and makes them available to #bibtypst.
 /// Due to architectural limitations in Typst, #bibtypst cannot read 
 /// #bibtex from a file. You will therefore typically call `read` yourself, like this:
@@ -200,6 +202,9 @@
 
   // reset the keys that are cited in this section
   reference-collection.update((:))
+
+  // reset the count of rendered citations to zero
+  rendered-citation-count.update(0)
 
   // update the citation formatter if one was specified
   if format-citation != auto {
@@ -726,11 +731,13 @@
     /// second bibliography is zero-based). The only default citation style that cares
     /// about indices is _numeric_.
     /// 
-    /// -> int
+    /// #todo[DOCUMENT AUTO]
+    /// 
+    /// -> int | auto
     resume-after: 0
   ) = context {
 
-  let start-index = resume-after
+  let start-index = if resume-after == auto { rendered-citation-count.get() } else { resume-after }
   let bib = bibliography.get()
   let refsection-id-here = refsection-id.get()
 
@@ -767,6 +774,8 @@
   // -> array(array(content))
   let num-columns = if formatted-references.len() == 0 { 0 } else { formatted-references.at(0).len() }
   let cells = ()
+
+  rendered-citation-count.update(x => x + n)
 
   // pergamon-start-index.update(start-index + bibl-unsorted.len())
 

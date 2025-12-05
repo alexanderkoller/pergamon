@@ -1,9 +1,9 @@
 
-#import "@preview/pergamon:0.5.0": *
-// #import "lib.typ": *
+// #import "@preview/pergamon:0.5.0": *
+#import "lib.typ": *
 
 // #import "@preview/layout-ltd:0.1.0": layout-limiter
-// #show: layout-limiter.with(max-iterations: 3)
+// #show: layout-limiter.with(max-iterations: 4)
 
 // In this example document, we are putting the whole bibliography source
 // into one string to make the example self-contained. In practice, you would read
@@ -88,8 +88,6 @@
 
 #refsection(format-citation: style.format-citation)[
   = Pergamon example
-  Here is some text.
-
   We can cite a paper like this: #cite("bender20:_climb_nlu").
 
   In the _authoryear_ style, we have some nice citation forms to play with:
@@ -129,28 +127,22 @@
   therefore both the citations and the bibliography look different
   [#citen("knuth1990"), #citen("modelizer-24")].
 
+  Note also that the numbering continues across bibliographies through the
+  use of the `resume-after: auto` parameter.
+
   #print-bibliography(
     format-reference: format-reference(reference-label: style2.reference-label),
-    label-generator: style2.label-generator
+    label-generator: style2.label-generator,
+    filter: reference => reference.entry_type == "book",
+    title: "References (only books)",
   )
-]
 
-
-#refsection()[
-  #v(1em)
-  = Fourth refsection
-
-  Here is a fourth refsection
-  #cite("knuth1990", "modelizer-24").
-  Notice that the numeric labels start at 3,
-  because we passed `resume-after: 2` to `print-bibliography`.
-  
-  #context {
-
-  print-bibliography(
+  #print-bibliography(
     format-reference: format-reference(reference-label: style2.reference-label),
-    resume-after: 2, // this only works in Pergamon >= 0.3
-    label-generator: style2.label-generator
+    label-generator: style2.label-generator,
+    filter: reference => reference.entry_type != "book",
+    title: "References (everything else)",
+    resume-after: auto
   )
-  }
 ]
+
