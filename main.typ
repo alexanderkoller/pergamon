@@ -1,7 +1,7 @@
 
 #import "lib.typ": *
+// #import "@preview/pergamon:0.5.0": *
 #let dev = pergamon-dev
-// #import "@preview/pergamon:0.2.0": *
 
 #let darkgreen = green.darken(20%)
 #let darkblue = blue.darken(20%)

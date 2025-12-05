@@ -67,11 +67,6 @@
   if refsection-id == none { key } else { refsection-id + "-" + key }
 }
 
-#let split(key, refsection-id) = {
-  if refsection-id == none { key } else { key.slice(refsection-id.len() + 1) }
-}
-
-
 
 /// Helper function for rendering the links to a bibliography entry.
 /// The first argument is assumed to be a Typst #link("https://typst.app/docs/reference/model/link/")[link]
@@ -535,8 +530,8 @@
     }
   } else {
     let cited-keys = reference-collection.get().keys()
-    for lbl in cited-keys {
-      let key = split(str(lbl), refsection-id-here)
+    for key in cited-keys {
+      // let key = split(str(lbl), refsection-id-here)
 
       if key in bib { // skip references to labels that are not bib keys
         let bib-entry = bib.at(key)
