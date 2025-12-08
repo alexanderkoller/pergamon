@@ -780,46 +780,15 @@ want the first conference paper to be "[8]".
 You can achieve this using the `resume-after` parameter of `print-bibliography`. If you pass the 
 number `7` for this parameter, the first entry in the bibliography will be labeled "[8]".
 
-It would be desirable to automatically keep a running count of the bibliography entries, so
-the arguments for `resume-after` can be calculated automatically. This should be doable
-using counters or states, but I have not managed to figure out how to do it in a stable way.
-The function `count-bib-entries` is intended for this use. If you find out how to do it,
-please let me know!
+You can automatically continue numbering across multiple bibliographies by passing the `auto`
+argument to the `resume-after` parameter. If you use `resume-after: auto` for the first bibliography
+in a refsection, the numbering will start at 1. Each subsequent bibliography in the refsection then
+determines how many references have already been displayed in this refsection and then starts numbering
+at this reference count plus 1.
 
+Note that the use of `resume-after: auto` requires an additional iteration of the Typst layout algorithm
+to converge. It might therefore slow down compilation a little and invite layout convergence issues.
 
-
-
-// #unfinished[
-//   explain this
-
-//   ```typ
-//  #let index  = state("index", 0)
-
-// #let cvsection(title, filter) = {
-//   refsection(format-citation: style.format-citation)[
-//     #context {
-//       print-bibliography(
-//         title: title,
-//         resume-after: index.get(),
-//         format-reference: fref,
-//         label-generator: style.label-generator,
-//         show-all: true,
-//         filter: filter
-//       )
-//     }
-//   ]
-
-//   context {
-//     let x = index.get()
-//     index.update(x + count-bib-entries(show-all: true, filter: filter))
-//   }
-// }
-
-
-// #cvsection("Journal articles", reference => reference.entry_type == "article" and "Koller" in reference.fields.author)
-// #cvsection("Conference papers", x => "Koller" in x.fields.author and x.entry_type == "inproceedings" and ("keywords" not in x.fields or "workshop" not in x.fields.keywords))
-// ```
-// ]
 
 == Highlighting references
 <sec:highlighting>
@@ -1118,6 +1087,9 @@ to parse #bibtex files, and that crate requires the syntax variant.
 
 
 = Changelog
+
+==== Changes in 0.6.1 (unreleased)
+- Dropped support for `count-bib-entries`, which is no longer needed.
 
 ==== Changes in 0.6.0 (2025-12-06)
 - Reduced the number of iterations until layout convergence from five to three.

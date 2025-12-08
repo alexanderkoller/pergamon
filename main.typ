@@ -142,8 +142,6 @@
 
     paper with byeditor: #cite("brownschmidt_2018_perspectivetaking")
 
-    #context { count-bib-entries() }
-
     // #set par(hanging-indent: 1em)
     #print-bibliography(format-reference: fref, sorting: sorting,
       // grid-style: (row-gutter: 0.8em),
@@ -152,9 +150,4 @@
   ]
 }
 
-#refsection(id: "hallo")[ lkjdf ]
-
-#refsection[
-  Another refsection
-]
 
