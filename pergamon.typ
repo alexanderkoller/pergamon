@@ -275,7 +275,7 @@ The difference between the three builtin citation styles is illustrated in @fig:
 in the case of _numeric_, the label is the position in the bibliography, and in the case of _alphabetic_, it is a unique string consisting of the first characters of the author names and the year. In both cases, these labels are displayed next to the references and also used as the string to which `#cite(key)` expands. By contrast, _authoryear_ does not display any labels next to the references; it expands `#cite(key)` to a string consisting of the last names of the authors and the year.
 
 Some of the citation styles have options that will let you control the appearance of the citations in detail.
-These are documented in @sec:package:builtin-reference. For instance, to enclose the year in the _authoryear_ style
+These are documented in @sec:package:builtin-citation. For instance, to enclose the year in the _authoryear_ style
 in square brackets rather than round ones, you can replace line 4 in the above example with
 
 #zebraw(lang: false,
@@ -996,6 +996,7 @@ Here we explain the builtin reference style.
 
 
 == Builtin citation styles 
+<sec:package:builtin-citation>
 
 Here we explain the builtin citation styles.
 #v(1em)
