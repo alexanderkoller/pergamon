@@ -373,7 +373,9 @@
 /// under these keys as arguments to `refsection`, `print-bibliography`, and `format-reference`,
 /// respectively.
 #let format-citation-numeric(
-    /// The string that separates the author and year in the `p` citation form.
+    /// The string that separates the different citations when `cite`
+    /// is called with multiple references (e.g. [1, 3, 15]).
+    /// 
     /// -> str
     citation-separator: ", ",
 
