@@ -718,7 +718,7 @@ typesets all #bibtypst citations in blue:
   #show link: it => if-citation(it, value => {
     set text(fill: blue)
     it
-  }})
+  })
 ```)
 
 The `value` argument contains metadata about the citation; `value.reference` is the
