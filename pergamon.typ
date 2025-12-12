@@ -1091,6 +1091,7 @@ to parse #bibtex files, and that crate requires the syntax variant.
 
 ==== Changes in 0.6.1 (unreleased)
 - Dropped support for `count-bib-entries`, which is no longer needed.
+- Fixed some bugs in the documentation (thanks thvdburgt).
 
 ==== Changes in 0.6.0 (2025-12-06)
 - Reduced the number of iterations until layout convergence from five to three.
