@@ -244,12 +244,17 @@
 /// such as "[1, 5]" or "(Author 2020; Other 2021)".
 /// 
 /// Note that bib keys are always given as strings in #bibtypst,
-/// e.g. `cite("paper1")`.
+/// e.g. `cite("paper1")`. This is in contrast to Typst's builtin cite function,
+/// which expects labels.
 /// 
 /// You can pass a `form` for finer control over the citation string,
 /// depending on what your citation style supports (see   @sec:builtin-citation-styles). If you do not specify
 /// the `form`, its default value of `auto` will generate a default form
 /// that depends on the citation style.
+/// 
+/// You can optionally pass a `prefix` or `suffix` argument to the `cite` call.
+/// The authoryear style will place these before or after the main citation,
+/// separated by its `prefix-separator` and `suffix-separator` parameters.
 /// 
 /// -> content
 #let cite(

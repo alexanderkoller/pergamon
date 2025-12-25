@@ -4,7 +4,7 @@
 #import "bib-util.typ": fd, ifdef, type-aliases, nn, concatenate-names
 #import "names.typ": family-names
 #import "dates.typ": is-year-defined
-
+#import "templating.typ": fjoin
 
 //////////////////////////////////////////////////////////////////////////
 //
@@ -152,7 +152,7 @@
 /// will be replaced by "(Yao et al. 2025a)" and the second one by "(Yao et al. 2025b)".
 /// 
 /// The _authoryear_ citation style supports a particularly rich selection of citation forms
-/// (see @fig:citation-forms).
+/// (see @fig:citation-forms). 
 /// 
 /// The function `format-citation-authoryear` returns a dictionary with keys
 /// `format-citation`, `label-generator`, and `reference-label`. You can use the values
@@ -186,6 +186,14 @@
   /// Separator symbol to connect the citations for the different keys.
   /// -> str
   citation-separator: "; ",
+
+  /// The string that separates the prefix from the citation.
+  /// -> str
+  prefix-separator: " ",
+
+  /// The string that separates the suffix from the citation.
+  /// -> str
+  suffix-separator: ", ",
 
   /// When typesetting lists (e.g. author names), #bibtypst will use this
   /// delimiter to combine list items before the last one.
@@ -314,8 +322,8 @@
   }
 
   let list-formatter(reference-dicts, form, options) = {
-    let prefix = options.at("prefix", default: "")
-    let suffix = options.at("suffix", default: "")
+    let prefix = options.at("prefix", default: none)
+    let suffix = options.at("suffix", default: none)
 
     let individual-form = if form == "p" or form == auto { "n" } else { form }
     let individual-citations = reference-dicts.map(x => {
@@ -329,10 +337,15 @@
     })
 
     let joined = individual-citations.join(citation-separator)
+    let joined-with-affixes = fjoin(suffix-separator,
+      fjoin(prefix-separator, prefix, joined),
+      suffix
+    )
+
     if form == "p" or form == auto {
-      format-parens([#prefix#joined#suffix])
+      format-parens(joined-with-affixes)
     } else {
-      joined
+      joined-with-affixes
     }
   }
 

@@ -13,13 +13,13 @@
 
 
 // Author-Year:
-// #let fcite = format-citation-authoryear()
+#let fcite = format-citation-authoryear()
 
 // Alphabetic:
 // #let fcite = format-citation-alphabetic()
 
 // Numeric:
-#let fcite = format-citation-numeric()
+// #let fcite = format-citation-numeric()
 
 #let marker = text(size: 8pt)[#emoji.star] 
 
@@ -143,6 +143,10 @@
     paper with byeditor: #cite("brownschmidt_2018_perspectivetaking")
 
     to test tracl \#17: #cite("abid2019gradio")
+
+    to test \#131: #citen("abid2019gradio", prefix: "see", suffix: "page 17")
+
+    Multi-citation with prefix and suffix: #cite("wu-etal-2024-reasoning", "knuth1990", prefix: "see", suffix: "and elsewhere")
 
     // #set par(hanging-indent: 1em)
     #let x = print-bibliography(format-reference: fref, sorting: sorting,

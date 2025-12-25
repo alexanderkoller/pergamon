@@ -356,15 +356,15 @@ citation formatter. For instance, the following citation will render as
 
 #zebraw(lang: false,
 ```typ
-#cite("bender20:_climb_nlu", prefix: "see ", suffix: ", p. 3")
+#cite("bender20:_climb_nlu", prefix: "see", suffix: "p. 3")
 ```
 )
 
 Currently, the only builtin citation style that supports such arguments
 is the _authoryear_ style. It accepts the `prefix` and `suffix` options,
-as in the example, and will print them just inside the opening and closing
-parentheses in the `p` and `auto` citation styles. You can still pass options 
+as in the example. You can still pass options 
 to the other citation styles; they will simply ignore them.
+
 
 
 
