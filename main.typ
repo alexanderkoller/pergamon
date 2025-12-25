@@ -146,6 +146,7 @@
 
     to test \#131: #citen("abid2019gradio", prefix: "see", suffix: "page 17")
 
+
     Multi-citation with prefix and suffix: #cite("wu-etal-2024-reasoning", "knuth1990", prefix: "see", suffix: "and elsewhere")
 
     // #set par(hanging-indent: 1em)
@@ -156,6 +157,9 @@
     )
 
     #x
+
+    to test tracl \#21: #cite("test_entry2")
+
   ]
 }
 
