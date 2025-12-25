@@ -13,13 +13,13 @@
 
 
 // Author-Year:
-#let fcite = format-citation-authoryear()
+// #let fcite = format-citation-authoryear()
 
 // Alphabetic:
 // #let fcite = format-citation-alphabetic()
 
 // Numeric:
-// #let fcite = format-citation-numeric()
+#let fcite = format-citation-numeric()
 
 #let marker = text(size: 8pt)[#emoji.star] 
 
@@ -142,11 +142,16 @@
 
     paper with byeditor: #cite("brownschmidt_2018_perspectivetaking")
 
+    to test tracl \#17: #cite("abid2019gradio")
+
     // #set par(hanging-indent: 1em)
-    #print-bibliography(format-reference: fref, sorting: sorting,
+    #let x = print-bibliography(format-reference: fref, sorting: sorting,
       // grid-style: (row-gutter: 0.8em),
-      label-generator: fcite.label-generator,
+      label-generator: fcite.label-generator
+      // label-generator: fcite.label-generator.with(format-string: "J{:02}") // try this to get numberings J01, J02, ...
     )
+
+    #x
   ]
 }
 

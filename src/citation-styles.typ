@@ -372,6 +372,15 @@
 /// `format-citation`, `label-generator`, and `reference-label`. You can use the values
 /// under these keys as arguments to `refsection`, `print-bibliography`, and `format-reference`,
 /// respectively.
+/// 
+/// Note that the `label-generator` of this citation style takes an optional argument
+/// `format-string` that controls how the numeric index (1, 2, 3, ...) is translated into
+/// the actual label. You can pass an oxifmt format string; by default it is `"{}"`, such that
+/// the index is rendered without any changes. If you want e.g. labels J01, J02, ...,
+/// you can pass `label-generator.with(format-string: "J{:02}")` to `print-bibliography`
+/// instead. Note that the numeric citation style still assumes that the labels of all
+/// references are different; there is no support for extradates like in the authoryear style.
+/// Thus you should probably make sure that `{}` occurs in the format string somewhere.
 #let format-citation-numeric(
     /// The string that separates the different citations when `cite`
     /// is called with multiple references (e.g. [1, 3, 15]).
@@ -393,8 +402,10 @@
     let lbl = reference-dict.reference.label
 
     if form == "n" {
-      [#{reference-dict.index+1}]
+      lbl
+      // [#{reference-dict.index+1}]
     } else {
+      // CLEANUP: not sure this is used anywhere
       return [[#{reference-dict.index+1}]]
     }
   }
@@ -419,8 +430,10 @@
     }
   }
 
-  let label-generator(index, reference) = {
-    (index + 1, str(index + 1))
+  let label-generator(index, reference, format-string: "{}") = {
+    let formatted = strfmt(format-string, index+1)
+    (formatted, formatted)
+    // (index + 1, str(index + 1))
   }
 
   let reference-label(index, reference) = {

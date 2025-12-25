@@ -800,7 +800,11 @@
 
     // store the data in "meta" in a metadata element, so it can later be access through the label
     let lbl = combine(reference.entry_key, refsection-id-here)
-    let cell0 = [#metadata(meta)#label(lbl)#formatted-reference.at(0)]
+    let cell0 = [
+      #metadata(meta)#label(lbl)#formatted-reference.at(0)
+      // Use this to debug #95
+      // #linebreak()#repr(formatted-reference)
+    ]
     cells.push(cell0)
 
     // add all the other cells, if any
