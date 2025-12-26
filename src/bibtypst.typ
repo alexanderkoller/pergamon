@@ -211,8 +211,6 @@
     current-citation-formatter.update(it => format-citation)
   }
 
-  // [!Refsection counter is  #context { refsection-counter.get() }! ]
-
   context {
     // check that we have a bibliography loaded
     if bibliography.get() == none {
@@ -228,6 +226,11 @@
   }
 
   doc
+
+  // For explicitly named refsections, add a label at the end of the refsection.
+  if id != auto {
+    [#metadata((end-refsection: id)) #label("end-refsection-" + id)]
+  }
 }
 
 
@@ -748,9 +751,17 @@
     resume-after: 0
   ) = context {
 
+
   let start-index = if resume-after == auto { rendered-citation-count.get() } else { resume-after }
-  let bib = bibliography.get()
   let refsection-id-here = refsection-id.get()
+  let bib = bibliography.get()
+
+  // Determine the location at which the cited references should be evaluated.
+  // If the refsection got an explicit ID, it is at the end of the refsection.
+  // If its ID was determined automatically, it is at the location where print-bibliography
+  // is rendered. Let's automate this once I get responses on https://forum.typst.app/t/how-do-i-create-unique-identifiers-and-access-them-immediately/7437
+  let end-refsection-locations = query(label("end-refsection-" + refsection-id-here))
+  let bib-evaluation-location = if end-refsection-locations.len() > 0 { end-refsection-locations.first().location() } else { here() }
 
   // construct sorting function if necessary
   let sorting-function = if type(sorting) == str { construct-sorting(sorting) } else { sorting }
@@ -768,7 +779,7 @@
       bibl-unsorted.push(ref)
     }
   } else {
-    let cited-keys = reference-collection.get().keys()
+    let cited-keys = reference-collection.at(bib-evaluation-location).keys()
     for key in cited-keys {
       if key in bib { // skip references to labels that are not bib keys
         let bib-entry = bib.at(key)
@@ -781,14 +792,12 @@
   bibl-unsorted = bibl-unsorted.filter(filter)
   let sorted = label-sort-deduplicate(bibl-unsorted, label-generator, sorting-function, start-index)
   let n = sorted.len()
-  let formatted-references = sorted.enumerate(start: start-index).map(it => format-reference(it.at(0), it.at(1)))   // TODOC
+  let formatted-references = sorted.enumerate(start: start-index).map(it => format-reference(it.at(0), it.at(1)))
   // -> array(array(content))
   let num-columns = if formatted-references.len() == 0 { 0 } else { formatted-references.at(0).len() }
   let cells = ()
 
   rendered-citation-count.update(x => x + n)
-
-  // pergamon-start-index.update(start-index + bibl-unsorted.len())
 
   // collect cells
   for index in range(sorted.len()) {

@@ -80,7 +80,7 @@
 
 #for i in range(1) { // to test whether multiple refsections cause issues
 
-  refsection(format-citation: fcite.format-citation)[
+  refsection(id: "hallo", format-citation: fcite.format-citation)[
     // This show rule has to come inside the refsection, otherwise it is
     // overwritten by the show rule that is defined in refsection's source code.
     // It colors the citation links based on whether the reference is to a PI publication.
@@ -146,7 +146,6 @@
 
     to test \#131: #citen("abid2019gradio", prefix: "see", suffix: "page 17")
 
-
     Multi-citation with prefix and suffix: #cite("wu-etal-2024-reasoning", "knuth1990", prefix: "see", suffix: "and elsewhere")
 
     // #set par(hanging-indent: 1em)
@@ -158,7 +157,7 @@
 
     #x
 
-    to test tracl \#21: #cite("test_entry2")
+    to test tracl \#21 / pergamon \#139: #cite("test_entry2")
 
   ]
 }
