@@ -287,6 +287,10 @@
 
   // collect individual citations
   for key in xkeys {
+    if type(key) != str {
+      panic("Pergamon's cite function wants strings, but you passed " + str(type(key)) + ": " + str(key))
+    }
+
     let lbl = combine(key, xrefsection-id)
 
     // Collect keys that are cited in this refsection

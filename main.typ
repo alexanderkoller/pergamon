@@ -151,6 +151,9 @@
 
     Multi-citation with prefix and suffix: #cite("wu-etal-2024-reasoning", "knuth1990", prefix: "see", suffix: "and elsewhere")
 
+    to test \#130: #cite(<irtg-sgraph-15>)
+
+
     // #set par(hanging-indent: 1em)
     #let x = print-bibliography(format-reference: fref, sorting: sorting,
       // grid-style: (row-gutter: 0.8em),
