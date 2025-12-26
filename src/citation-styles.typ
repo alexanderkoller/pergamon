@@ -445,11 +445,15 @@
 
   let label-generator(index, reference, format-string: "{}") = {
     let formatted = strfmt(format-string, index+1)
+    // ((index + 1, format-string), str(index + 1))
     (formatted, formatted)
     // (index + 1, str(index + 1))
   }
 
   let reference-label(index, reference) = {
+    // let (ix, format-string) = reference.label
+    // strfmt(format-string, ix)
+
     [[#reference.label]]
   }
 

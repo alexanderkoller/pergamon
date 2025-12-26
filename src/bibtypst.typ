@@ -527,51 +527,6 @@
 }
 
 
-// /// Counts the entries that would be rendered by `print-bibliography`.
-// /// This may (eventually?) be useful to implement automatic continuous counting
-// /// using print-bibliography's `resume-after` parameter; see @sec:continuous-numbering.
-// /// 
-// /// This function uses #link("https://typst.app/docs/reference/context/")[context],
-// /// but does not acquire it internally. This is so you can access the int value
-// /// returned by `count-bib-entries` in your own code, rather than getting it
-// /// back wrapped in content. Calls to the function must therefore be enclosed
-// /// in the `context` keyword, e.g.
-// /// 
-// /// #zebraw(lang: false,
-// /// ```typ
-// /// #context { count-bib-entries() }
-// /// ```)
-// /// 
-// /// See @print-bibliography for an explanation of the parameters.
-// /// 
-// /// -> int
-// #let count-bib-entries(show-all: false, filter: reference => true) = {
-//   let bibl-unsorted = ()
-//   let refsection-id-here = refsection-id.get()
-//   let bib = bibliography.get()
-
-//   if show-all {
-//     for reference in bib.values() {
-//       bibl-unsorted.push(reference)
-//     }
-//   } else {
-//     let cited-keys = reference-collection.get().keys()
-//     for key in cited-keys {
-//       // let key = split(str(lbl), refsection-id-here)
-
-//       if key in bib { // skip references to labels that are not bib keys
-//         let bib-entry = bib.at(key)
-//         bibl-unsorted.push(bib-entry)
-//       }
-//     }
-//   }
-
-//   bibl-unsorted = bibl-unsorted.filter(filter)
-
-//   return bibl-unsorted.len()
-
-// }
-
 /// Prints the bibliography for the @refsection in which it is contained.
 /// This function cannot be used outside of a refsection.
 ///

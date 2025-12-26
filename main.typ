@@ -16,13 +16,13 @@
 
 
 // Author-Year:
-#let fcite = format-citation-authoryear()
+// #let fcite = format-citation-authoryear()
 
 // Alphabetic:
 // #let fcite = format-citation-alphabetic()
 
 // Numeric:
-// #let fcite = format-citation-numeric()
+#let fcite = format-citation-numeric()
 
 #let marker = text(size: 8pt)[#emoji.star] 
 
@@ -151,7 +151,7 @@
 
     Multi-citation with prefix and suffix: #cite("wu-etal-2024-reasoning", "knuth1990", prefix: "see", suffix: "and elsewhere")
 
-    to test \#130: #cite(<irtg-sgraph-15>)
+    // to test \#130: #cite(<irtg-sgraph-15>)
 
 
     // #set par(hanging-indent: 1em)
