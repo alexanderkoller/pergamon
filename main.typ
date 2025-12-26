@@ -1,3 +1,6 @@
+#import "@preview/layout-ltd:0.1.0": layout-limiter
+#show: layout-limiter.with(max-iterations: 4)
+
 
 #import "lib.typ": *
 // #import "@preview/pergamon:0.5.0": *
@@ -80,7 +83,7 @@
 
 #for i in range(1) { // to test whether multiple refsections cause issues
 
-  refsection(id: "hallo", format-citation: fcite.format-citation)[
+  refsection(format-citation: fcite.format-citation)[ // id: "hallo", 
     // This show rule has to come inside the refsection, otherwise it is
     // overwritten by the show rule that is defined in refsection's source code.
     // It colors the citation links based on whether the reference is to a PI publication.
@@ -111,7 +114,7 @@
 
     citen: #citen("yang2025goescrosslinguisticstudyimpossible", "yang2025goescrosslinguisticstudyimpossible")
 
-    #cite("sec:intro")
+    "citations" of non-references should fail: #cite("sec:intro")
 
     // #citename("kandra-bsc-25")
 

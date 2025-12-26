@@ -227,9 +227,18 @@
 
   doc
 
-  // For explicitly named refsections, add a label at the end of the refsection.
+  // Add a label at the end of the refsection, so that print-bibliography
+  // can access the state of reference-collection at the end of the refsection.
+  // Note that the `auto` case requires a call to `get`, which increases
+  // the number of layout iterations until convergence by one. It is probably
+  // a good idea to avoid this.
   if id != auto {
     [#metadata((end-refsection: id)) #label("end-refsection-" + id)]
+  } else {
+    context {
+      let id = refsection-id.get()
+      [#metadata((end-refsection: id)) #label("end-refsection-" + id)]
+    }
   }
 }
 

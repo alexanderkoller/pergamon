@@ -858,6 +858,36 @@ all other references unchanged.
 }
 
 
+= Caveats
+
+#v(-1em)
+== Layout iterations
+
+In the simplest case, #pergamon requires three iterations of the Typst layout algorithm
+to converge. First, the cited references in each refsection are collected in a state; second,
+the bibliography for the refsection is rendered and citation labels are assigned to each
+reference; third, the citations in the running text are rendered correctly based on these labels.
+
+There are certain specialized features of #pergamon that can increase the number of necessary layout
+iterations. If you want to use these features, please be aware what you're doing.
+
+1. The use of `resume-after: auto` in the numeric citation style requires an accurate count of the
+   references in the first bibliography in order to determine the numbering of the second bibliography.
+   Thus, the labels in the second bibliography only stabilize in layout iteration 3, and the citations
+   to these references only stabilize in iteration 4. Be aware that the use of this feature increases
+   the iteration count by one.
+
+2. Citing a reference _after_ the print-bibliography call (but not before) in a refsection with an
+   `auto` ID increases the number of layout iterations by one. This is because #pergamon puts a
+   label at the end of each refsection, but the name of this label only becomes available in iteration
+   2 if the ID is `auto`. Thus, the bibliography will only contain the references that were cited
+   after print-bibliography in iteration 3; and citations will only stabilize in iteration 4.
+   Consider giving an explicit ID to any refsection in which you cite a paper for the first time
+   after the print-bibliography call.
+
+Note that these two iteration increases are cumulative: if you use `resume-after: auto` _and_
+cite papers for the first time in an `auto` refsection, Typst will need five layout iterations.
+
 
 
 = Data model
