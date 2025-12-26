@@ -1121,6 +1121,8 @@ to parse #bibtex files, and that crate requires the syntax variant.
 
 ==== Changes in 0.6.1 (unreleased)
 - Dropped support for `count-bib-entries`, which is no longer needed.
+- The _numeric_ style now supports custom citation labels (thanks andreas-bulling for the suggestion).
+- Fixed a number of bugs (thanks ironupiwada, zouharvi).
 - Fixed some bugs in the documentation (thanks thvdburgt).
 
 ==== Changes in 0.6.0 (2025-12-06)
