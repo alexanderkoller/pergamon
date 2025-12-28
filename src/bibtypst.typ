@@ -11,7 +11,7 @@
 #let bibliography = state("bibliography", (:))
 #let current-citation-formatter = state("format-citation", (reference, form, options) => [CITATION], )
 
-#let refsection-id = state("refsection-id", "ref") // AAA remove
+// #let refsection-id = state("refsection-id", "ref") // AAA remove
 
 #let rendered-citation-count = state("rendered-citation-count", 0)
 
@@ -68,9 +68,17 @@
 
 // Combine and split keys and refsection identifiers.
 // AAA remove
-#let combine(key, refsection-id) = {
-  if refsection-id == none { key } else { refsection-id + "-" + key }
+// #let combine(key, refsection-id) = {
+//   if refsection-id == none { key } else { refsection-id + "-" + key }
+// }
+
+
+#let current-refsection() = {
+  let refsection-count = reference-collection.get().len()
+  "ref" + str(refsection-count)
 }
+
+#let refsectionize(x) = current-refsection() + "-" + x
 
 
 /// Helper function for rendering the links to a bibliography entry.
@@ -227,11 +235,11 @@
 
     // determine the refsection ID
     // AAA remove this
-    if id != auto {
-      refsection-id.update(id)
-    } else {
-      refsection-id.update(x => x + "_1")
-    }
+    // if id != auto {
+    //   refsection-id.update(id)
+    // } else {
+    //   refsection-id.update(x => x + "_1")
+    // }
   }
 
   doc
@@ -316,7 +324,7 @@
   /// -> str | auto
   form: auto,
 ) = context {
-  let xrefsection-id = refsection-id.get()
+  // let xrefsection-id = refsection-id.get()
   let format-citation = current-citation-formatter.get()
   let to-format = ()
 
@@ -328,7 +336,7 @@
       panic("Pergamon's cite function wants strings, but you passed " + str(type(key)) + ": " + str(key))
     }
 
-    let lbl = combine(key, xrefsection-id) // AAA replace this
+    let lbl = refsectionize(key) //  combine(key, xrefsection-id) // AAA replace this
 
     // Collect keys that are cited in this refsection
     // reference-collection.update( dict => {
@@ -763,7 +771,7 @@
 
 
   let start-index = if resume-after == auto { rendered-citation-count.get() } else { resume-after }
-  let refsection-id-here = refsection-id.get()
+  // let refsection-id-here = refsection-id.get()
   let bib = bibliography.get()
 
   // Determine the location at which the cited references should be evaluated.
@@ -808,7 +816,7 @@
   let num-columns = if formatted-references.len() == 0 { 0 } else { formatted-references.at(0).len() }
   let cells = ()
 
-  rendered-citation-count.update(x => x + n)
+  // rendered-citation-count.update(x => x + n) // AAAx
 
   // collect cells
   for index in range(sorted.len()) {
@@ -824,7 +832,7 @@
     )
 
     // store the data in "meta" in a metadata element, so it can later be access through the label
-    let lbl = combine(reference.entry_key, refsection-id-here)
+    let lbl = refsectionize(reference.entry_key)  // combine(reference.entry_key, refsection-id-here)
     let cell0 = [
       #metadata(meta)#label(lbl)#formatted-reference.at(0)
       // Use this to debug #95
@@ -842,6 +850,14 @@
   if title != none {
     heading(title, numbering: none, outlined: outlined)
   }
+
+  /// AAA
+  [
+    Refsection: #current-refsection()
+
+    Cited keys: #references-at-refsection-end()
+
+  ]
 
   // layout the cells in a grid
   let alignment = if num-columns > 1 { (right, left) } else { (left,) }

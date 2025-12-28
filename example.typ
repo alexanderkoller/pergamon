@@ -138,8 +138,6 @@
     resume-after: auto
   )
 
-
-
   #print-bibliography(
     format-reference: format-reference(reference-label: style2.reference-label),
     label-generator: style2.label-generator,

@@ -1,9 +1,8 @@
 #import "@preview/layout-ltd:0.1.0": layout-limiter
-#show: layout-limiter.with(max-iterations: 4) // AAA check this
+#show: layout-limiter.with(max-iterations: 3) // AAA check this
 
 
 #import "lib.typ": *
-// #import "@preview/pergamon:0.5.0": *
 #let dev = pergamon-dev
 
 #let darkgreen = green.darken(20%)
@@ -13,7 +12,7 @@
 
 #set heading(numbering: "1.1")
 
-
+x
 
 // Author-Year:
 // #let fcite = format-citation-authoryear()
@@ -168,4 +167,15 @@
   ]
 }
 
+a
 
+#context {
+  let all_meta = query(selector(metadata))
+  for meta in all_meta {
+    [
+      #meta.value.kind (#meta.value.at("key", default: "--"))
+      #if "label" in meta.fields() [: #str(meta.label)]
+    ]
+    linebreak()
+  }
+}
