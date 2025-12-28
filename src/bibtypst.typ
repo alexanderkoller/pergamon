@@ -5,11 +5,13 @@
 #import "names.typ": parse-reference-names
 #import "dates.typ": parse-date, make-date-tuple
 
-#let reference-collection = state("reference-collection", (:))
+#let REFSECTION-END-MARKER = "refsection-end"
+
+#let reference-collection = state("reference-collection", ())
 #let bibliography = state("bibliography", (:))
 #let current-citation-formatter = state("format-citation", (reference, form, options) => [CITATION], )
 
-#let refsection-id = state("refsection-id", "ref")
+#let refsection-id = state("refsection-id", "ref") // AAA remove
 
 #let rendered-citation-count = state("rendered-citation-count", 0)
 
@@ -65,6 +67,7 @@
 }
 
 // Combine and split keys and refsection identifiers.
+// AAA remove
 #let combine(key, refsection-id) = {
   if refsection-id == none { key } else { refsection-id + "-" + key }
 }
@@ -194,6 +197,7 @@
   /// identifier is `none`, the original label `knuth1990` will be used instead.
   /// 
   /// -> str | auto
+  /// AAA remove this
   id: auto,
 
   /// The section of the document that is to be wrapped in this `refsection`.
@@ -201,7 +205,11 @@
   doc) = {
 
   // reset the keys that are cited in this section
-  reference-collection.update((:))
+  reference-collection.update(rc => {
+    rc.push((:))
+    rc
+  })
+  // AAA // reference-collection.update((:))
 
   // reset the count of rendered citations to zero
   rendered-citation-count.update(0)
@@ -218,6 +226,7 @@
     }
 
     // determine the refsection ID
+    // AAA remove this
     if id != auto {
       refsection-id.update(id)
     } else {
@@ -227,22 +236,51 @@
 
   doc
 
+  metadata((kind: REFSECTION-END-MARKER))
+
   // Add a label at the end of the refsection, so that print-bibliography
   // can access the state of reference-collection at the end of the refsection.
   // Note that the `auto` case requires a call to `get`, which increases
   // the number of layout iterations until convergence by one. It is probably
   // a good idea to avoid this.
-  if id != auto {
-    [#metadata((end-refsection: id)) #label("end-refsection-" + id)]
+  // if id != auto {
+  //   [#metadata((end-refsection: id)) #label("end-refsection-" + id)]
+  // } else {
+  //   context {
+  //     let id = refsection-id.get()
+  //     [#metadata((end-refsection: id)) #label("end-refsection-" + id)]
+  //   }
+  // }
+}
+
+/// Returns the metadata element at the end of the current refsection.
+/// The location() of this element can be used to retrieve the full set
+/// of references cited in the refsection, including ones that were only
+/// cited after the print-bibliography call.
+/// 
+/// -> metadata
+#let find-refsection-end() = {
+  let upcoming = query(selector(metadata).after(here()))
+  let matching = upcoming.filter(m => {
+    let v = m.value
+    type(v) == dictionary and v.at("kind", default: none) == REFSECTION-END-MARKER
+  })
+  
+  if matching.len() > 0 {
+    matching.first()
   } else {
-    context {
-      let id = refsection-id.get()
-      [#metadata((end-refsection: id)) #label("end-refsection-" + id)]
-    }
+    none
   }
 }
 
-
+/// Returns the set of all reference keys that were cited in the
+/// current refsection.
+/// 
+/// -> array
+#let references-at-refsection-end() = {
+  let loc = find-refsection-end().location()
+  reference-collection.at(loc).last().keys()
+}
 
 /// Typesets a citation to the bibliography entry with the given keys.
 /// The `cite` function keeps track of what `refsection` we are in and
@@ -283,7 +321,6 @@
   let to-format = ()
 
   let xkeys = keys.pos()
-  // let key = xkeys.at(0)
 
   // collect individual citations
   for key in xkeys {
@@ -291,12 +328,17 @@
       panic("Pergamon's cite function wants strings, but you passed " + str(type(key)) + ": " + str(key))
     }
 
-    let lbl = combine(key, xrefsection-id)
+    let lbl = combine(key, xrefsection-id) // AAA replace this
 
     // Collect keys that are cited in this refsection
-    reference-collection.update( dict => {
-      dict.insert(key, "1")
-      return dict
+    // reference-collection.update( dict => {
+    //   dict.insert(key, "1")
+    //   return dict
+    // })
+
+    reference-collection.update(rc => {
+      rc.last().insert(key, 1)
+      rc
     })
 
     // Render the citation.
@@ -728,8 +770,8 @@
   // If the refsection got an explicit ID, it is at the end of the refsection.
   // If its ID was determined automatically, it is at the location where print-bibliography
   // is rendered. Let's automate this once I get responses on https://forum.typst.app/t/how-do-i-create-unique-identifiers-and-access-them-immediately/7437
-  let end-refsection-locations = query(label("end-refsection-" + refsection-id-here))
-  let bib-evaluation-location = if end-refsection-locations.len() > 0 { end-refsection-locations.first().location() } else { here() }
+  // let end-refsection-locations = query(label("end-refsection-" + refsection-id-here))
+  // let bib-evaluation-location = if end-refsection-locations.len() > 0 { end-refsection-locations.first().location() } else { here() }
 
   // construct sorting function if necessary
   let sorting-function = if type(sorting) == str { construct-sorting(sorting) } else { sorting }
@@ -747,7 +789,8 @@
       bibl-unsorted.push(ref)
     }
   } else {
-    let cited-keys = reference-collection.at(bib-evaluation-location).keys()
+    // let cited-keys = reference-collection.at(bib-evaluation-location).keys()
+    let cited-keys = references-at-refsection-end()
     for key in cited-keys {
       if key in bib { // skip references to labels that are not bib keys
         let bib-entry = bib.at(key)
