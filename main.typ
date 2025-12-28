@@ -16,24 +16,24 @@
 
 
 // Author-Year:
-// #let fcite = format-citation-authoryear()
+#let fcite = format-citation-authoryear()
 
 // Alphabetic:
 // #let fcite = format-citation-alphabetic()
 
 // Numeric:
-#let fcite = format-citation-numeric()
+// #let fcite = format-citation-numeric()
 
 #let marker = text(size: 8pt)[#emoji.star] 
 
 #let fref = format-reference(
+  reference-label: fcite.reference-label,
   name-format: "{given} {family}",
   // name-format: (
   //   "author": "{given} {family}",
   //   "editor": "{g}. {family}"
   // ),
   print-date-after-authors: true,
-  reference-label: fcite.reference-label,
   format-quotes: it => it,
   print-identifiers: ("doi", "url"),
   // print-doi: true,
@@ -83,7 +83,7 @@
 
 #for i in range(1) { // to test whether multiple refsections cause issues
 
-  refsection(format-citation: fcite.format-citation)[ // id: "hallo", 
+  refsection( id: "hallo", format-citation: fcite.format-citation)[ 
     // This show rule has to come inside the refsection, otherwise it is
     // overwritten by the show rule that is defined in refsection's source code.
     // It colors the citation links based on whether the reference is to a PI publication.
@@ -123,7 +123,8 @@
     #cite("irtg-sgraph-15")
 
     #cite("wu-etal-2024-reasoning", "knuth1990") #cite("yao2025language") #cite("hershcovichItMeaningThat2021")
-    #cite("abgrallMeasurementsppmKpm2016") #cite("kuhlmann2003tiny") #cite("fake-mastersthesis")
+    #cite("abgrallMeasurementsppmKpm2016")
+    #cite("kuhlmann2003tiny") #cite("fake-mastersthesis")
 
     #cite("multi1") #citen("multi2")
 
