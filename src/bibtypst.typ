@@ -816,7 +816,7 @@
   let num-columns = if formatted-references.len() == 0 { 0 } else { formatted-references.at(0).len() }
   let cells = ()
 
-  // rendered-citation-count.update(x => x + n) // AAAx
+  rendered-citation-count.update(x => x + n) // AAAx
 
   // collect cells
   for index in range(sorted.len()) {
@@ -850,14 +850,6 @@
   if title != none {
     heading(title, numbering: none, outlined: outlined)
   }
-
-  /// AAA
-  [
-    Refsection: #current-refsection()
-
-    Cited keys: #references-at-refsection-end()
-
-  ]
 
   // layout the cells in a grid
   let alignment = if num-columns > 1 { (right, left) } else { (left,) }

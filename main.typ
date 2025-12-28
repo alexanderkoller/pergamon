@@ -1,5 +1,15 @@
 #import "@preview/layout-ltd:0.1.0": layout-limiter
-#show: layout-limiter.with(max-iterations: 3) // AAA check this
+#show: layout-limiter.with(max-iterations: 4) // AAA check this
+
+
+/*
+  There is a very mysterious issue with this document. It needs 4 iterations if:
+  - the "x" at the start is missing / more generally, I think certain things can't be on the same page together
+  - print-identifiers is there
+  - additional-fields in functional form is there
+
+  Why??
+*/
 
 
 #import "lib.typ": *
@@ -12,7 +22,8 @@
 
 #set heading(numbering: "1.1")
 
-x
+// X
+// #lorem(100)
 
 // Author-Year:
 // #let fcite = format-citation-authoryear()
@@ -26,15 +37,15 @@ x
 #let marker = text(size: 8pt)[#emoji.star] 
 
 #let fref = format-reference(
+  reference-label: fcite.reference-label,
   name-format: "{given} {family}",
   // name-format: (
   //   "author": "{given} {family}",
   //   "editor": "{g}. {family}"
   // ),
   print-date-after-authors: true,
-  reference-label: fcite.reference-label,
   format-quotes: it => it,
-  print-identifiers: ("doi", "url"),
+  // print-identifiers: ("doi", "url"), // <--
   // print-doi: true,
   suppress-fields: (
     "*": ("month", "day",),
@@ -42,9 +53,9 @@ x
   ),
   eval-scope: ("todo": x => text(fill: red, x)),
   // suppress-fields: ("*": ("pages",), "inproceedings": ("editor", "publisher") ),
-  // additional-fields: ("award",)
+  // additional-fields: ("award",),
   //  period: ",",
-  additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),
+  // additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),), // <--
   highlight: (x, reference, index) => {
     if "highlight" in reference.fields.at("keywords", default: ()) {
       place(dx: -1.5em, dy: -0.15em, marker)
@@ -58,15 +69,15 @@ x
 
   format-fields: (
     // highlight my name in all references
-    // "author": (dffmt, value, reference, field, options, style) => {
-    //   let formatted-names = value.map(d => {
-    //     let highlighted = (d.family == "Koller")
-    //     let name = format-name(d, name-type: "author", format: options.name-format)
-    //     if highlighted { strong(name) } else { name }
-    //   })
+    "author": (dffmt, value, reference, field, options, style) => {
+      let formatted-names = value.map(d => {
+        let highlighted = (d.family == "Koller")
+        let name = format-name(d, name-type: "author", format: options.name-format)
+        if highlighted { strong(name) } else { name }
+      })
 
-    //   concatenate-names(formatted-names, maxnames: 999)
-    // },
+      concatenate-names(formatted-names, maxnames: 999)
+    },
   )
 )
 
@@ -167,15 +178,15 @@ x
   ]
 }
 
-a
+// a
 
-#context {
-  let all_meta = query(selector(metadata))
-  for meta in all_meta {
-    [
-      #meta.value.kind (#meta.value.at("key", default: "--"))
-      #if "label" in meta.fields() [: #str(meta.label)]
-    ]
-    linebreak()
-  }
-}
+// #context {
+//   let all_meta = query(selector(metadata))
+//   for meta in all_meta {
+//     [
+//       #meta.value.kind (#meta.value.at("key", default: "--"))
+//       #if "label" in meta.fields() [: #str(meta.label)]
+//     ]
+//     linebreak()
+//   }
+// }
