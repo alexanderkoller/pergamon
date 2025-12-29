@@ -1,5 +1,5 @@
-#import "@preview/layout-ltd:0.1.0": layout-limiter
-#show: layout-limiter.with(max-iterations: 4) // AAA check this
+// #import "@preview/layout-ltd:0.1.0": layout-limiter
+// #show: layout-limiter.with(max-iterations: 2) // AAA check this
 
 
 /*
@@ -9,6 +9,17 @@
   - additional-fields in functional form is there
 
   Why??
+
+  - Iteration 2: Reference [9] is genuinely on page 2
+  - Iteration 3: Layout shifts, [9] moves to page 1, but queries see iteration 2's positions (page 2)
+  - Iteration 4: Queries now see iteration 3's positions (page 1), layout is stable
+
+  This is just normal Typst convergence behavior. The content is legitimately moving between pages as the layout stabilizes. The 4th iteration is needed because:
+
+  1. Iterations 1-3: Bibliography content changes as citations are resolved
+  2. Reference [9] is right at the page boundary
+  3. As content settles, [9] shifts from page 2 → page 1
+  4. Iteration 4 confirms stability
 */
 
 
@@ -91,28 +102,30 @@
 #add-bib-resource(read("bibs/other.bib"))
 #add-bib-resource(read("bibs/physics.bib"))
 
-#for i in range(1) { // to test whether multiple refsections cause issues
+// #for i in range(1) { // to test whether multiple refsections cause issues
 
-  refsection(format-citation: fcite.format-citation)[ // id: "hallo", 
+  #refsection(format-citation: fcite.format-citation)[ // id: "hallo", 
     // This show rule has to come inside the refsection, otherwise it is
     // overwritten by the show rule that is defined in refsection's source code.
     // It colors the citation links based on whether the reference is to a PI publication.
-    #show link: it => if-citation(it, value => {
-      let color = if "Koller" in family-names(value.reference.fields.labelname) { darkgreen } else { darkblue }
-      set text(fill: color)
-      it
-    })
+    // AAA
+    // #show link: it => if-citation(it, value => {
+    //   let color = if "Koller" in family-names(value.reference.fields.labelname) { darkgreen } else { darkblue }
+    //   set text(fill: color)
+    //   it
+    // })
     
     #set par(justify: true)
 
     = Introduction <sec:intro>
     #lorem(100)
 
-    To reproduce \#78:
-    #context {
-      let hdr = query(heading).first()
-      link(hdr.location())[#hdr.body]
-    }
+    // AAA
+    // To reproduce \#78:
+    // #context {
+    //   let hdr = query(heading).first()
+    //   link(hdr.location())[#hdr.body]
+    // }
 
     = Another section
 
@@ -124,7 +137,7 @@
 
     citen: #citen("yang2025goescrosslinguisticstudyimpossible", "yang2025goescrosslinguisticstudyimpossible")
 
-    "citations" of non-references should fail: #cite("sec:intro")
+    // "citations" of non-references should fail: #cite("sec:intro") // AAA
 
     // #citename("kandra-bsc-25")
 
@@ -132,51 +145,53 @@
 
     #cite("irtg-sgraph-15")
 
-    #cite("wu-etal-2024-reasoning", "knuth1990") #cite("yao2025language") #cite("hershcovichItMeaningThat2021")
-    #cite("abgrallMeasurementsppmKpm2016") #cite("kuhlmann2003tiny") #cite("fake-mastersthesis")
+    #cite("wu-etal-2024-reasoning", "knuth1990")
+     #cite("yao2025language")
+     #cite("hershcovichItMeaningThat2021")
+    // #cite("abgrallMeasurementsppmKpm2016")
+     #cite("kuhlmann2003tiny") #cite("fake-mastersthesis")
 
-    #cite("multi1") #citen("multi2")
+    // #cite("multi1") #citen("multi2")
 
     to test trailing punctuation: #cite("tedeschi-etal-2023-whats")
 
     to test editors: #cite("hempel1965science")
 
-    to test prefix and suffix: #cite("tedeschi-etal-2023-whats", prefix: "e.g. ", suffix: ", page 17")
+    x
 
-    to test undefined citations: #cite("DOES-NOT-EXIST", "tedeschi-etal-2023-whats")
+    // to test prefix and suffix: #cite("tedeschi-etal-2023-whats", prefix: "e.g. ", suffix: ", page 17")
 
-    to test journal subtitles: #cite("clls")
+    // to test undefined citations: #cite("DOES-NOT-EXIST", "tedeschi-etal-2023-whats")
 
-    to test nodate: #cite("nodate")
+    // to test journal subtitles: #cite("clls")
 
-    to test books editor instead of author, \#88: #cite("Dorfles1969")
+    // to test nodate: #cite("nodate")
 
-    to test \#91: #cite("Ruwitch2025AISlop")
+    // to test books editor instead of author, \#88: #cite("Dorfles1969")
 
-    paper with byeditor: #cite("brownschmidt_2018_perspectivetaking")
+    // to test \#91: #cite("Ruwitch2025AISlop")
 
-    to test tracl \#17: #cite("abid2019gradio")
+    // paper with byeditor: #cite("brownschmidt_2018_perspectivetaking")
 
-    to test \#131: #citen("abid2019gradio", prefix: "see", suffix: "page 17")
+    // to test tracl \#17: #cite("abid2019gradio")
 
-    Multi-citation with prefix and suffix: #cite("wu-etal-2024-reasoning", "knuth1990", prefix: "see", suffix: "and elsewhere")
+    // to test \#131: #citen("abid2019gradio", prefix: "see", suffix: "page 17")
+
+    // Multi-citation with prefix and suffix: #cite("wu-etal-2024-reasoning", "knuth1990", prefix: "see", suffix: "and elsewhere")
 
     // to test \#130: #cite(<irtg-sgraph-15>)
 
-
     // #set par(hanging-indent: 1em)
-    #let x = print-bibliography(format-reference: fref, sorting: sorting,
-      // grid-style: (row-gutter: 0.8em),
+    #print-bibliography(format-reference: fref, sorting: sorting,
+      // grid-style: (row-gutter: 2cm),
       label-generator: fcite.label-generator
       // label-generator: fcite.label-generator.with(format-string: "J{:02}") // try this to get numberings J01, J02, ...
     )
 
-    #x
-
     to test tracl \#21 / pergamon \#139: #cite("test_entry2")
 
   ]
-}
+// }
 
 // a
 
@@ -186,6 +201,7 @@
 //     [
 //       #meta.value.kind (#meta.value.at("key", default: "--"))
 //       #if "label" in meta.fields() [: #str(meta.label)]
+//       -- page #meta.location().page() -- #meta.location().position()
 //     ]
 //     linebreak()
 //   }

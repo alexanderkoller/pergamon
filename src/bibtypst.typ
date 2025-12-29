@@ -816,7 +816,7 @@
   let num-columns = if formatted-references.len() == 0 { 0 } else { formatted-references.at(0).len() }
   let cells = ()
 
-  rendered-citation-count.update(x => x + n) // AAAx
+  rendered-citation-count.update(x => x + n)
 
   // collect cells
   for index in range(sorted.len()) {
@@ -832,9 +832,10 @@
     )
 
     // store the data in "meta" in a metadata element, so it can later be access through the label
-    let lbl = refsectionize(reference.entry_key)  // combine(reference.entry_key, refsection-id-here)
+    let lbl = refsectionize(reference.entry_key)
     let cell0 = [
-      #metadata(meta)#label(lbl)#formatted-reference.at(0)
+      #metadata(meta)#label(lbl)#formatted-reference.at(0) // AAA
+      // #place[#metadata(meta)#label(lbl)]#formatted-reference.at(0) // AAA
       // Use this to debug #95
       // #linebreak()#repr(formatted-reference)
     ]

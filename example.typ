@@ -2,8 +2,8 @@
 // #import "@preview/pergamon:0.6.0": *
 #import "lib.typ": *
 
-// #import "@preview/layout-ltd:0.1.0": layout-limiter
-// #show: layout-limiter.with(max-iterations: 3)
+#import "@preview/layout-ltd:0.1.0": layout-limiter
+#show: layout-limiter.with(max-iterations: 3)
 
 // In this example document, we are putting the whole bibliography source
 // into one string to make the example self-contained. In practice, you would read
@@ -135,7 +135,7 @@
     label-generator: style2.label-generator,
     filter: reference => reference.entry_type == "book",
     title: "References (only books)",
-    resume-after: auto
+    // resume-after: auto
   )
 
   #print-bibliography(
@@ -143,7 +143,10 @@
     label-generator: style2.label-generator,
     filter: reference => reference.entry_type != "book",
     title: "References (everything else)",
-    resume-after: auto
+    resume-after: 1
+    // resume-after: auto
   )
+
+  Hey look, citations can come after the bibliography: #cite("bender20:_climb_nlu").
 ]
 
