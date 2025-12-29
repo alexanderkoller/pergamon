@@ -5,12 +5,11 @@
 #import "names.typ": parse-reference-names
 #import "dates.typ": parse-date, make-date-tuple
 
-#let reference-collection = state("reference-collection", (:))
+#let REFSECTION-END-MARKER = "refsection-end"
+
+#let reference-collection = state("reference-collection", ())
 #let bibliography = state("bibliography", (:))
 #let current-citation-formatter = state("format-citation", (reference, form, options) => [CITATION], )
-
-#let refsection-id = state("refsection-id", "ref")
-
 #let rendered-citation-count = state("rendered-citation-count", 0)
 
 /// Parses #bibtex references and makes them available to #bibtypst.
@@ -64,10 +63,18 @@
   })
 }
 
-// Combine and split keys and refsection identifiers.
-#let combine(key, refsection-id) = {
-  if refsection-id == none { key } else { refsection-id + "-" + key }
+// Returns the current refsection identifier.
+// -> str
+#let current-refsection() = {
+  let refsection-count = reference-collection.get().len()
+  "ref" + str(refsection-count)
 }
+
+// Prepends x with the current refsection identifier.
+// Can be used to generate globally unique labels for references,
+// even when they appear in multiple refsections.
+// -> str
+#let refsectionize(x) = current-refsection() + "-" + x
 
 
 /// Helper function for rendering the links to a bibliography entry.
@@ -133,6 +140,15 @@
 /// Defines a section of the document with its own bibliography.
 /// You need to load a bibliography with the @add-bib-resource function
 /// in a place that is earlier than the refsection in rendering order.
+/// 
+/// Each refsection is automatically assigned a unique identifier that distinguishes
+/// it from all other refsections in the document. These refsection identifiers are
+/// used to generate unique Typst labels for all references in the document, even
+/// when they represent the same Bibtex key. Users should make no assumptions about
+/// the form of these identifiers beyond their uniqueness. Note that unlike in
+/// #pergamon 0.6.0 and earlier, it is no longer possible to specify the refsection
+/// identifier explicitly.
+/// 
 /// -> none
 #let refsection(
   /// A function that generates the citation string for a list of references.
@@ -177,31 +193,21 @@
   /// same citation formatter as in the previous `refsection`. If you pass `auto`
   /// to the first refsection in the document, #bibtypst will use the dummy
   /// citation formatter `(references, form) => [CITATION]`.
-
+  /// 
   /// -> function | auto
   format-citation: auto,
-
-  /// A unique identifier for this refsection. Each refsection needs its own unique
-  /// id, which distinguishes it from all the other refsections. You can either specify
-  /// an explicit identifier here, or you can pass `auto` to indicate that Pergamon
-  /// should assign an identifier automatically. In this case, the first refsection
-  /// in the document receives the identifier `none`, and the subsequent refsections
-  /// will be named `ref1`, `ref2`, and so on.
-  /// 
-  /// All references and citations within a refsection with identifier X will be prefixed
-  /// by `X-`; so for instance, the citation `cite("knuth1990")` in the refsection `ref1`
-  /// will silently introduce and reference a label `ref1-knuth1990`. If the refsection
-  /// identifier is `none`, the original label `knuth1990` will be used instead.
-  /// 
-  /// -> str | auto
-  id: auto,
 
   /// The section of the document that is to be wrapped in this `refsection`.
   /// -> content
   doc) = {
 
-  // reset the keys that are cited in this section
-  reference-collection.update((:))
+  // Reset the keys that are cited in this section. Note that reference-collection
+  // is an array of dictionaries, with one element per refsection in the document.
+  // The last element of the array collects the references for the current refsection.
+  reference-collection.update(rc => {
+    rc.push((:))
+    rc
+  })
 
   // reset the count of rendered citations to zero
   rendered-citation-count.update(0)
@@ -216,33 +222,43 @@
     if bibliography.get() == none {
       panic("Add a bibliography before starting a refsection.")
     }
-
-    // determine the refsection ID
-    if id != auto {
-      refsection-id.update(id)
-    } else {
-      refsection-id.update(x => x + "_1")
-    }
   }
 
   doc
 
   // Add a label at the end of the refsection, so that print-bibliography
   // can access the state of reference-collection at the end of the refsection.
-  // Note that the `auto` case requires a call to `get`, which increases
-  // the number of layout iterations until convergence by one. It is probably
-  // a good idea to avoid this.
-  if id != auto {
-    [#metadata((end-refsection: id)) #label("end-refsection-" + id)]
+  metadata((kind: REFSECTION-END-MARKER))
+}
+
+// Returns the metadata element at the end of the current refsection.
+// The location() of this element can be used to retrieve the full set
+// of references cited in the refsection, including ones that were only
+// cited after the print-bibliography call.
+// 
+// -> metadata
+#let find-refsection-end() = {
+  let upcoming = query(selector(metadata).after(here()))
+  let matching = upcoming.filter(m => {
+    let v = m.value
+    type(v) == dictionary and v.at("kind", default: none) == REFSECTION-END-MARKER
+  })
+  
+  if matching.len() > 0 {
+    matching.first()
   } else {
-    context {
-      let id = refsection-id.get()
-      [#metadata((end-refsection: id)) #label("end-refsection-" + id)]
-    }
+    none
   }
 }
 
-
+// Returns the set of all reference keys that were cited in the
+// current refsection.
+// 
+// -> array
+#let references-at-refsection-end() = {
+  let loc = find-refsection-end().location()
+  reference-collection.at(loc).last().keys()
+}
 
 /// Typesets a citation to the bibliography entry with the given keys.
 /// The `cite` function keeps track of what `refsection` we are in and
@@ -278,28 +294,24 @@
   /// -> str | auto
   form: auto,
 ) = context {
-  let xrefsection-id = refsection-id.get()
   let format-citation = current-citation-formatter.get()
   let to-format = ()
 
   let xkeys = keys.pos()
-  // let key = xkeys.at(0)
 
-  // collect individual citations
   for key in xkeys {
     if type(key) != str {
       panic("Pergamon's cite function wants strings, but you passed " + str(type(key)) + ": " + str(key))
     }
 
-    let lbl = combine(key, xrefsection-id)
-
-    // Collect keys that are cited in this refsection
-    reference-collection.update( dict => {
-      dict.insert(key, "1")
-      return dict
+    // collect individual citations
+    reference-collection.update(rc => {
+      rc.last().insert(key, 1)
+      rc
     })
 
     // Render the citation.
+    let lbl = refsectionize(key)
     let targets = query(label(lbl)) // find metadata object generated by print-bibliography
     if targets.len() == 0 {
       // on first pass, the label does not exist yet
@@ -719,17 +731,8 @@
     resume-after: 0
   ) = context {
 
-
   let start-index = if resume-after == auto { rendered-citation-count.get() } else { resume-after }
-  let refsection-id-here = refsection-id.get()
   let bib = bibliography.get()
-
-  // Determine the location at which the cited references should be evaluated.
-  // If the refsection got an explicit ID, it is at the end of the refsection.
-  // If its ID was determined automatically, it is at the location where print-bibliography
-  // is rendered. Let's automate this once I get responses on https://forum.typst.app/t/how-do-i-create-unique-identifiers-and-access-them-immediately/7437
-  let end-refsection-locations = query(label("end-refsection-" + refsection-id-here))
-  let bib-evaluation-location = if end-refsection-locations.len() > 0 { end-refsection-locations.first().location() } else { here() }
 
   // construct sorting function if necessary
   let sorting-function = if type(sorting) == str { construct-sorting(sorting) } else { sorting }
@@ -747,7 +750,7 @@
       bibl-unsorted.push(ref)
     }
   } else {
-    let cited-keys = reference-collection.at(bib-evaluation-location).keys()
+    let cited-keys = references-at-refsection-end()
     for key in cited-keys {
       if key in bib { // skip references to labels that are not bib keys
         let bib-entry = bib.at(key)
@@ -776,12 +779,12 @@
     let meta = (
       kind: "reference-data",
       key: reference.entry_key,
-      index: start-index + index,  // TODOC
+      index: start-index + index,
       reference: reference,
     )
 
     // store the data in "meta" in a metadata element, so it can later be access through the label
-    let lbl = combine(reference.entry_key, refsection-id-here)
+    let lbl = refsectionize(reference.entry_key)
     let cell0 = [
       #metadata(meta)#label(lbl)#formatted-reference.at(0)
       // Use this to debug #95

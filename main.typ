@@ -1,9 +1,8 @@
-#import "@preview/layout-ltd:0.1.0": layout-limiter
-#show: layout-limiter.with(max-iterations: 4)
+// #import "@preview/layout-ltd:0.1.0": layout-limiter
+// #show: layout-limiter.with(max-iterations: 2) // AAA check this
 
 
 #import "lib.typ": *
-// #import "@preview/pergamon:0.5.0": *
 #let dev = pergamon-dev
 
 #let darkgreen = green.darken(20%)
@@ -12,8 +11,6 @@
 #show link: set text(fill: darkblue)
 
 #set heading(numbering: "1.1")
-
-
 
 // Author-Year:
 #let fcite = format-citation-authoryear()
@@ -35,7 +32,7 @@
   // ),
   print-date-after-authors: true,
   format-quotes: it => it,
-  print-identifiers: ("doi", "url"),
+  // print-identifiers: ("doi", "url"),
   // print-doi: true,
   suppress-fields: (
     "*": ("month", "day",),
@@ -43,9 +40,9 @@
   ),
   eval-scope: ("todo": x => text(fill: red, x)),
   // suppress-fields: ("*": ("pages",), "inproceedings": ("editor", "publisher") ),
-  // additional-fields: ("award",)
+  // additional-fields: ("award",),
   //  period: ",",
-  additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),
+  // additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),
   highlight: (x, reference, index) => {
     if "highlight" in reference.fields.at("keywords", default: ()) {
       place(dx: -1.5em, dy: -0.15em, marker)
@@ -59,15 +56,15 @@
 
   format-fields: (
     // highlight my name in all references
-    // "author": (dffmt, value, reference, field, options, style) => {
-    //   let formatted-names = value.map(d => {
-    //     let highlighted = (d.family == "Koller")
-    //     let name = format-name(d, name-type: "author", format: options.name-format)
-    //     if highlighted { strong(name) } else { name }
-    //   })
+    "author": (dffmt, value, reference, field, options, style) => {
+      let formatted-names = value.map(d => {
+        let highlighted = (d.family == "Koller")
+        let name = format-name(d, name-type: "author", format: options.name-format)
+        if highlighted { strong(name) } else { name }
+      })
 
-    //   concatenate-names(formatted-names, maxnames: 999)
-    // },
+      concatenate-names(formatted-names, maxnames: 999)
+    },
   )
 )
 
@@ -81,92 +78,96 @@
 #add-bib-resource(read("bibs/other.bib"))
 #add-bib-resource(read("bibs/physics.bib"))
 
-#for i in range(1) { // to test whether multiple refsections cause issues
+#refsection(format-citation: fcite.format-citation)[ // id: "hallo", 
+  // This show rule has to come inside the refsection, otherwise it is
+  // overwritten by the show rule that is defined in refsection's source code.
+  // It colors the citation links based on whether the reference is to a PI publication.
+  #show link: it => if-citation(it, value => {
+    let color = if "Koller" in family-names(value.reference.fields.labelname) { darkgreen } else { darkblue }
+    set text(fill: color)
+    it
+  })
+  
+  #set par(justify: true)
 
-  refsection( id: "hallo", format-citation: fcite.format-citation)[ 
-    // This show rule has to come inside the refsection, otherwise it is
-    // overwritten by the show rule that is defined in refsection's source code.
-    // It colors the citation links based on whether the reference is to a PI publication.
-    #show link: it => if-citation(it, value => {
-      let color = if "Koller" in family-names(value.reference.fields.labelname) { darkgreen } else { darkblue }
-      set text(fill: color)
-      it
-    })
-    
-    #set par(justify: true)
+  = Introduction <sec:intro>
+  To reproduce \#78:
+  #context {
+    let hdr = query(heading).first()
+    link(hdr.location())[#hdr.body]
+  }
 
-    = Introduction <sec:intro>
-    #lorem(100)
+  = Another section
 
-    To reproduce \#78:
-    #context {
-      let hdr = query(heading).first()
-      link(hdr.location())[#hdr.body]
-    }
+  citet: !#citet("modelizer-24", "modelizer-24")!
 
-    = Another section
+  citep: #citep("bender20:_climb_nlu", "knuth1990")
 
-    citet: !#citet("modelizer-24", "modelizer-24")!
+  citeg: #citeg("kandra-bsc-25", "kandra-bsc-25")
 
-    citep: #citep("bender20:_climb_nlu", "knuth1990")
+  citen: #citen("yang2025goescrosslinguisticstudyimpossible", "yang2025goescrosslinguisticstudyimpossible")
 
-    citeg: #citeg("kandra-bsc-25", "kandra-bsc-25")
+  "citations" of non-references should fail: #cite("sec:intro") // AAA
 
-    citen: #citen("yang2025goescrosslinguisticstudyimpossible", "yang2025goescrosslinguisticstudyimpossible")
+  #citename("kandra-bsc-25")
 
-    "citations" of non-references should fail: #cite("sec:intro")
+  #citeyear("bender20:_climb_nlu")
 
-    // #citename("kandra-bsc-25")
+  #cite("irtg-sgraph-15")
 
-    // #citeyear("bender20:_climb_nlu")
-
-    #cite("irtg-sgraph-15")
-
-    #cite("wu-etal-2024-reasoning", "knuth1990") #cite("yao2025language") #cite("hershcovichItMeaningThat2021")
-    #cite("abgrallMeasurementsppmKpm2016")
+  #cite("wu-etal-2024-reasoning", "knuth1990")
+    #cite("yao2025language")
+    #cite("hershcovichItMeaningThat2021")
+  #cite("abgrallMeasurementsppmKpm2016")
     #cite("kuhlmann2003tiny") #cite("fake-mastersthesis")
 
-    #cite("multi1") #citen("multi2")
+  #cite("multi1") #citen("multi2")
 
-    to test trailing punctuation: #cite("tedeschi-etal-2023-whats")
+  to test trailing punctuation: #cite("tedeschi-etal-2023-whats")
 
-    to test editors: #cite("hempel1965science")
+  to test editors: #cite("hempel1965science")
 
-    to test prefix and suffix: #cite("tedeschi-etal-2023-whats", prefix: "e.g. ", suffix: ", page 17")
+  to test prefix and suffix: #cite("tedeschi-etal-2023-whats", prefix: "e.g. ", suffix: ", page 17")
 
-    to test undefined citations: #cite("DOES-NOT-EXIST", "tedeschi-etal-2023-whats")
+  to test undefined citations: #cite("DOES-NOT-EXIST", "tedeschi-etal-2023-whats")
 
-    to test journal subtitles: #cite("clls")
+  to test journal subtitles: #cite("clls")
 
-    to test nodate: #cite("nodate")
+  to test nodate: #cite("nodate")
 
-    to test books editor instead of author, \#88: #cite("Dorfles1969")
+  to test books editor instead of author, \#88: #cite("Dorfles1969")
 
-    to test \#91: #cite("Ruwitch2025AISlop")
+  to test \#91: #cite("Ruwitch2025AISlop")
 
-    paper with byeditor: #cite("brownschmidt_2018_perspectivetaking")
+  paper with byeditor: #cite("brownschmidt_2018_perspectivetaking")
 
-    to test tracl \#17: #cite("abid2019gradio")
+  to test tracl \#17: #cite("abid2019gradio")
 
-    to test \#131: #citen("abid2019gradio", prefix: "see", suffix: "page 17")
+  to test \#131: #citen("abid2019gradio", prefix: "see", suffix: "page 17")
 
-    Multi-citation with prefix and suffix: #cite("wu-etal-2024-reasoning", "knuth1990", prefix: "see", suffix: "and elsewhere")
+  Multi-citation with prefix and suffix: #cite("wu-etal-2024-reasoning", "knuth1990", prefix: "see", suffix: "and elsewhere")
 
-    // to test \#130: #cite(<irtg-sgraph-15>)
+  // to test \#130: #cite(<irtg-sgraph-15>)
 
+  // #set par(hanging-indent: 1em)
+  #print-bibliography(format-reference: fref, sorting: sorting,
+    // grid-style: (row-gutter: 2cm),
+    label-generator: fcite.label-generator
+    // label-generator: fcite.label-generator.with(format-string: "J{:02}") // try this to get numberings J01, J02, ...
+  )
 
-    // #set par(hanging-indent: 1em)
-    #let x = print-bibliography(format-reference: fref, sorting: sorting,
-      // grid-style: (row-gutter: 0.8em),
-      label-generator: fcite.label-generator
-      // label-generator: fcite.label-generator.with(format-string: "J{:02}") // try this to get numberings J01, J02, ...
-    )
+  to test tracl \#21 / pergamon \#139: #cite("test_entry2")
 
-    #x
+]
 
-    to test tracl \#21 / pergamon \#139: #cite("test_entry2")
-
-  ]
-}
-
-
+// #context {
+//   let all_meta = query(selector(metadata))
+//   for meta in all_meta {
+//     [
+//       #meta.value.kind (#meta.value.at("key", default: "--"))
+//       #if "label" in meta.fields() [: #str(meta.label)]
+//       -- page #meta.location().page() -- #meta.location().position()
+//     ]
+//     linebreak()
+//   }
+// }
