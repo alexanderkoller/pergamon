@@ -868,26 +868,19 @@ to converge. First, the cited references in each refsection are collected in a s
 the bibliography for the refsection is rendered and citation labels are assigned to each
 reference; third, the citations in the running text are rendered correctly based on these labels.
 
-There are certain specialized features of #pergamon that can increase the number of necessary layout
-iterations. If you want to use these features, please be aware what you're doing.
+The number of layout iterations is increased to four if you use the `resume-after: auto` feature 
+in the numeric citation style. This feature requires an accurate count of the
+references in the first bibliography in order to determine the numbering of the second bibliography.
+Thus, the labels in the second bibliography only stabilize in layout iteration 3, and the citations
+to these references only stabilize in iteration 4. Be aware that the use of this feature increases
+the iteration count by one.
 
-1. The use of `resume-after: auto` in the numeric citation style requires an accurate count of the
-   references in the first bibliography in order to determine the numbering of the second bibliography.
-   Thus, the labels in the second bibliography only stabilize in layout iteration 3, and the citations
-   to these references only stabilize in iteration 4. Be aware that the use of this feature increases
-   the iteration count by one.
-
-2. Citing a reference _after_ the print-bibliography call (but not before) in a refsection with an
-   `auto` ID increases the number of layout iterations by one. This is because #pergamon puts a
-   label at the end of each refsection, but the name of this label only becomes available in iteration
-   2 if the ID is `auto`. Thus, the bibliography will only contain the references that were cited
-   after print-bibliography in iteration 3; and citations will only stabilize in iteration 4.
-   Consider giving an explicit ID to any refsection in which you cite a paper for the first time
-   after the print-bibliography call.
-
-Note that these two iteration increases are cumulative: if you use `resume-after: auto` _and_
-cite papers for the first time in an `auto` refsection, Typst will need five layout iterations.
-
+Furthermore, the number of layout iterations can occasionally grow to four if a reference in the
+bibliography occurs close to a page break. Because the exact rendering of a citation into a string changes
+across layout iterations 1--3, the bibliography itself may shift up or down by a few lines. When this
+pushes the reference across a page break, Typst needs another layout iteration to stabilize the page
+number for its label. This increase in iterations should not be cumulative with the resume-after increase;
+both together should still be done in four iterations.
 
 
 = Data model
@@ -1120,10 +1113,11 @@ to parse #bibtex files, and that crate requires the syntax variant.
 = Changelog
 
 ==== Changes in 0.6.1 (unreleased)
+- Revamped the way in which references are collected in each refsection (thanks to bluss and SillyFreak for technical advice).
 - Dropped support for `count-bib-entries`, which is no longer needed.
-- The _numeric_ style now supports custom citation labels (thanks andreas-bulling for the suggestion).
-- Fixed a number of bugs (thanks ironupiwada, zouharvi).
-- Fixed some bugs in the documentation (thanks thvdburgt).
+- The _numeric_ style now supports custom citation labels (thanks to andreas-bulling for the suggestion).
+- Fixed a number of bugs (thanks to ironupiwada, zouharvi).
+- Fixed some bugs in the documentation (thanks to thvdburgt).
 
 ==== Changes in 0.6.0 (2025-12-06)
 - Reduced the number of iterations until layout convergence from five to three.
