@@ -119,7 +119,7 @@
 
 
 #let style2 = format-citation-numeric()
-#refsection(id: "x", format-citation: style2.format-citation)[
+#refsection(format-citation: style2.format-citation)[
   #v(1em)
   = Third refsection
 
