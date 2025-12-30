@@ -19,7 +19,7 @@
 // #let fcite = format-citation-alphabetic()
 
 // Numeric:
-#let fcite = format-citation-numeric()
+#let fcite = format-citation-numeric(compact: true)
 
 #let marker = text(size: 8pt)[#emoji.star] 
 
@@ -99,7 +99,7 @@
 
   = Another section
 
-  to test \#129: #cite("bender20:_climb_nlu", "brownschmidt_2018_perspectivetaking", "test_entry2")
+  to test \#129: #cite("bender20:_climb_nlu", "brownschmidt_2018_perspectivetaking", "test_entry2", "clls", "nodate", "xxxxx", "yyyy")
 
   citet: !#citet("modelizer-24", "modelizer-24")!
 
@@ -154,8 +154,8 @@
   // #set par(hanging-indent: 1em)
   #print-bibliography(format-reference: fref, sorting: sorting,
     // grid-style: (row-gutter: 2cm),
-    label-generator: fcite.label-generator
-    // label-generator: fcite.label-generator.with(format-string: "J{:02}") // try this to get numberings J01, J02, ...
+    // label-generator: fcite.label-generator
+    label-generator: fcite.label-generator.with(format-string: "J{:02}") // try this to get numberings J01, J02, ...
   )
 
   to test tracl \#21 / pergamon \#139: #cite("test_entry2")

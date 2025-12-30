@@ -395,11 +395,28 @@
 /// references are different; there is no support for extradates like in the authoryear style.
 /// Thus you should probably make sure that `{}` occurs in the format string somewhere.
 #let format-citation-numeric(
+    /// Determines whether sequences of subsequent citation indices
+    /// should be compacted into a range. If `true`, a citation [1, 2, 3, 5, 6]
+    /// is instead rendered as [1--3, 5--6].
+    /// 
+    /// Note that the citation style does not do anything particular to sort
+    /// the citation indices within the same citation. The citation [3, 2, 1] 
+    /// will still be rendered as [3, 2, 1] and not as [1--3].
+    /// 
+    /// -> bool
+    compact: false,
+
     /// The string that separates the different citations when `cite`
     /// is called with multiple references (e.g. [1, 3, 15]).
     /// 
-    /// -> str
+    /// -> str | content
     citation-separator: ", ",
+
+    /// The string that separates the two ends of a range, if
+    /// the `compact` parameter is set to `true`.
+    /// 
+    /// -> str | content
+    compact-separator: [--],
 
     /// Wraps text in square brackets. The argument needs to be a function
     /// that takes one argument (`str` or `content`) and returns `content`.
@@ -409,22 +426,9 @@
     /// function wrapper, see @sec:package:utility.
     /// 
     /// -> function
-    format-brackets: nn(it => [[#it]])
+    format-brackets: nn(it => [[#it]]),
   ) = {
-  // let formatter(reference-dict, form) = {
-  //   let lbl = reference-dict.reference.label
-
-  //   if form == "n" {
-  //     lbl
-  //     // [#{reference-dict.index+1}]
-  //   } else {
-  //     // CLEANUP: not sure this is used anywhere
-  //     return [[#{reference-dict.index+1}]]
-  //   }
-  // }
-
   let list-formatter(reference-dicts, form, options) = {
-    // let individual-form = "n"
     let individual-citations = reference-dicts.map(x => {
       if type(x) == str {
         [*?#x?*]
@@ -436,11 +440,66 @@
         
         let (index, format-string) = reference.reference.label
         let formatted = strfmt(format-string, index)
-        link(label(lbl), formatted)
+        (index, link(label(lbl), formatted))
       }
     })
 
-    let joined = individual-citations.join(citation-separator)
+    let joined = if compact {
+      // If "compact" is requested, we suppress subsequent numbers and
+      // replace them with hyphens: 1, 2, 3, 5, 6 becomes [1-3, 5-6].
+      // This requires a bit of indexing gymnastics.
+      let pieces = ()
+
+      for (i, cit) in individual-citations.enumerate() {
+        if type(cit) == array {
+          let this-ix = cit.at(0)
+          
+          // index of previous citation in group, if exists
+          let prev-ix = if i > 0 and type(individual-citations.at(i - 1)) == array {
+            individual-citations.at(i - 1).at(0)
+          } else {
+            -100
+          }
+
+          // index of next citation in group, if exists
+          let next-ix = if i < individual-citations.len() - 1 and type(individual-citations.at(i + 1)) == array {
+            individual-citations.at(i+1).at(0)
+          } else {
+            -100
+          }
+
+          if i == 0 {
+            // first element in citation doesn't get a separator
+            pieces.push(cit.at(1))
+          } else if prev-ix == this-ix - 1 {
+            // continue range
+            if next-ix == this-ix + 1 {
+              // ignore this citation, it is inside a compact range
+            } else {
+              // last citation of compact range
+              pieces.push(compact-separator)
+              pieces.push(cit.at(1))
+            }
+          } else {
+            // start new range
+            pieces.push(citation-separator)
+            pieces.push(cit.at(1))
+          }
+        } else {
+          // undefined citation - not an array
+          if i > 0 {
+            pieces.push(citation-separator)
+          }
+          pieces.push(cit)
+        }
+      }
+
+      pieces.join("")
+    } else {
+      // non-compact
+      individual-citations.map(x => if type(x) == array { x.at(1) } else { x }).join(citation-separator)
+    }
+
     if form != "n" {
       format-brackets(joined)
     } else {
@@ -449,17 +508,13 @@
   }
 
   let label-generator(index, reference, format-string: "{}") = {
-    // let formatted = strfmt(format-string, index+1)
     ((index + 1, format-string), str(index + 1))
-    // (formatted, formatted)
-    // (index + 1, str(index + 1))
   }
 
   let reference-label(index, reference) = {
-    // let (ix, format-string) = reference.label
-    // strfmt(format-string, ix)
-
-    [[#reference.label]]
+    let (index, format-string) = reference.label
+    let formatted = strfmt(format-string, index)
+    [[#formatted]]
   }
 
   ("format-citation": list-formatter, "label-generator": label-generator, "reference-label": reference-label)
