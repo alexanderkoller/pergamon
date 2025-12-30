@@ -411,27 +411,32 @@
     /// -> function
     format-brackets: nn(it => [[#it]])
   ) = {
-  let formatter(reference-dict, form) = {
-    let lbl = reference-dict.reference.label
+  // let formatter(reference-dict, form) = {
+  //   let lbl = reference-dict.reference.label
 
-    if form == "n" {
-      lbl
-      // [#{reference-dict.index+1}]
-    } else {
-      // CLEANUP: not sure this is used anywhere
-      return [[#{reference-dict.index+1}]]
-    }
-  }
+  //   if form == "n" {
+  //     lbl
+  //     // [#{reference-dict.index+1}]
+  //   } else {
+  //     // CLEANUP: not sure this is used anywhere
+  //     return [[#{reference-dict.index+1}]]
+  //   }
+  // }
 
   let list-formatter(reference-dicts, form, options) = {
-    let individual-form = "n"
+    // let individual-form = "n"
     let individual-citations = reference-dicts.map(x => {
       if type(x) == str {
         [*?#x?*]
       } else {
-        let lbl = x.at(0)
-        let reference = x.at(1)
-        link(label(lbl), formatter(reference, individual-form))
+        let lbl = x.at(0) // str: label to link to (refid-key)
+        let reference = x.at(1) // dict: augmented reference dictionary
+        // reference.reference.label: any = first value from label-generator
+        // reference.reference.label-repr: str = second value from label-generator
+        
+        let (index, format-string) = reference.reference.label
+        let formatted = strfmt(format-string, index)
+        link(label(lbl), formatted)
       }
     })
 
@@ -444,9 +449,9 @@
   }
 
   let label-generator(index, reference, format-string: "{}") = {
-    let formatted = strfmt(format-string, index+1)
-    // ((index + 1, format-string), str(index + 1))
-    (formatted, formatted)
+    // let formatted = strfmt(format-string, index+1)
+    ((index + 1, format-string), str(index + 1))
+    // (formatted, formatted)
     // (index + 1, str(index + 1))
   }
 

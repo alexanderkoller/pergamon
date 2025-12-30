@@ -13,13 +13,13 @@
 #set heading(numbering: "1.1")
 
 // Author-Year:
-#let fcite = format-citation-authoryear()
+// #let fcite = format-citation-authoryear()
 
 // Alphabetic:
 // #let fcite = format-citation-alphabetic()
 
 // Numeric:
-// #let fcite = format-citation-numeric()
+#let fcite = format-citation-numeric()
 
 #let marker = text(size: 8pt)[#emoji.star] 
 
@@ -98,6 +98,8 @@
   }
 
   = Another section
+
+  to test \#129: #cite("bender20:_climb_nlu", "brownschmidt_2018_perspectivetaking", "test_entry2")
 
   citet: !#citet("modelizer-24", "modelizer-24")!
 
