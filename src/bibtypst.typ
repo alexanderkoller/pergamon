@@ -728,7 +728,16 @@
     /// (rather than three for other uses of Pergamon).
     /// 
     /// -> int | auto
-    resume-after: 0
+    resume-after: 0,
+
+    /// Prints the bibliography in reverse order. This does not change the
+    /// numbering of the references -- e.g. in the numeric style, the first
+    /// reference in the order of the `sorting` order is still called "[1]".
+    /// However, if `reversed` is set to `true`, the reference [1] will be
+    /// the final reference in the bibliography.
+    /// 
+    /// -> bool
+    reversed: false
   ) = context {
 
   let start-index = if resume-after == auto { rendered-citation-count.get() } else { resume-after }
@@ -763,8 +772,15 @@
   bibl-unsorted = bibl-unsorted.filter(filter)
   let sorted = label-sort-deduplicate(bibl-unsorted, label-generator, sorting-function, start-index)
   let n = sorted.len()
-  let formatted-references = sorted.enumerate(start: start-index).map(it => format-reference(it.at(0), it.at(1)))
+  let formatted-references-original = sorted.enumerate(start: start-index).map(it => format-reference(it.at(0), it.at(1)))
   // -> array(array(content))
+  
+  let formatted-references = if reversed {
+    formatted-references-original.rev()
+  } else {
+    formatted-references-original
+  }
+  
   let num-columns = if formatted-references.len() == 0 { 0 } else { formatted-references.at(0).len() }
   let cells = ()
 

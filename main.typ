@@ -153,9 +153,10 @@
 
   // #set par(hanging-indent: 1em)
   #print-bibliography(format-reference: fref, sorting: sorting,
+    // reversed: true,
     // grid-style: (row-gutter: 2cm),
-    // label-generator: fcite.label-generator
-    label-generator: fcite.label-generator.with(format-string: "J{:02}") // try this to get numberings J01, J02, ...
+    label-generator: fcite.label-generator
+    // label-generator: fcite.label-generator.with(format-string: "J{:02}") // try this to get numberings J01, J02, ...
   )
 
   to test tracl \#21 / pergamon \#139: #cite("test_entry2")

@@ -1117,6 +1117,7 @@ to parse #bibtex files, and that crate requires the syntax variant.
 - Dropped support for `count-bib-entries`, which is no longer needed.
 - The _numeric_ style now supports custom citation labels (thanks to andreas-bulling for the suggestion).
 - The _numeric_ style now supports a compact form (thanks to thvdburgt for the suggestion).
+- The `print-bibliography` function can now print the references in reverse order (thanks to andreas-bulling for the suggestion).
 - Fixed a number of bugs (thanks to ironupiwada, zouharvi).
 - Fixed some bugs in the documentation (thanks to thvdburgt).
 
