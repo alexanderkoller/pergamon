@@ -64,6 +64,7 @@
 }
 
 // Returns the current refsection identifier.
+// 
 // -> str
 #let current-refsection() = {
   let refsection-count = reference-collection.get().len()
@@ -73,6 +74,7 @@
 // Prepends x with the current refsection identifier.
 // Can be used to generate globally unique labels for references,
 // even when they appear in multiple refsections.
+// 
 // -> str
 #let refsectionize(x) = current-refsection() + "-" + x
 
@@ -287,10 +289,12 @@
 /// -> content
 #let cite(
   /// The keys of the #bibtex entries you want to cite.
+  /// 
   /// -> arguments
   ..keys,
 
   /// The citation form.
+  /// 
   /// -> str | auto
   form: auto,
 ) = context {
@@ -642,7 +646,7 @@
     /// The string given here will be rendered as a first-level heading without numbering.
     /// Pass `none` to suppress the bibliography title.
     /// 
-    /// -> str | none
+    /// -> str | content | none
     title: "References",
 
     /// Whether the title of the bibliography should appear in the document's #link("https://typst.app/docs/reference/model/outline/")[outline].

@@ -57,18 +57,19 @@
   ) = {
   let etal = names.len() > maxnames and names.len() > minnames // print "et al.", at least one name dropped
   let num-names = if etal { calc.min(minnames, names.len()) } else { names.len() } // #names that will be printed
-  let options = (list-end-delim-two: " and ", list-middle-delim: ", ", list-end-delim-many: ", and ", bibstring: default-long-bibstring) + options
+
+  let options-d = (list-end-delim-two: " and ", list-middle-delim: ", ", list-end-delim-many: ", and ", bibstring: default-long-bibstring) + options
 
   if etal {
-    let nn = names.slice(0, num-names).join(options.list-middle-delim)
-    nn + " " + options.bibstring.andothers
+    let nn = names.slice(0, num-names).join(options-d.list-middle-delim)
+    nn + " " + options-d.bibstring.andothers
   } else {
     if names.len() == 1 {
       names.at(0)
     } else if names.len() == 2 {
-      names.at(0) + options.list-end-delim-two + names.at(1)
+      names.at(0) + options-d.list-end-delim-two + names.at(1)
     } else {
-      names.join(options.list-middle-delim, last: options.list-end-delim-many)
+      names.join(options-d.list-middle-delim, last: options-d.list-end-delim-many)
     }
   }
 }

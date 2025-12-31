@@ -56,11 +56,16 @@
 
     /// The "et al" character that is appended if the number of authors exceeds the
     /// value of the `maxalphanames` parameter.
+    /// 
+    /// Note that this argument really has to be a string, not content,
+    /// because it is used in the construction of the reference labels.
+    /// 
     /// -> str
     labelalphaothers: "+",
 
     /// The string that separates the author and year in the `p` citation form.
-    /// -> str
+    /// 
+    /// -> str | content
     citation-separator: ", ",
 
     /// Wraps text in square brackets. The argument needs to be a function
@@ -180,11 +185,12 @@
   format-brackets: nn(it => [[#it]]),
 
   /// The string that separates the author and year in the `p` citation form.
-  /// -> str
+  /// 
+  /// -> str | content
   author-year-separator: " ",
 
   /// Separator symbol to connect the citations for the different keys.
-  /// -> str
+  /// -> str | content
   citation-separator: "; ",
 
   /// The string that separates the prefix from the citation.
@@ -201,7 +207,7 @@
   /// Will typically match the `list-middle-delim` argument of
   /// @format-reference.
   /// 
-  /// -> str
+  /// -> str | content
   list-middle-delim: ", ",
 
   /// When typesetting lists (e.g. author names), #bibtypst will use this
@@ -210,7 +216,7 @@
   /// Will typically match the `list-end-delim-two` argument of
   /// @format-reference.
   /// 
-  /// -> str
+  /// -> str | content
   list-end-delim-two: " and ",
 
   /// When typesetting lists (e.g. author names), #bibtypst will use this
@@ -220,7 +226,7 @@
   /// Will typically match the `list-end-delim-many` argument of
   /// @format-reference.
   /// 
-  /// -> str
+  /// -> str | content
   list-end-delim-many: ", and ",
   
   /// Overrides entries in the bibstring table. The bibstring table is a dictionary

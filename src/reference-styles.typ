@@ -1165,18 +1165,18 @@
 
     /// When typesetting lists (e.g. author names), #bibtypst will use this
     /// delimiter to combine list items before the last one.
-    /// -> str
+    /// -> str | content
     list-middle-delim: ", ",
 
     /// When typesetting lists (e.g. author names), #bibtypst will use this
     /// delimiter to combine the items of lists of length two.
-    /// -> str
+    /// -> str | content
     list-end-delim-two: " and ",
 
     /// When typesetting lists (e.g. author names), #bibtypst will use this
     /// delimiter in lists of length three of more to combine the final
     /// item in the list with the rest.
-    /// -> str
+    /// -> str | content
     list-end-delim-many: ", and ",
 
     /// String that is used to combine the name of an author with the author
