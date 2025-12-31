@@ -1,9 +1,9 @@
 
-// #import "@preview/pergamon:0.6.0": *
-#import "lib.typ": *
+#import "@preview/pergamon:0.7.0": *
+// #import "lib.typ": *
 
-#import "@preview/layout-ltd:0.1.0": layout-limiter
-#show: layout-limiter.with(max-iterations: 3)
+// #import "@preview/layout-ltd:0.1.0": layout-limiter
+// #show: layout-limiter.with(max-iterations: 3)
 
 // In this example document, we are putting the whole bibliography source
 // into one string to make the example self-contained. In practice, you would read
