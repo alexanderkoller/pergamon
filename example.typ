@@ -1,9 +1,5 @@
 
 #import "@preview/pergamon:0.7.0": *
-// #import "lib.typ": *
-
-// #import "@preview/layout-ltd:0.1.0": layout-limiter
-// #show: layout-limiter.with(max-iterations: 3)
 
 // In this example document, we are putting the whole bibliography source
 // into one string to make the example self-contained. In practice, you would read
@@ -90,7 +86,7 @@
   = Pergamon example
   We can cite a paper like this: #cite("bender20:_climb_nlu").
 
-  In the _authoryear_ style, we have some nice citation forms to play with:
+  In the _authoryear_ citation style, we have some nice citation forms to play with:
   #citet("knuth1990") said that he really liked #citeg("modelizer-24") paper.
   (This is not actually true.)
 
@@ -102,8 +98,9 @@
 
 
 
-
-#refsection()[
+// If you don't pass a "format-citation" argument, the refsection uses
+// the same citation style as the previous refsection.
+#refsection[
   #v(1em)
   = Second refsection
 
@@ -125,17 +122,17 @@
 
   Here is a third refsection. It uses a different citation style than the first two, and
   therefore both the citations and the bibliography look different
-  [#citen("knuth1990"), #citen("modelizer-24")].
+  #cite("knuth1990","modelizer-24").
 
-  Note also that the numbering continues across bibliographies through the
-  use of the `resume-after: auto` parameter.
+  Here the references are automatically split across two
+  bibliographies, and the numbering continues across bibliographies through the
+  use of the `resume-after: auto` argument.
 
   #print-bibliography(
     format-reference: format-reference(reference-label: style2.reference-label),
     label-generator: style2.label-generator,
     filter: reference => reference.entry_type == "book",
     title: "References (only books)",
-    // resume-after: auto
   )
 
   #print-bibliography(
@@ -143,8 +140,7 @@
     label-generator: style2.label-generator,
     filter: reference => reference.entry_type != "book",
     title: "References (everything else)",
-    resume-after: 1
-    // resume-after: auto
+    resume-after: auto
   )
 
   Hey look, citations can come after the bibliography: #cite("bender20:_climb_nlu").
