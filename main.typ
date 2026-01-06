@@ -13,13 +13,13 @@
 #set heading(numbering: "1.1")
 
 // Author-Year:
-// #let fcite = format-citation-authoryear()
+#let fcite = format-citation-authoryear()
 
 // Alphabetic:
 // #let fcite = format-citation-alphabetic()
 
 // Numeric:
-#let fcite = format-citation-numeric(compact: true)
+// #let fcite = format-citation-numeric(compact: true)
 
 #let marker = text(size: 8pt)[#emoji.star] 
 

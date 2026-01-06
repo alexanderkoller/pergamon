@@ -1,4 +1,4 @@
-
+#import "@preview/bullseye:0.1.0": *
 #import "@preview/oxifmt:1.0.0": strfmt
 #import "@preview/citegeist:0.2.0": load-bibliography
 #import "bib-util.typ": collect-deduplicate, fd
@@ -820,7 +820,10 @@
 
   // "References" heading
   if title != none {
-    heading(title, numbering: none, outlined: outlined)
+    match-target(
+      paged: heading(title, numbering: none, outlined: outlined),
+      html: html.elem("h2", attrs: (class: "reference-heading"), title)
+    )
   }
 
   // layout the cells in a grid
@@ -832,7 +835,10 @@
       final-grid-style.insert(key, value)
     }
 
-    grid(..final-grid-style, ..cells)
+    match-target(
+      paged: grid(..final-grid-style, ..cells),
+      html: table(columns: num-columns, ..cells)
+    )
   } else {
     []
   }

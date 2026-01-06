@@ -1,5 +1,6 @@
 
-#import "@preview/pergamon:0.7.0": *
+// #import "@preview/pergamon:0.7.0": *
+#import "lib.typ": *
 
 // In this example document, we are putting the whole bibliography source
 // into one string to make the example self-contained. In practice, you would read
