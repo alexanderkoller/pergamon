@@ -50,6 +50,11 @@
     /// -> int
     maxalphanames: 3, 
 
+    /// The minimum number of author initials to keep when abbreviating long author lists.
+    /// If `none`, defaults to `maxalphanames`.
+    /// -> int | none
+    minalphanames: none,
+
     /// The maximum number of characters that will be printed for single-authored papers.
     /// -> int
     labelalpha: 3, 
@@ -117,7 +122,7 @@
     } else {
       let first-letters = lastnames.map(s => s.at(0)).join("")
       if lastnames.len() > maxalphanames {
-        first-letters.slice(0, maxalphanames) + labelalphaothers
+        first-letters.slice(0, if minalphanames == none { maxalphanames } else { minalphanames }) + labelalphaothers
       } else {
         first-letters
       }
