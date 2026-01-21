@@ -1,3 +1,6 @@
+// #import "@preview/layout-ltd:0.1.0": layout-limiter
+// #show: layout-limiter.with(max-iterations: 3)
+
 
 // #import "@preview/pergamon:0.7.0": *
 #import "lib.typ": *
@@ -35,6 +38,8 @@
  year = {2025}
 }
 "
+
+
 
 // Here we're making the bibliography available to Pergamon.
 #add-bib-resource(bibliography)

@@ -1,5 +1,5 @@
 
-#import "src/bibtypst.typ": add-bib-resource, refsection, print-bibliography, if-citation, cite, citet, citep, citen, citeg, citename, citeyear
+#import "src/bibtypst.typ": add-bib-resource, refsection, print-bibliography, if-citation, cite, citet, citep, citen, citeg, citename, citeyear, add-category, has-category
 #import "src/reference-styles.typ": format-reference
 #import "src/citation-styles.typ": format-citation-authoryear, format-citation-alphabetic, format-citation-numeric
 #import "src/names.typ": family-names, format-name

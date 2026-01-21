@@ -1,5 +1,5 @@
 // #import "@preview/layout-ltd:0.1.0": layout-limiter
-// #show: layout-limiter.with(max-iterations: 2) // AAA check this
+// #show: layout-limiter.with(max-iterations: 3) // AAA check this
 
 
 #import "lib.typ": *
@@ -149,14 +149,25 @@
 
   Multi-citation with prefix and suffix: #cite("wu-etal-2024-reasoning", "knuth1990", prefix: "see", suffix: "and elsewhere")
 
+  to test categories (\#143):
+  #add-category("test-cat", "brownschmidt_2018_perspectivetaking", "wu-etal-2024-reasoning")
+  #context { has-category("wu-etal-2024-reasoning", "test-cat") }
+
   // to test \#130: #cite(<irtg-sgraph-15>)
 
   // #set par(hanging-indent: 1em)
   #print-bibliography(format-reference: fref, sorting: sorting,
     // reversed: true,
     // grid-style: (row-gutter: 2cm),
-    label-generator: fcite.label-generator
+    label-generator: fcite.label-generator,
+    filter: reference => not has-category(reference, "test-cat")
     // label-generator: fcite.label-generator.with(format-string: "J{:02}") // try this to get numberings J01, J02, ...
+  )
+
+  #print-bibliography(format-reference: fref, sorting: sorting,
+    label-generator: fcite.label-generator,
+    title: [References (with category "test-cat")],
+    filter: reference => has-category(reference, "test-cat")
   )
 
   to test tracl \#21 / pergamon \#139: #cite("test_entry2")

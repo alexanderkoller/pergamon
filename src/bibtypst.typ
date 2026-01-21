@@ -11,6 +11,7 @@
 #let bibliography = state("bibliography", (:))
 #let current-citation-formatter = state("format-citation", (reference, form, options) => [CITATION], )
 #let rendered-citation-count = state("rendered-citation-count", 0)
+#let categories = state("categories", (:))
 
 /// Parses #bibtex references and makes them available to #bibtypst.
 /// Due to architectural limitations in Typst, #bibtypst cannot read 
@@ -61,6 +62,68 @@
 
     old-bib
   })
+}
+
+/// Adds a category to the given bibliography entries.
+/// The primary use of a category is in splitting bibliographies;
+/// you could e.g. have one bibliography with highlighted references
+/// and another one with the other references by adding some
+/// references to a `"highlighted"` category. See the `has-category`
+/// function for looking up categories.
+/// 
+/// Like in #biblatex, a category is defined globally for the
+/// entire document, not per refsection. Calls to `add-category`
+/// should come after the call to `add-bib-resource` that loaded
+/// the references to which a category is assigned.
+#let add-category(
+  /// The category to which the keys should be assigned.
+  /// -> str
+  category, 
+
+  /// The entry keys in the bibliography that should be assigned
+  /// to the bibliography.
+  /// -> arguments
+  ..keys
+) = {
+  for key in keys.pos() {
+    categories.update(cat-dict => {
+      let cats = cat-dict.at(key, default: ())
+      cats.push(category)
+      cat-dict.insert(key, cats)
+      cat-dict
+    })
+  }
+}
+
+/// Checks whether a bibliography entry has been assigned to the
+/// given category. The primary purpose of this function is to be
+/// used as a `filter` in `print-bibliography`.
+/// 
+/// The `key` argument can be a string; in this case it is interpreted
+/// as the Bibtex key of a bibliography entry, and the function checks
+/// whether this key has been assigned to the given `category`.
+/// 
+/// Alternatively, you can pass a reference dictionary as the `key`
+/// argument. In this case, the function will check whether `key.entry_key`
+/// has been assigned to the given category.
+/// 
+/// -> bool
+#let has-category(
+  /// The key that should be looked up.
+  /// -> str | dict
+  key,
+
+  /// The category that should be checked.
+  /// -> str
+  category
+) = {
+  let kkey = if type(key) == dictionary and "entry_key" in key {
+    key.entry_key
+  } else {
+    key
+  }
+
+  category in categories.get().at(kkey, default: ())
 }
 
 // Returns the current refsection identifier.
