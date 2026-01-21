@@ -60,8 +60,3 @@ here's [the PDF it generates](https://github.com/alexanderkoller/pergamon/blob/m
 
 Please see the [Pergamon guide](https://github.com/alexanderkoller/pergamon/blob/main/docs/pergamon-0.7.0.pdf) for more details.
 
-## Contributors
-
-- [@ironupiwada](https://www.github.com/ironupiwada) contributed code for date parsing in 0.2.0.
-
-

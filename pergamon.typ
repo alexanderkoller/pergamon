@@ -1177,7 +1177,7 @@ to parse #bibtex files, and that crate requires the syntax variant.
 ==== Changes in v0.2.0
 
 - Aggregated citation commands: `#cite("key1", "key2", ...)`.
-- Support for `date` and `month` fields.
+- Support for `date` and `month` fields (thanks to ironupiwada for contributing code).
 - Added `source-id` parameter to `add-bib-resource`.
 - The `suppress-fields` option in `format-reference` can now be defined per entry type.
 - Default style avoids printing two punctuation symbols in a row.
