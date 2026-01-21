@@ -46,12 +46,24 @@
 #let format-citation-alphabetic(
     /// The maximum number of authors that will be printed in a citation string.
     /// If the actual number of authors exceeds this value, the symbol specified under
-    /// `labelalphaothers` below will be appended to indicate "et al".
+    /// `labelalphaothers` below will be appended to indicate that the author
+    /// list was truncated.
+    /// 
     /// -> int
     maxalphanames: 3, 
 
-    /// The minimum number of author initials to keep when abbreviating long author lists.
-    /// If `none`, defaults to `maxalphanames`.
+    /// The number of author initials to keep when author lists are truncated
+    /// because their length exceeded `maxalphanames`. With minalphanames = 2,
+    /// you get "[AB+26]"; with minalphanames = 3, you get "[ABC+26]".
+    /// 
+    /// Note that `maxalphanames` controls _whether_ long author lists get
+    /// truncated, and `minalphanames` controls _how many_ authors get included
+    /// in the truncated author list. Therefore, `minalphanames` can never be
+    /// greater than `maxalphanames`. If you pass a larger value, it will instead
+    /// be set to `maxalphanames`.
+    /// 
+    /// If you pass `none` (the default), `minalphanames` defaults to `maxalphanames`.
+    /// 
     /// -> int | none
     minalphanames: none,
 
@@ -83,6 +95,16 @@
     /// -> function
     format-brackets: nn(it => [[#it]])
   ) = {
+
+    // correct minalphanames
+    minalphanames = if minalphanames == none {
+      maxalphanames
+    } else if minalphanames > maxalphanames {
+      maxalphanames
+    } else {
+      minalphanames
+    }
+
   let formatter(reference-dict, form) = {
     let (reference-label, extradate) = label-parts-alphabetic(reference-dict.reference)
 
@@ -116,13 +138,13 @@
 
   let label-generator(index, reference) = {
     let lastnames = family-names(reference.fields.labelname)
-
+    
     let abbreviation = if lastnames.len() == 1 {
       lastnames.at(0).slice(0, labelalpha)
     } else {
       let first-letters = lastnames.map(s => s.at(0)).join("")
       if lastnames.len() > maxalphanames {
-        first-letters.slice(0, if minalphanames == none { maxalphanames } else { minalphanames }) + labelalphaothers
+        first-letters.slice(0, minalphanames) + labelalphaothers
       } else {
         first-letters
       }
