@@ -1,6 +1,6 @@
 #import "@preview/bullseye:0.1.0": *
 #import "@preview/oxifmt:1.0.0": strfmt
-#import "@preview/citegeist:0.2.0": load-bibliography
+#import "@preview/citegeist:0.2.1": load-bibliography
 #import "bib-util.typ": collect-deduplicate, fd
 #import "names.typ": parse-reference-names
 #import "dates.typ": parse-date, make-date-tuple
