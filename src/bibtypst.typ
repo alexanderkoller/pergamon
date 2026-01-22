@@ -355,6 +355,9 @@
   reference-collection.at(loc).last().keys()
 }
 
+// Returns the local bibliography for the current refsection.
+//
+// -> dictionary
 #let local-bibliography-at-refsection-end() = {
   let loc = find-refsection-end().location()
   local-bibliographies.at(loc).last()
@@ -844,7 +847,10 @@
   ) = context {
 
   let start-index = if resume-after == auto { rendered-citation-count.get() } else { resume-after }
-  let bib = bibliography.get()
+
+  // Combine the local bibliography for this refsection with the global bibliography.
+  // In case of duplicate keys, the definition in the local bibliography wins.
+  let bib = bibliography.get() + local-bibliography-at-refsection-end()
 
   // construct sorting function if necessary
   let sorting-function = if type(sorting) == str { construct-sorting(sorting) } else { sorting }
