@@ -48,6 +48,18 @@
     /// -> str | none
     source-id: none,
 
+    /// Marks this bibliography resource as _local_. Local bibliographies are
+    /// only available within the `refsection` in which they are defined; papers
+    /// in these bibliographies cannot be referenced from outside this refsection.
+    /// 
+    /// Pergamon allows you to define the same entry key in both the global
+    /// and a local bibliography. In case of such collisions, the entry in the
+    /// local bibliography wins.
+    /// 
+    /// Calls to `add-bib-resource` with `local: true` from outside of a
+    /// refsection are not allowed and will cause an error message.
+    /// 
+    /// -> bool
     local: false
   ) = {
     let update-bib-dict(old-bib) = {
