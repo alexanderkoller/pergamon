@@ -1114,9 +1114,9 @@ to parse #bibtex files, and that crate requires the syntax variant.
 
 ==== Changes in 0.7.1 (2026-01-22)
 - Added elementary support for HTML export.
-- Bumped to citegeist 0.2.1, which parses Bibtex more robustly and has improved error reporting.
-- Added the ability to define categories.
-- Added minalphanames option to the _alphabetic_ citation style (thanks to DorianRudolph)..
+- Bumped to citegeist 0.2.1, which parses Bibtex more robustly and has improved error reporting (thanks to Y.D.X. for the pull request).
+- Added the ability to define categories (thanks to maxnoe for the suggestion).
+- Added minalphanames option to the _alphabetic_ citation style (thanks to DorianRudolph for the pull request).
 
 ==== Changes in 0.7.0 (2025-12-31)
 - Revamped the way in which references are collected in each refsection (thanks to bluss and SillyFreak for technical advice).
