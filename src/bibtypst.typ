@@ -9,6 +9,7 @@
 
 #let reference-collection = state("reference-collection", ())
 #let bibliography = state("bibliography", (:))
+#let local-bibliographies = state("local-bibliographies", ())
 #let current-citation-formatter = state("format-citation", (reference, form, options) => [CITATION], )
 #let rendered-citation-count = state("rendered-citation-count", 0)
 #let categories = state("categories", (:))
@@ -45,24 +46,45 @@
     /// ```
     /// 
     /// -> str | none
-    source-id: none
+    source-id: none,
+
+    local: false
   ) = {
-  bibliography.update(old-bib => {
-    for (key, value) in load-bibliography(bibtex-string).pairs() {
-      if key in old-bib {
-        panic("Duplicate definition of bibliography key '" + key + "'.")
+    let update-bib-dict(old-bib) = {
+      for (key, value) in load-bibliography(bibtex-string).pairs() {
+        if key in old-bib {
+          panic("Duplicate definition of bibliography key '" + key + "'.")
+        }
+
+        if source-id != none {
+          value.fields.insert("source-id", source-id)
+        }
+
+        old-bib.insert(key, value)
       }
 
-      if source-id != none {
-        value.fields.insert("source-id", source-id)
-      }
-
-      old-bib.insert(key, value)
+      old-bib
     }
 
-    old-bib
-  })
+    if local  {
+      local-bibliographies.update(old-bib-list => {
+        if old-bib-list.len() == 0 {
+          panic("add-bib-resource(local: true) is only allowed inside a refsection!")
+        } else {
+          let old-bib = old-bib-list.pop()
+          old-bib = update-bib-dict(old-bib)
+          old-bib-list.push(old-bib)
+          old-bib-list
+        }
+      })
+    } else {
+      bibliography.update(old-bib => {
+        update-bib-dict(old-bib)
+      })
+    }
+  }
 }
+
 
 /// Adds a category to the given bibliography entries.
 /// The primary use of a category is in splitting bibliographies;
@@ -274,6 +296,14 @@
     rc
   })
 
+  // Append a new element to the list of local bibliographies. Each refsection has
+  // its own local bibliography, which is not accessible from the other refsections
+  // and shadows any bib entries with the same key from the global bibliographies.
+  local-bibliographies.update(lb => {
+    lb.push((:))
+    lb
+  })
+
   // reset the count of rendered citations to zero
   rendered-citation-count.update(0)
 
@@ -324,6 +354,12 @@
   let loc = find-refsection-end().location()
   reference-collection.at(loc).last().keys()
 }
+
+#let local-bibliography-at-refsection-end() = {
+  let loc = find-refsection-end().location()
+  local-bibliographies.at(loc).last()
+}
+
 
 /// Typesets a citation to the bibliography entry with the given keys.
 /// The `cite` function keeps track of what `refsection` we are in and
