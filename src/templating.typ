@@ -36,7 +36,7 @@
   // do the actual formatting
   for (i, x) in xs.enumerate() {
     if x != none {
-      let capitalized = if i > 0 and connector-capitalizes and type(x) == str {
+      let capitalized = if i > 0 and connector-capitalizes and type(x) == str and x.len() > 0 {
         upper(x.at(0)) + x.slice(1)
       } else if type(x) != str {
         // "NONSTRING"
@@ -52,7 +52,7 @@
         let s = content-to-string(x)
         let previous-character = if s != none and s.len() > 0 { s.codepoints().at(-1) } else { s }
 
-        if not skip-if(previous-character) {
+        if previous-character != none and not skip-if(previous-character) {
           parts.push(connector)
         }
 
