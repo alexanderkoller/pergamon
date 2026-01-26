@@ -1112,6 +1112,10 @@ to parse #bibtex files, and that crate requires the syntax variant.
 
 = Changelog
 
+==== Changes in 0.7.2 (2026-01-26)
+- Added support for refsection-local bibliographies.
+- Improved robustness in Bibtex processing.
+
 ==== Changes in 0.7.1 (2026-01-22)
 - Added elementary support for HTML export.
 - Bumped to citegeist 0.2.1, which parses Bibtex more robustly and has improved error reporting (thanks to Y.D.X. for the pull request).
