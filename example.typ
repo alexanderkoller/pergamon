@@ -2,7 +2,7 @@
 // #show: layout-limiter.with(max-iterations: 3)
 
 
-// #import "@preview/pergamon:0.7.1": *
+// #import "@preview/pergamon:0.7.2": *
 #import "lib.typ": *
 
 // In this example document, we are putting the whole bibliography source
