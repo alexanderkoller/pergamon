@@ -68,6 +68,14 @@
           panic("Duplicate definition of bibliography key '" + key + "'.")
         }
 
+        // Trim whitespace from all string field values, since citegeist
+        // does not guarantee trimmed output.
+        for (field-key, field-value) in value.fields.pairs() {
+          if type(field-value) == str {
+            value.fields.insert(field-key, field-value.trim())
+          }
+        }
+
         if source-id != none {
           value.fields.insert("source-id", source-id)
         }
