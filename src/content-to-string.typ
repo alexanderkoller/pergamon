@@ -269,7 +269,7 @@
   } else if fn == "styled" {
     capitalize-first(c.child)
 
-  } else if "body" in fields {
+  } else if fn in ("strong", "emph", "underline", "overline", "strike", "highlight", "sub", "super") {
     (c.func())(capitalize-first(c.body))
 
   } else {
