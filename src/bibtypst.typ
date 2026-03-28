@@ -10,9 +10,12 @@
 #let reference-collection = state("reference-collection", ())
 #let bibliography = state("bibliography", (:))
 #let local-bibliographies = state("local-bibliographies", ())
-#let current-citation-formatter = state("format-citation", (reference, form, options) => [CITATION], )
 #let rendered-citation-count = state("rendered-citation-count", 0)
 #let categories = state("categories", (:))
+
+
+#let current-citation-formatter = state("format-citation", (reference, form, options) => [CITATION], )
+#let current-style-bundle = state("style", none) // TODOD: replace none with good default
 
 /// Parses #bibtex references and makes them available to #bibtypst.
 /// Due to architectural limitations in Typst, #bibtypst cannot read 
@@ -304,6 +307,10 @@
   /// -> function | auto
   format-citation: auto,
 
+  /// TODO: DOCUMENT ME
+  /// -> dictionary
+  style: auto,
+
   /// The section of the document that is to be wrapped in this `refsection`.
   /// -> content
   doc) = {
@@ -327,9 +334,19 @@
   // reset the count of rendered citations to zero
   rendered-citation-count.update(0)
 
-  // update the citation formatter if one was specified
+  // Update either the style bundle or the citation formatter.
+  // Priority is as follows:
+  // 1. If an explicit citation formatter was given, we use it.
+  //    Any previous style bundle stays intact, but the citation formatter
+  //    takes precedence within this refsection.
+  // 2. If an explicit style bundle was given, we use it and
+  //    delete any previous citation formatter.
+  // 3. If both are `auto`, we reuse the state from the previous refsection.
   if format-citation != auto {
     current-citation-formatter.update(it => format-citation)
+  } else if style != auto {
+    current-style-bundle.update(it => style)
+    current-citation-formatter.update(it => none)
   }
 
   context {
@@ -383,6 +400,16 @@
   local-bibliographies.at(loc).last()
 }
 
+// Returns the citation formatter for the current refsection.
+// If the refsection is controlled by a style bundle, return its
+// citation style; otherwise return the current citation style.
+#let get-citation-formatter() = {
+  if current-citation-formatter.get() == none {
+    current-style-bundle.get().at("citation-style")
+  } else {
+    current-citation-formatter.get()
+  }
+}
 
 /// Typesets a citation to the bibliography entry with the given keys.
 /// The `cite` function keeps track of what `refsection` we are in and
@@ -420,7 +447,7 @@
   /// -> str | auto
   form: auto,
 ) = context {
-  let format-citation = current-citation-formatter.get()
+  let format-citation = get-citation-formatter()
   let to-format = ()
 
   let xkeys = keys.pos()
@@ -451,7 +478,8 @@
   }
 
   // call the citation formatter to typeset the citations
-  format-citation(to-format, form, keys.named())
+  format-citation(to-format, form, keys.named()) // XXX
+  // [#format-citation]
 }
 
 /// Typesets a citation with the form `"t"`, e.g. "Smith et al. (2020)".
@@ -691,7 +719,7 @@
     /// All calls to `format-reference` should return arrays of the same length.
     /// 
     /// -> function
-    format-reference: (index, reference) => ([REFERENCE],),
+    format-reference: auto, 
 
     /// Generates label information for the given reference. The function takes
     /// the reference dictionary and the reference's index in the sorted bibliography as input and returns
@@ -712,7 +740,7 @@
     /// Note that `label-repr` _must_ be a `str`.
     /// 
     /// -> function
-    label-generator: (index, reference) => (index + 1, str(index + 1)),
+    label-generator: auto, 
 
     /// A function that defines the order in which references are shown in the bibliography.
     /// This function takes a #link(<sec:reference>)[reference dictionary] as input and returns a value that can be 
@@ -865,6 +893,29 @@
     /// -> bool
     reversed: false
   ) = context {
+  // look up format-reference and label-generator
+  let style = current-style-bundle.get()
+  
+  let format-reference = if format-reference == auto {
+    if style != none {
+      style.at("reference-style")
+    } else {
+      (index, reference) => ([REFERENCE],)
+    }
+  } else {
+    format-reference
+  }
+
+  let label-generator = if label-generator == auto {
+    if style != none {
+      style.at("label-generator")
+    } else {
+      (index, reference) => (index + 1, str(index + 1))
+    }
+  } else {
+    label-generator
+  }
+
 
   let start-index = if resume-after == auto { rendered-citation-count.get() } else { resume-after }
 

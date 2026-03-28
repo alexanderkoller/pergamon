@@ -1,5 +1,5 @@
-// #import "@preview/layout-ltd:0.1.0": layout-limiter
-// #show: layout-limiter.with(max-iterations: 3) // AAA check this
+#import "@preview/layout-ltd:0.1.0": layout-limiter
+#show: layout-limiter.with(max-iterations: 3) // AAA check this
 
 
 #import "lib.typ": *
@@ -70,6 +70,12 @@
 
 
 
+#let style = (
+  citation-style: fcite.format-citation,
+  reference-style: fref,
+  label-generator: fcite.label-generator
+)
+
 
 #let sorting = "nyt"
 
@@ -78,7 +84,8 @@
 #add-bib-resource(read("bibs/other.bib"))
 #add-bib-resource(read("bibs/physics.bib"))
 
-#refsection(format-citation: fcite.format-citation)[ // id: "hallo", 
+#refsection(style: style)[
+// #refsection(format-citation: fcite.format-citation)[ // id: "hallo", 
   // This show rule has to come inside the refsection, otherwise it is
   // overwritten by the show rule that is defined in refsection's source code.
   // It colors the citation links based on whether the reference is to a PI publication.
@@ -156,10 +163,12 @@
   // to test \#130: #cite(<irtg-sgraph-15>)
 
   // #set par(hanging-indent: 1em)
-  #print-bibliography(format-reference: fref, sorting: sorting,
+  #print-bibliography(
+    // format-reference: fref, 
+    sorting: sorting,
     // reversed: true,
     // grid-style: (row-gutter: 2cm),
-    label-generator: fcite.label-generator,
+    // label-generator: fcite.label-generator,
     filter: reference => not has-category(reference, "test-cat")
     // label-generator: fcite.label-generator.with(format-string: "J{:02}") // try this to get numberings J01, J02, ...
   )
