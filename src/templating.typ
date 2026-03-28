@@ -1,5 +1,5 @@
 
-#import "content-to-string.typ": content-to-string
+#import "content-to-string.typ": content-to-string, capitalize-first
 
 #let not-none(el) = el != none
 // #let strip-final(s, character) = if s.ends-with(character) { s.slice(0, -1) } else { s }
@@ -20,7 +20,7 @@
   let parts = () // acts as a stringbuffer, so fjoin can run in linear time
   let empty = true
   let rightmost-nonempty-index = -1
-  let connector-capitalizes = connector in capitalize-after
+  let connector-capitalizes = capitalize-after.len() > 0 and connector in capitalize-after
 
   if type(skip-if) == str {
     skip-if = previous-character => previous-character in skip-if
@@ -36,11 +36,8 @@
   // do the actual formatting
   for (i, x) in xs.enumerate() {
     if x != none {
-      let capitalized = if i > 0 and connector-capitalizes and type(x) == str and x.len() > 0 {
-        upper(x.at(0)) + x.slice(1)
-      } else if type(x) != str {
-        // "NONSTRING"
-        x
+      let capitalized = if i > 0 and connector-capitalizes {
+        capitalize-first(x)
       } else {
         x
       }

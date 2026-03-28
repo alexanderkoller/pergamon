@@ -51,7 +51,7 @@
   },
 
   // Override bibstring entries like this:
-  bibstring: ("in": "In"),
+  // bibstring: ("in": "In"),
   bibstring-style: "long",
 
   // format-fields: (
