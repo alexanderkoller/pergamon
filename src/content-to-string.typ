@@ -216,4 +216,66 @@
 }
 
 
+/// Capitalize the first text character in a string or content tree,
+/// but only if that character is a letter (including non-English letters like "ä").
+/// Returns the input unchanged if the first character is not a letter.
+/// Follows the same dispatch pattern as `map-tree`, but reconstructs
+/// the tree with only the first text leaf modified.
+#let capitalize-first(c) = {
+  if c == none { return none }
+
+  if type(c) == str {
+    if c.len() == 0 { return c }
+    let cps = c.codepoints()
+    let ch = cps.at(0)
+    if upper(ch) == lower(ch) { return c } // not a letter
+    return upper(ch) + cps.slice(1).join()
+  }
+
+  let fn = repr(c.func())
+  let fields = c.fields().keys()
+
+  if fn in ("text", "raw") {
+    let t = c.text
+    if t.len() == 0 { return c }
+    let cps = t.codepoints()
+    let ch = cps.at(0)
+    if upper(ch) == lower(ch) { return c } // not a letter
+    upper(ch) + cps.slice(1).join()
+
+  } else if "children" in fields {
+    // Do NOT call concat-adjacent-text here — unlike map-tree, we are
+    // reconstructing content and must preserve smartquotes etc.
+    let children = c.children
+
+    // Capitalize only the first substantive child, keep the rest unchanged
+    let found = false
+    let new-children = ()
+    for child in children {
+      if not found {
+        let child-fn = repr(child.func())
+        if child-fn in ("space", "linebreak", "parbreak") {
+          new-children.push(child)
+        } else {
+          new-children.push(capitalize-first(child))
+          found = true
+        }
+      } else {
+        new-children.push(child)
+      }
+    }
+    new-children.join()
+
+  } else if fn == "styled" {
+    capitalize-first(c.child)
+
+  } else if "body" in fields {
+    (c.func())(capitalize-first(c.body))
+
+  } else {
+    c
+  }
+}
+
+
 // English punctuation: ".,?!;:"
