@@ -552,3 +552,4 @@
 
   ("format-citation": list-formatter, "label-generator": label-generator, "reference-label": reference-label)
 }
+

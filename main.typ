@@ -1,5 +1,5 @@
-#import "@preview/layout-ltd:0.1.0": layout-limiter
-#show: layout-limiter.with(max-iterations: 3) // AAA check this
+// #import "@preview/layout-ltd:0.1.0": layout-limiter
+// #show: layout-limiter.with(max-iterations: 3) // AAA check this
 
 
 #import "lib.typ": *
@@ -174,7 +174,7 @@
   )
 
   #print-bibliography(format-reference: fref, sorting: sorting,
-    label-generator: fcite.label-generator,
+    // label-generator: fcite.label-generator,
     title: [References (with category "test-cat")],
     filter: reference => has-category(reference, "test-cat")
   )

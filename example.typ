@@ -47,30 +47,32 @@
 
 
 // Select a citation style by uncommenting the line you like:
-#let style = format-citation-authoryear()
-// #let style = format-citation-alphabetic()
-// #let style = format-citation-numeric()
+// #let style = format-citation-authoryear()
+// // #let style = format-citation-alphabetic()
+// // #let style = format-citation-numeric()
 
-// Pick options for the reference style:
-#let fref = format-reference(
-  reference-label: style.reference-label,
+// // Pick options for the reference style:
+// #let fref = format-reference(
+//   reference-label: style.reference-label,
 
-  // Try out different name formats, e.g. "{family}, {given}" and "{g}. {family}":
-  // name-format: "{family}, {given}",
+//   // Try out different name formats, e.g. "{family}, {given}" and "{g}. {family}":
+//   // name-format: "{family}, {given}",
   
-  // Try rendering additional fields, either as strings or as functions:
-  // additional-fields: ("award",)
-  // additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),
+//   // Try rendering additional fields, either as strings or as functions:
+//   // additional-fields: ("award",)
+//   // additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),
   
-  // Try highlighting references, e.g. based on keywords:
-  // highlight: (x, reference, index) => {
-  //  if "highlight" in reference.fields.at("keywords", default: ()) {
-  //     [#text(size: 8pt)[#emoji.star.box] #x]
-  //  } else {
-  //     x
-  //  }
-  // }
-)
+//   // Try highlighting references, e.g. based on keywords:
+//   // highlight: (x, reference, index) => {
+//   //  if "highlight" in reference.fields.at("keywords", default: ()) {
+//   //     [#text(size: 8pt)[#emoji.star.box] #x]
+//   //  } else {
+//   //     x
+//   //  }
+//   // }
+// )
+
+#let style = authoryear-style()
 
 // These show rules typeset references to my own papers in green
 // and all other links in blue.
@@ -88,7 +90,7 @@
 
 
 
-#refsection(format-citation: style.format-citation)[
+#refsection(style: style)[
   = Pergamon example
   We can cite a paper like this: #cite("bender20:_climb_nlu").
 
@@ -96,10 +98,7 @@
   #citet("knuth1990") said that he really liked #citeg("modelizer-24") paper.
   (This is not actually true.)
 
-  #print-bibliography(
-    format-reference: fref,
-    label-generator: style.label-generator,
-  )
+  #print-bibliography()
 ]
 
 
@@ -113,16 +112,12 @@
   Here is another refsection. If you cite different papers than in the first 
   refsection, the bibliography will contain different papers: #cite("bender20:_climb_nlu").
 
-  #print-bibliography(
-    format-reference: fref,
-    label-generator: style.label-generator,
-  )
+  #print-bibliography()
 ]
 
 
 
-#let style2 = format-citation-numeric()
-#refsection(format-citation: style2.format-citation)[
+#refsection(style: numeric-style())[
   #v(1em)
   = Third refsection
 
@@ -135,15 +130,11 @@
   use of the `resume-after: auto` argument.
 
   #print-bibliography(
-    format-reference: format-reference(reference-label: style2.reference-label),
-    label-generator: style2.label-generator,
     filter: reference => reference.entry_type == "book",
     title: "References (only books)",
   )
 
   #print-bibliography(
-    format-reference: format-reference(reference-label: style2.reference-label),
-    label-generator: style2.label-generator,
     filter: reference => reference.entry_type != "book",
     title: "References (everything else)",
     resume-after: auto
