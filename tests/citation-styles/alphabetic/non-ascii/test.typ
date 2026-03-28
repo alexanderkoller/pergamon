@@ -20,6 +20,8 @@ year = {1968}
 #refsection(format-citation: style.format-citation)[
   = UTF-8 Bug
 
+  #cite("https://doi.org/10.1002/qua.560020505")
+
   #print-bibliography(
     show-all: true,
     title: none,
