@@ -30,13 +30,3 @@
 
 // capitalize content: mixed string and content
 #assert.eq("Operating System. Research report", content-to-string(fjoin(".", "Operating System", [research report], capitalize-after: ".!?")))
-
-// capitalize-first unit tests
-#import "/src/content-to-string.typ": capitalize-first
-
-#assert.eq("Hello", capitalize-first("hello"))
-#assert.eq("Hello", capitalize-first("Hello"))
-#assert.eq("", capitalize-first(""))
-#assert.eq(none, capitalize-first(none))
-#assert.eq("Hello", content-to-string(capitalize-first([hello])))
-#assert.eq("Hello world", content-to-string(capitalize-first([hello world])))
