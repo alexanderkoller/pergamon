@@ -140,7 +140,7 @@
     let lastnames = family-names(reference.fields.labelname)
     
     let abbreviation = if lastnames.len() == 1 {
-      lastnames.at(0).slice(0, labelalpha)
+      lastnames.at(0).codepoints().slice(0, labelalpha).join()
     } else {
       let first-letters = lastnames.map(s => s.at(0)).join("")
       if lastnames.len() > maxalphanames {
