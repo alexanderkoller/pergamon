@@ -966,7 +966,7 @@ reference; third, the citations in the running text are rendered correctly based
 The number of layout iterations is increased to four if you use the `resume-after: auto` feature 
 in the numeric citation style. This feature requires an accurate count of the
 references in the first bibliography in order to determine the numbering of the second bibliography.
-Thus, the labels in the second bibliography only stabilize in layout iteration 3, and the citations
+Thus, the labels in the second bibliography only stabil§ize in layout iteration 3, and the citations
 to these references only stabilize in iteration 4. Be aware that the use of this feature increases
 the iteration count by one.
 
@@ -1126,7 +1126,9 @@ Here we explain the builtin citation styles.
 == Style bundles
 <sec:package:style-bundles>
 
-#unfinished[write this]
+The following functions construct style bundles and provide the
+ three builtin style bundles.
+#v(1em)
 
 #let x = tidy.parse-module(read("src/style-bundles.typ"), scope: scope)
 #tidy.show-module(x, style: tidy.styles.default, show-outline: false)
