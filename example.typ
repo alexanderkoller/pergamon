@@ -48,6 +48,8 @@
 #let style = authoryear-style(
   // Pick options for the reference style:
   reference: (
+    print-date-after-authors: true,
+    
     // Try out different name formats, e.g. "{family}, {given}" and "{g}. {family}":
     // name-format: "{family}, {given}",
     
