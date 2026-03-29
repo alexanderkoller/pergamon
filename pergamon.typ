@@ -1112,6 +1112,13 @@ to parse #bibtex files, and that crate requires the syntax variant.
 
 = Changelog
 
+==== Changes in 0.8.0 (2026-03-29)
+- Introduced style bundles.
+- Words that appear after periods are now systematically uppercased, fixing the most glaringly incorrect visual mistake.
+- Leading and trailing whitespace in Bibtex fields is now trimmed.
+- In the _alphabetic_ style, author names with non-ASCII first characters are now treated correctly (thanks to prawin12345 for the pull request).
+- In the _authoryear_ style, subsequent citations with the same authors can now be automatically merged (thanks to zouharvi for the suggestion).
+
 ==== Changes in 0.7.2 (2026-01-26)
 - Added support for refsection-local bibliographies.
 - Improved robustness in Bibtex processing.
