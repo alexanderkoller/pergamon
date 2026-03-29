@@ -1380,15 +1380,21 @@
 
     /// A specification of field names that should not be printed. References are treated
     /// as if they do not contain values for these fields, even if the #bibtex file
-    /// defines them. 
+    /// defines them.
     /// 
-    /// You can pass an array of strings here. These field names will be suppressed in
-    /// all references.
-    /// 
-    /// Alternatively, you can pass a dictionary that maps entry types to arrays of strings.
+    /// You can pass a dictionary that maps entry types to arrays of strings.
     /// `("inproceedings": ("editor", "location"))` means that the editor and location fields
     /// will not be printed in `inproceedings` references, but may be printed in other
-    /// entry types. You can use the special key `"*"` to suppress fields in _all_ entry types.
+    /// entry types. 
+    /// 
+    /// You can use the special key `"*"` to suppress fields in _all_ entry types.
+    /// A typical usecase is to hide the months and days of the `date` field
+    /// and typeset only the year: pass `("*": ("month", "day"))` to `suppress-fields`.
+    ///
+    /// If you don't need fine-grained control over the entry types, you can simply
+    /// pass an array of strings instead of a dictionary. 
+    /// These field names will be suppressed in
+    /// all references.
     /// 
     /// Finally, you can also pass  `none` to indicate that
     /// no fields should be suppressed.
