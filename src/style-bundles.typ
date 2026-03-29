@@ -1,10 +1,10 @@
 #import "citation-styles.typ": format-citation-alphabetic, format-citation-authoryear, format-citation-numeric
 #import "reference-styles.typ": format-reference
 
-/// Style bundles for the builtin styles.
-/// TODO: Add parameters.
+// Style bundles for the builtin styles.
 
 
+/// #unfinished[TODO]
 #let build-style(
   citation-factory, 
   reference-factory,
@@ -25,6 +25,7 @@
   )
 }
 
+/// #unfinished[TODO]
 #let numeric-style(
   citation: (:),
   reference: (:)
@@ -37,6 +38,7 @@
   )
 }
 
+/// #unfinished[TODO]
 #let alphabetic-style(
   citation: (:),
   reference: (:)
@@ -49,6 +51,7 @@
   )
 }
 
+/// #unfinished[TODO]
 #let authoryear-style(
   citation: (:),
   reference: (:)

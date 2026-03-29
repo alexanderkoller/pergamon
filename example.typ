@@ -49,7 +49,7 @@
   // Pick options for the reference style:
   reference: (
     print-date-after-authors: true,
-    
+
     // Try out different name formats, e.g. "{family}, {given}" and "{g}. {family}":
     // name-format: "{family}, {given}",
     
@@ -97,8 +97,8 @@
 
 
 
-// If you don't pass a "format-citation" argument, the refsection uses
-// the same citation style as the previous refsection.
+// If you don't pass a "style" or "format-citation" argument, the refsection 
+// uses the same citation style as the previous refsection.
 #refsection[
   #v(1em)
   = Second refsection

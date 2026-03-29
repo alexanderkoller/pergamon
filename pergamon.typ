@@ -90,7 +90,8 @@ people actually care about.
 #link("https://en.wikipedia.org/wiki/Pergamon")[Pergamon] was an ancient Greek city state in Asia Minor.
 Its library was second only to the Library of Alexandria around 200 BC.
 
-= Example 
+= Example
+<sec:example>
 
 The following piece of code typesets a bibliography using #bibtypst.
 (You can try out a more complex example yourself: download #link("https://github.com/alexanderkoller/pergamon/blob/main/example.typ")[example.typ from Github]\;
@@ -100,18 +101,13 @@ see also #link("https://github.com/alexanderkoller/pergamon/blob/main/example.pd
 // construct code example, with the right Pergamon version interpolated in
 #let example-raw = "#import \"@preview/pergamon:VERSION\": *
 
-#let style = format-citation-numeric()
 #add-bib-resource(read(\"bibliography.bib\"))
 
-#refsection(format-citation: style.format-citation)[
+#refsection(style: numeric-style())[
   ... some text here ...
   #cite(\"bender20:_climb_nlu\")
 
-  #print-bibliography(
-       format-reference: 
-             format-reference(reference-label: style.reference-label), 
-       label-generator: style.label-generator,
-       sorting: \"nyt\")
+  #print-bibliography()
 ]".replace("VERSION", version)
 
 #zebraw(lang: false, raw(example-raw, lang: "typ", block: true))
@@ -122,21 +118,18 @@ see also #link("https://github.com/alexanderkoller/pergamon/blob/main/example.pd
 #figure(
   box(stroke: 1pt, inset: 6pt)[
     #set align(left)
-    #let style = format-citation-numeric()
 
-    #refsection(format-citation: style.format-citation)[
+    #refsection(style: numeric-style())[
       ... some text here ... #cite("bender20:_climb_nlu")
       #v(-1em)
 
       #print-bibliography(
-       outlined: false,
-       format-reference: format-reference(reference-label: style.reference-label), 
-       label-generator: style.label-generator
+       outlined: false
       )
     ]
   ],
   placement: top,
-  caption: [Example bibliography typeset with #bibtypst (`numeric` citation style).]
+  caption: [Example bibliography typeset with #bibtypst (`numeric` style).]
 ) <fig:example-output>
 
 This will generate the output shown in @fig:example-output. Let's go through the different
@@ -158,26 +151,19 @@ regular Typst citation syntax `@bender20:_climb_nlu` for a number of reasons (se
 Note that this is not the same as Typst's builtin #link("https://typst.app/docs/reference/model/cite/")[cite] function, which is overwritten 
 by #bibtypst.
 
-Notice that `refsection` has a parameter `format-citation` to which we passed `style.format-citation` in the example.
-This tells the `refsection` how to typeset citations -- in the example, that `#cite("bender20:_climb_nlu")` should be
-rendered as "[1]". 
+The call to `refsection` has a parameter `style`, to which we passed `numeric-style()`.
+This specifies the _style_ that should be used to typeset citations and bibliographies
+in this refsection. _Numeric_ is one of the three builtin styles of #pergamon; the
+two others, _alphabetic_ and _authoryear_, will be demonstrated below. 
+The call to `print-bibliography` at the end of the refsection typesets all
+the references that were cited in this refsection; the style controls how exactly 
+it typesets the references.
 
-The `format-citation` function is typically defined in a _#bibtypst style_, along with
-a companion function `format-reference` that specifies how the individual references in the bibliography are rendered.
-In the example, the `style` is obtained through a call to `format-citation-numeric()` in line 4.
-Observe that it has an opening and closing bracket after the function name.
-This is because citation and reference formatters can be configured by passing arguments to this function.
-In the example, we just use the default configuration for the numeric style.
-
-Finally, the example calls `print-bibliography` to typeset the bibliography itself. This is where you pass
-the `format-reference` function that renders the individual references. You can furthermore specify how the 
-references should be ordered in the bibliography through the `sorting` parameter. In the example, the 
-references are ordered by ascending author name; then ascending publication year; then ascending title.
-Note also that `style.label-generator` is passed as an argument to `print-bibliography`. This function generates 
-internal style-specific information that is used to typeset both references and citations.
-
-All of these functions can take additional parameters that you can use to customize the appearance of the bibliography.
-See @sec:package-doc for details.
+Observe that `numeric-style()` has an opening and closing bracket after the function name,
+indicating that we want to use the numeric style with its default parameters.
+You can customize how #pergamon typesets citations and references by passing
+different arguments to the styles; modifying the builtin citation and reference
+styles; and even implementing your own styles from scratch. This is explained below.
 
 
 
@@ -192,10 +178,57 @@ There are two different types of styles in #bibtypst:
 - _Reference styles_ define how the individual references are typeset in the bibliography.
 - _Citation styles_ define how citations are typeset in the text.
 
-Obviously, the reference and citation style that is used in a refsection should fit together to avoid confusing the reader.
-
 #bibtypst comes with one predefined reference style and three predefined citation styles. We will explain these below,
 and then we will sketch how to define your own custom styles.
+
+For convenience, a matching reference style and citation style can be packaged
+into a _style bundle_. When we passed `style: numeric-style()` in the example
+of @sec:example, we specified a style bundle for the refsection.  While this section focuses on
+explaining the reference and citation styles separately, you will probably
+mostly use style bundles in practice. They are explained in @sec:style-bundles.
+
+
+== Specifying styles
+
+There are two fundamental ways in which a style can be specified in #pergamon.
+The first is through a style bundle, as shown in the example in @sec:example:
+You pass a style bundle to the refsection's `style` argument; the citations
+within this refsection then use this bundle's citation style, and all calls
+to `print-bibliography` in the refsection use the bundle's reference style.
+This should be sufficient for most uses of #pergamon.
+
+Alternatively, you can specify the citation and reference styles
+separately:
+
+// construct code example, with the right Pergamon version interpolated in
+#let example-raw = "#import \"@preview/pergamon:VERSION\": *
+
+#let style = format-citation-numeric()
+#add-bib-resource(read(\"bibliography.bib\"))
+
+#refsection(format-citation: style.format-citation)[
+  ... some text here ...
+  #cite(\"bender20:_climb_nlu\")
+
+  #print-bibliography(
+    format-reference: 
+      format-reference(reference-label: style.reference-label), 
+    label-generator: style.label-generator
+  )
+]".replace("VERSION", version)
+
+#zebraw(lang: false, raw(example-raw, lang: "typ", block: true))
+
+This will generate the same output as the original example
+(as in @fig:example-output); the code is more complicated, but
+makes the different components of the style bundle visible.
+Notice that the refsection is only passed a citation style.
+The `print-bibliography` function is passed a reference style
+in the `format-reference` argument. The citation and reference
+style are connected through the `label-generator`, which generates
+the labels by which each reference is displayed when it is cited.
+
+
 
 == Builtin reference style
 <sec:builtin-reference>
@@ -244,8 +277,8 @@ the following arguments will change the output of the example above to look like
     print-date-after-authors: true, 
     format-quotes: it => it
   ), 
-  label-generator: style.label-generator,
-  sorting: "nyt")
+  label-generator: style.label-generator
+)
 ```)
 
 We passed `true` for the argument `print-date-after-authors`. This moved the year from the end of the 
@@ -257,8 +290,8 @@ collections (in this case, a volume of conference proceedings) in quotes by appl
 By replacing the default `format-quotes` function with the identity function, we can make the quotes disappear
 in the output.
 
-#bibtypst exploits Typst's ability to pass functions as arguments quite heavily. This makes it cleaner in some ways 
-than #biblatex, which is built on top of LaTeX, whose macros are much less flexible.
+// #bibtypst exploits Typst's ability to pass functions as arguments quite heavily. This makes it cleaner in some ways 
+// than #biblatex, which is built on top of LaTeX, whose macros are much less flexible.
 
 
 == Builtin citation styles
@@ -268,8 +301,9 @@ than #biblatex, which is built on top of LaTeX, whose macros are much less flexi
 These replicate the #biblatex styles of the same names (see e.g. the #link("https://www.overleaf.com/learn/latex/Biblatex_bibliography_styles")[examples on Overleaf]).
 
 Unlike in Typst's regular bibliography mechanism, you write `#cite("key")` to insert a citation into your document
-when you use #bibtypst. The exact string that is inserted depends on 
-the citation style you use. 
+when you use #bibtypst, _not_ `#cite(<key>)`.
+#pergamon replaces this citation command by a citation string, which depends
+on the citation style you use.
 
 The difference between the three builtin citation styles is illustrated in @fig:example-output (numeric), @fig:example-alphabetic (alphabetic), and @fig:example-authoryear (authoryear). _Numeric_ and _alphabetic_ both create a label for each bibliography entry;
 in the case of _numeric_, the label is the position in the bibliography, and in the case of _alphabetic_, it is a unique string consisting of the first characters of the author names and the year. In both cases, these labels are displayed next to the references and also used as the string to which `#cite(key)` expands. By contrast, _authoryear_ does not display any labels next to the references; it expands `#cite(key)` to a string consisting of the last names of the authors and the year.
@@ -287,18 +321,13 @@ in square brackets rather than round ones, you can replace line 4 in the above e
 #figure(
   box(stroke: 1pt, inset: 6pt)[
     #set align(left)
-    #let style = format-citation-alphabetic()
 
-    #refsection(format-citation: style.format-citation)[
+    #refsection(style: alphabetic-style())[
       ... some text here ... #cite("bender20:_climb_nlu")
       #v(-1em)
 
       #print-bibliography(
-       format-reference: format-reference(
-          reference-label: style.reference-label,
-       ), 
-       outlined: false,
-       label-generator: style.label-generator
+       outlined: false
       )
     ]
   ],
@@ -310,18 +339,13 @@ in square brackets rather than round ones, you can replace line 4 in the above e
 #figure(
   box(stroke: 1pt, inset: 6pt)[
     #set align(left)
-    #let style = format-citation-authoryear()
 
-    #refsection(format-citation: style.format-citation)[
+    #refsection(style: authoryear-style())[
       ... some text here ... #cite("bender20:_climb_nlu")
       #v(-1em)
 
       #print-bibliography(
-       format-reference: format-reference(
-          reference-label: style.reference-label,
-       ), 
-       outlined: false,
-       label-generator: style.label-generator
+       outlined: false
       )
     ]
   ],
@@ -347,6 +371,30 @@ convenience, #biblatex defines the functions `citet`, `citep`, `citen`, and `cit
 just call `cite` with the respective citation form.
 
 
+
+#figure(
+  table(columns: 4,
+    align: left + horizon,
+    // column-gutter: 1em,
+    inset: (x: 1em, y: 0.7em),
+    // stroke: none,
+    fill: (_, y) => if calc.odd(y) { rgb("EAF2F5") },
+
+    [], [*authoryear*], [*alphabetic*], [*numeric*],
+    [`auto`], [(Bender and Koller 2020)], [[BK20]], [[1]],
+    [p], [(Bender and Koller 2020)], [--], [--],
+    [t], [Bender and Koller (2020)], [--], [--],
+    [g], [Bender and Koller's (2020)], [--], [--],
+    [name], [Bender and Koller], [--], [--],
+    [year], [2020], [--], [--],
+    [n], [Bender and Koller 2020], [BK20], [1]
+  ),
+  placement: top,
+  caption: [Citation forms.]
+) <fig:citation-forms>
+
+
+
 === Citation options
 
 You can pass extra named arguments to the Pergamon citation commands
@@ -366,12 +414,14 @@ as in the example. You can still pass options
 to the other citation styles; they will simply ignore them.
 
 
-
-
 == Customizing the reference style
 <sec:customizing-style>
 
-You can deeply customize how the default reference style in #pergamon typesets the individual references.
+You can deeply customize how the default reference style in #pergamon typesets the individual references. Your first stop should be to look into the parameters of
+`format-reference` and `print-bibliography`, see @sec:package:main and @sec:package:builtin-reference.
+
+If this is not flexible enough, you can modify the behavior of the default reference style
+by defining how specific pieces of references are typeset.
 The default style defines a variety of functions in #link("https://github.com/alexanderkoller/pergamon/blob/main/src/reference-styles.typ")[reference-styles.typ]
  that typeset pieces of the reference; for instance,
 the function `journal-issue-title` displays the title and issue of a journal and connects them correctly with
@@ -422,7 +472,7 @@ as shown below:
 
 #zebraw(lang: false,
 ```typ
-#import "@preview/pergamon:0.5.0": *
+#import "@preview/pergamon:0.8.0": *
 #let dev = pergamon-dev
 
 #print-bibliography(
@@ -452,7 +502,6 @@ the default one.
 The formatting functions that can be overridden are exactly those that start with `with-default` in #link("https://github.com/alexanderkoller/pergamon/blob/main/src/reference-styles.typ")[reference-styles.typ]. That file will also give you hints on which formatting function you have to override for the effect you want.
 You can access the other formatting functions through the dictionary `pergamon-dev`, which you can access after importing #pergamon
 (see the code above). 
-
 
 
 == Implementing your own styles from scratch 
@@ -508,28 +557,68 @@ will still be available, allowing you to precompute any information you find use
 
 
 
-#figure(
-  table(columns: 4,
+
+== Style bundles
+<sec:style-bundles>
+
+A style bundle is a dictionary that packages a reference style, a citation formatter,
+and a label generator:
+
+#zebraw(lang: false,
+```typ
+(
+  citation-style: (citation formatter),
+  reference-style: (reference style),
+  label-generator: (label generator)
+)
+```)
+
+The citation style also contains a reference labeler, which is used in the
+construction of the reference style.
+
+#pergamon comes with three builtin style bundles, each of which combines
+the default reference style with one of the three builtin citation styles:
+
+#align(center)[
+#table(columns: 2,
     align: left + horizon,
-    // column-gutter: 1em,
     inset: (x: 1em, y: 0.7em),
-    // stroke: none,
     fill: (_, y) => if calc.odd(y) { rgb("EAF2F5") },
 
-    [], [*authoryear*], [*alphabetic*], [*numeric*],
-    [`auto`], [(Bender and Koller 2020)], [[BK20]], [[1]],
-    [p], [(Bender and Koller 2020)], [--], [--],
-    [t], [Bender and Koller (2020)], [--], [--],
-    [g], [Bender and Koller's (2020)], [--], [--],
-    [name], [Bender and Koller], [--], [--],
-    [year], [2020], [--], [--],
-    [n], [Bender and Koller 2020], [BK20], [1]
-  ),
-  placement: top,
-  caption: [Citation forms.]
-) <fig:citation-forms>
+    [*citation style*], [*style bundle*],
+    [`format-citation-numeric`], [`numeric-style`],
+    [`format-citation-alphabetic`], [`alphabetic-style`],
+    [`format-citation-authoryear`], [`authoryear-style`],
+)
+]
 
+You can package your own citation and reference styles into a style bundle 
+using the `build-style` function, cf. @sec:package:style-bundles.
 
+The functions `numeric-style` etc. also permit you to pass arguments to
+the reference and citation styles they bundle, using their `reference`
+and `reference` arguments. For instance, recall that we passed
+arguments `print-date-after-authors` and `format-quotes` to the 
+reference style in @sec:builtin-reference. We can write this
+example more succinctly by passing arguments through the
+reference style:
+
+#zebraw(lang: false,
+```typ
+#let style = numeric-style(
+  reference: (
+    print-date-after-authors: true, 
+    format-quotes: it => it
+  )
+)
+
+#refsection(style: style)[
+  ... some text here ...
+  #cite("bender20:_climb_nlu")
+
+  #print-bibliography()
+]
+```)
 
 
 = Advanced usage 
@@ -563,11 +652,11 @@ refsection, you can configure it through a document show rule, like this:
 
 #zebraw(lang: false,
 ```typ
-#let style = format-citation-numeric()
-#show: doc => refsection(format-citation: style.format-citation, doc)
+#show: refsection.with(style: numeric-style())
 
-#add-bib-resource(read("bibs/bibliography.bib"))
+#add-bib-resource(read("bibliography.bib"))
 #cite("bender20:_climb_nlu")
+#print-bibliography()
 ```)
 
 
@@ -701,13 +790,15 @@ your own functions in these arguments.
 
 You can furthermore control the order in which references are presented in the bibliography.
 To this end, you can pass a sorting string in the `sorting` argument of `print-bibliography`.
+You can also reverse the order in which the references are displayed with the `reversed` parameter.
 See the documentation of this argument in @sec:package-doc for details.
 
 == Styling the citations
 <sec:styling-citations>
 
-Citations in #bibtypst are #link("https://typst.app/docs/reference/model/link/")[link] elements, 
-and can be styled using show rules. However, it is 
+Citations in #bibtypst are #link("https://typst.app/docs/reference/model/link/")[link] elements
+that point to the location where the reference is typeset in the bibliography. 
+They can be styled using show rules. However, it is 
 not entirely trivial to distinguish a `link` element that represents a #bibtypst citation from 
 any other `link` element (referring e.g. to a website). #bibtypst therefore provides a function 
  `if-citation` which will make this distinction for you. The following piece of code
@@ -861,6 +952,10 @@ all other references unchanged.
 = Caveats
 
 #v(-1em)
+== Special characters in #bibtex fields
+
+#unfinished[explain \#160]
+
 == Layout iterations
 
 In the simplest case, #pergamon requires three iterations of the Typst layout algorithm
@@ -1028,6 +1123,15 @@ Here we explain the builtin citation styles.
 #tidy.show-module(style-docs, style: tidy.styles.default, show-outline: false, break-param-descriptions: true)
 
 
+== Style bundles
+<sec:package:style-bundles>
+
+#unfinished[write this]
+
+#let x = tidy.parse-module(read("src/style-bundles.typ"), scope: scope)
+#tidy.show-module(x, style: tidy.styles.default, show-outline: false)
+
+
 == Utility functions 
 <sec:package:utility>
 
@@ -1105,8 +1209,6 @@ to parse #bibtex files, and that crate requires the syntax variant.
   person has multiple roles, these are printed separately and not aggregated (#issue(103)).
 - #pergamon currently requires all #bibtex entries to specify an author, editor, or
   translator; there is no support for the `label` or `shorthand` fields (#issue(115)).
-- It is a known bug that #pergamon does not automatically uppercase words at the beginning
-  of a sentence (#issue(95)).
 - `set`, `crossref`, `related`, and `pageref` are not yet supported.
 
 

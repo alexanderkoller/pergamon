@@ -261,8 +261,11 @@
 /// 
 /// -> none
 #let refsection(
-  /// A function that generates the citation string for a list of references.
-  /// The function receives an array of _citation specifications_ as its first
+  /// The citation formatter that should be used to generate citation strings
+  /// within this refsection. It typically comes from a citation style.
+  /// 
+  /// A citation formatter is a function that
+  /// receives an array of _citation specifications_ as its first
   /// argument, a `form` string as its second argument, and an `options` dictionary
   /// as its third argument. It returns
   /// the content that is displayed in place of a @cite call.
@@ -295,20 +298,39 @@
   /// interpret the same options; see the documentation of the citation style
   /// for details.
   /// 
-  /// The function you pass here will typically be defined in a #bibtypst citation style, to be
-  /// compatible with the `format-reference` function that is passed to
-  /// @print-bibliography.
-  /// 
   /// You can pass `auto` in this argument to indicate that you want to use the
   /// same citation formatter as in the previous `refsection`. If you pass `auto`
   /// to the first refsection in the document, #bibtypst will use the dummy
   /// citation formatter `(references, form) => [CITATION]`.
   /// 
+  /// See the documentation of the `style` parameter for an alternative way
+  /// to specify citation formatters.
+  /// 
   /// -> function | auto
   format-citation: auto,
 
-  /// TODO: DOCUMENT ME
-  /// -> dictionary
+  /// The style bundle that should be used to typeset citations and
+  /// bibliographies within this refsection.
+  /// 
+  /// A style bundle combines citation style and a reference style
+  /// in a single dictionary,
+  /// as explained in@sec:style-bundles. The citation style will be used
+  /// to format citations within the refsection, and the reference style
+  /// will be used to typeset the references in all calls to
+  /// @print-bibliography within the refsection.
+  /// 
+  /// You will typically specify how to format citations by passing _either_
+  /// a `format-citation` _or_ a `style` argument. The `style` argument is
+  /// much more convenient, so there is a good chance that this is how most
+  /// users will do it. However, you are allowed to specify both `format-citation`
+  /// and `style` arguments; in this case, `format-citation` takes precedence.
+  /// The `style` will still provide a reference style and label generator
+  /// to the `print-bibliography` calls.
+  /// 
+  /// If you pass `auto` as the `style` argument, the refsection will use the
+  /// same style as the previous refsection in the document.
+  /// 
+  /// -> dictionary | auto
   style: auto,
 
   /// The section of the document that is to be wrapped in this `refsection`.
@@ -716,19 +738,17 @@
 ///
 /// -> none
 #let print-bibliography( 
-    /// A function that renders the reference into Typst content, which will
-    /// then be included  in the
-    /// printed bibliography. This function will typically be defined
-    /// in a #bibtypst style, to be compatible with the `format-citation`
-    /// function that is passed to @refsection.
+    /// The reference style that should be used to render a reference
+    /// into Typst content.
     /// 
-    /// `format-reference` is passed the position of the reference in the
+    /// A reference style is a function that takes two arguments.
+    /// It takes the position of the reference in the
     /// bibliography as a zero-based `int` in the first argument.
-    /// It is passed the #link(<sec:reference>)[reference dictionary]
+    /// It takes the #link(<sec:reference>)[reference dictionary]
     /// for the reference
     /// in the second argument.
     /// 
-    /// It returns an
+    /// The function returns an
     /// array of contents. The elements of this array will be laid out as the columns
     /// of a grid, in the same row, permitting e.g. bibliography layouts with one
     /// column for the reference label and one with the reference itself. 
@@ -736,10 +756,18 @@
     /// `format-reference` should return an array of length one.
     /// All calls to `format-reference` should return arrays of the same length.
     /// 
-    /// -> function
+    /// You can pass the value `auto` instead of a function. In this case,
+    /// `print-bibliography` will look up the reference formatter from the
+    /// style bundle that you passed to the @refsection that surrounds
+    /// this call to `print-bibliography`. If you pass `auto` without
+    /// specifying a `style` for the refsection, a dummy reference style
+    /// will be used.
+    /// 
+    /// -> auto | function
     format-reference: auto, 
 
-    /// Generates label information for the given reference. The function takes
+    /// The label generator that should be used to generate label information
+    /// for a reference. This is a function that takes
     /// the reference dictionary and the reference's index in the sorted bibliography as input and returns
     /// an array `(label, label-repr)`, where `label` can be anything the style finds
     /// useful for generating the citations and `label-repr` is a string representation
@@ -757,7 +785,15 @@
     /// 
     /// Note that `label-repr` _must_ be a `str`.
     /// 
-    /// -> function
+    /// You can pass the value `auto` instead of a function. In this case,
+    /// `print-bibliography` will look up the label generator from the
+    /// style bundle that you passed to the @refsection that surrounds
+    /// this call to `print-bibliography`. If you pass `auto` without
+    /// specifying a `style` for the refsection, the default implementation
+    /// described above
+    /// will be used.
+    /// 
+    /// -> auto | function
     label-generator: auto, 
 
     /// A function that defines the order in which references are shown in the bibliography.
