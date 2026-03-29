@@ -394,16 +394,28 @@
 // 
 // -> array
 #let references-at-refsection-end() = {
-  let loc = find-refsection-end().location()
-  reference-collection.at(loc).last().keys()
+  let ref-end = find-refsection-end()
+
+  if ref-end != none {
+    let loc = ref-end.location()
+    reference-collection.at(loc).last().keys()
+  } else {
+    return ()
+  }
 }
 
 // Returns the local bibliography for the current refsection.
 //
 // -> dictionary
 #let local-bibliography-at-refsection-end() = {
-  let loc = find-refsection-end().location()
-  local-bibliographies.at(loc).last()
+  let ref-end = find-refsection-end()
+
+  if ref-end != none {
+    let loc = ref-end.location()
+    local-bibliographies.at(loc).last()
+  } else {
+    return (:)
+  }
 }
 
 // Returns the citation formatter for the current refsection.

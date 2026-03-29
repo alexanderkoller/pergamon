@@ -1,4 +1,5 @@
 // Test for robustness in the first layout iteration (#166).
+// The warning about layout iterations in `tt run` is expected.
 
 #import "@preview/layout-ltd:0.1.0": layout-limiter
 #show: layout-limiter.with(max-iterations: 1)
