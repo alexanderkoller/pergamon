@@ -344,6 +344,12 @@
   // 3. If both are `auto`, we reuse the state from the previous refsection.
   if format-citation != auto {
     current-citation-formatter.update(it => format-citation)
+
+    if style != auto {
+      // set the style bundle for the reference style,
+      // but citation style still takes precedence in get-citation-formatter()
+      current-style-bundle.update(it => style)
+    }
   } else if style != auto {
     current-style-bundle.update(it => style)
     current-citation-formatter.update(it => none)
