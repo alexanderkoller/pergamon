@@ -44,35 +44,27 @@
 // Here we're making the bibliography available to Pergamon.
 #add-bib-resource(bibliography)
 
-
-
-// Select a citation style by uncommenting the line you like:
-// #let style = format-citation-authoryear()
-// // #let style = format-citation-alphabetic()
-// // #let style = format-citation-numeric()
-
-// // Pick options for the reference style:
-// #let fref = format-reference(
-//   reference-label: style.reference-label,
-
-//   // Try out different name formats, e.g. "{family}, {given}" and "{g}. {family}":
-//   // name-format: "{family}, {given}",
-  
-//   // Try rendering additional fields, either as strings or as functions:
-//   // additional-fields: ("award",)
-//   // additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),
-  
-//   // Try highlighting references, e.g. based on keywords:
-//   // highlight: (x, reference, index) => {
-//   //  if "highlight" in reference.fields.at("keywords", default: ()) {
-//   //     [#text(size: 8pt)[#emoji.star.box] #x]
-//   //  } else {
-//   //     x
-//   //  }
-//   // }
-// )
-
-#let style = authoryear-style()
+// Select numeric-style or alphabetic-style if you like.
+#let style = authoryear-style(
+  // Pick options for the reference style:
+  reference: (
+    // Try out different name formats, e.g. "{family}, {given}" and "{g}. {family}":
+    // name-format: "{family}, {given}",
+    
+    // Try rendering additional fields, either as strings or as functions:
+    // additional-fields: ("award",)
+    // additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),
+    
+    // Try highlighting references, e.g. based on keywords:
+    // highlight: (x, reference, index) => {
+    //  if "highlight" in reference.fields.at("keywords", default: ()) {
+    //     [#text(size: 8pt)[#emoji.star.box] #x]
+    //  } else {
+    //     x
+    //  }
+    // }    
+  )
+)
 
 // These show rules typeset references to my own papers in green
 // and all other links in blue.
@@ -114,7 +106,6 @@
 
   #print-bibliography()
 ]
-
 
 
 #refsection(style: numeric-style())[
