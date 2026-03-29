@@ -32,22 +32,18 @@ Its library was second only to the Library of Alexandria around 200 BC.
 
 The following piece of code typesets a bibliography using Pergamon.
 
-  ```typ
+```typ
 #import "@preview/pergamon:0.7.2": *
-
-#let style = format-citation-numeric()
 
 #add-bib-resource(read("bibliography.bib"))
 
-#refsection(format-citation: style.format-citation)[
-  ... some text here ...
+#refsection(style: numeric-style())[
+  ... some text here ... 
   #cite("bender20:_climb_nlu")
 
-  #print-bibliography(
-       format-reference: format-reference(reference-label: style.reference-label), 
-       label-generator: style.label-generator)
+  #print-bibliography()
 ]
-  ```
+```
 
 It generates citations and a bibliography that look like this:
 
