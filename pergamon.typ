@@ -954,7 +954,23 @@ all other references unchanged.
 #v(-1em)
 == Special characters in #bibtex fields
 
-#unfinished[explain \#160]
+By default, #pergamon evaluates the title of a #bibtex entry
+as Typst code, using Typst's #link("https://typst.app/docs/reference/foundations/eval/")[eval]
+function. This is controlled by the `eval-mode` parameter of 
+`format-reference`, the default reference style; see @sec:package:builtin-reference
+for details.
+
+This can have unexpected consequences. For instance, consider
+references whose
+titles have single quotes that are suitable for LaTeX, such as
+"#raw("Towards a new `aesthetic from below'")".
+#pergamon calls `eval` to evaluate the title as Typst markup,
+but will choke on the backtick, which it interprets as opening
+a `raw` element.
+
+To handle such cases, you will need to either modify the #bibtex
+entry so it avoids special characters that Typst interprets as markup,
+or you can pass `eval-mode: none` to avoid calling `eval` on titles.
 
 == Layout iterations
 

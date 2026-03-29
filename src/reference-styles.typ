@@ -1154,7 +1154,9 @@
     /// The default value of `"markup"` renders the title as if it were ordinary
     /// Typst content, typesetting e.g. mathematical expressions correctly.
     /// 
-    /// -> str
+    /// You can pass `none` to typeset the title literally, without calling `eval.`
+    /// 
+    /// -> str | none
     eval-mode: "markup",
 
     /// The `scope` argument that is passed to the `eval` call (see `eval-mode`).
