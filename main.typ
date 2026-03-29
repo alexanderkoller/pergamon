@@ -12,17 +12,72 @@
 
 #set heading(numbering: "1.1")
 
-// Author-Year:
-#let fcite = format-citation-authoryear()
-
-// Alphabetic:
-// #let fcite = format-citation-alphabetic()
-
-// Numeric:
-// #let fcite = format-citation-numeric(compact: true)
-
 #let marker = text(size: 8pt)[#emoji.star] 
 
+
+// Alphabetic:
+// #let style = alphabetic-style(
+
+// Numeric:
+// #let style = numeric-style(
+
+#let style = authoryear-style(
+  reference: (
+    name-format: "{given} {family}",
+    // name-format: (
+    //   "author": "{given} {family}",
+    //   "editor": "{g}. {family}"
+    // ),
+
+    print-date-after-authors: true,
+
+    format-quotes: it => it,
+
+    // print-identifiers: ("doi", "url"),
+    // print-doi: true,
+    // 
+    suppress-fields: (
+      "*": ("month", "day",),
+      "inproceedings": ("editor", "publisher", "pages", "location")
+    ),
+
+    eval-scope: ("todo": x => text(fill: red, x)),
+
+    // suppress-fields: ("*": ("pages",), "inproceedings": ("editor", "publisher") ),
+
+    // additional-fields: ("award",),
+    //  period: ",",
+    // additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),
+
+    highlight: (x, reference, index) => {
+      if "highlight" in reference.fields.at("keywords", default: ()) {
+        place(dx: -1.5em, dy: -0.15em, marker)
+      }
+      x
+    },
+
+    // Override bibstring entries like this:
+    // bibstring: ("in": "In"),
+    bibstring-style: "long",
+
+    // format-fields: (
+    //   // highlight my name in all references
+    //   "author": (dffmt, value, reference, field, options, style) => {
+    //     let formatted-names = value.map(d => {
+    //       let highlighted = (d.family == "Koller")
+    //       let name = format-name(d, name-type: "author", format: options.name-format)
+    //       if highlighted { strong(name) } else { name }
+    //     })
+
+    //     concatenate-names(formatted-names, maxnames: 999)
+    //   },
+    // )    
+  )
+)
+
+
+
+/*
 #let fref = format-reference(
   reference-label: fcite.reference-label,
   name-format: "{given} {family}",
@@ -68,13 +123,13 @@
   // )
 )
 
+*/
 
-
-#let style = (
-  citation-style: fcite.format-citation,
-  reference-style: fref,
-  label-generator: fcite.label-generator
-)
+// #let style = (
+//   citation-style: fcite.format-citation,
+//   reference-style: fref,
+//   label-generator: fcite.label-generator
+// )
 
 
 #let sorting = "nyt"
@@ -164,17 +219,22 @@
 
   // #set par(hanging-indent: 1em)
   #print-bibliography(
-    // format-reference: fref, 
     sorting: sorting,
+    filter: reference => not has-category(reference, "test-cat"),
+
+    // print references in reversed order:
     // reversed: true,
+    
+    // control the formatting of the bibliography:
     // grid-style: (row-gutter: 2cm),
-    // label-generator: fcite.label-generator,
-    filter: reference => not has-category(reference, "test-cat")
-    // label-generator: fcite.label-generator.with(format-string: "J{:02}") // try this to get numberings J01, J02, ...
+
+    // override the label-generator if you like -- here's how you get
+    // numberings J01, J02, ... in the numeric style:
+    // label-generator: style.label-generator.with(format-string: "J{:02}")
   )
 
-  #print-bibliography(format-reference: fref, sorting: sorting,
-    // label-generator: fcite.label-generator,
+  #print-bibliography(
+    sorting: sorting,
     title: [References (with category "test-cat")],
     filter: reference => has-category(reference, "test-cat")
   )
@@ -183,14 +243,4 @@
 
 ]
 
-// #context {
-//   let all_meta = query(selector(metadata))
-//   for meta in all_meta {
-//     [
-//       #meta.value.kind (#meta.value.at("key", default: "--"))
-//       #if "label" in meta.fields() [: #str(meta.label)]
-//       -- page #meta.location().page() -- #meta.location().position()
-//     ]
-//     linebreak()
-//   }
-// }
+
