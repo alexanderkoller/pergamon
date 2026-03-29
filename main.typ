@@ -217,6 +217,8 @@
 
   // to test \#130: #cite(<irtg-sgraph-15>)
 
+  to test merged authoryear citations \#146: #cite("hempel1965science", "nodate")
+
   // #set par(hanging-indent: 1em)
   #print-bibliography(
     sorting: sorting,

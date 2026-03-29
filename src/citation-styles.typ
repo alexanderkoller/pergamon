@@ -220,6 +220,20 @@
   /// -> str | content
   citation-separator: "; ",
 
+  /// Whether to merge consecutive citations that share the same author(s)
+  /// into a single group. When enabled, `#cite("doe2023", "doe2024")`
+  /// renders as "(Doe 2023, 2024)" instead of "(Doe 2023; Doe 2024)".
+  /// -> bool
+  merge-citations: true,
+
+  /// Separator symbol to connect years within a merged citation group.
+  /// When multiple consecutive citations share the same author(s),
+  /// they are merged into a single group (e.g. "Author (2023, 2024)").
+  /// This separator is placed between the years within such a group.
+  /// Only used when `merge-citations` is `true`.
+  /// -> str | content
+  merge-separator: ", ",
+
   /// The string that separates the prefix from the citation.
   /// -> str
   prefix-separator: " ",
@@ -354,22 +368,85 @@
     }
   }
 
+  // Formats the year+extradate part of a single citation entry.
+  // Returns linked content like "2024a".
+  let format-year-part(lbl, reference, form) = {
+    let (authors-str, year, extradate) = reference.reference.at("label")
+    let year-defined = is-year-defined(reference.reference)
+    let extradate = if extradate == none {
+      ""
+    } else if year-defined {
+      extradate
+    } else if form in ("t", "g", "p", auto) {
+      format-brackets(extradate)
+    } else {
+      format-parens(extradate)
+    }
+    link(label(lbl), [#year#extradate])
+  }
+
+  // Formats a merged group of citations that share the same author string.
+  // The years are joined with merge-separator; the author appears once.
+  let format-merged-group(authors-str, entries, form) = {
+    let year-parts = entries.map(e => format-year-part(e.label, e.entry, form))
+    let years-joined = year-parts.join(merge-separator)
+
+    if form == "t" {
+      [#authors-str #format-parens(years-joined)]
+    } else if form == "g" {
+      [#authors-str\'s #format-parens(years-joined)]
+    } else { // "n" (used for "p"/auto individual-form too)
+      [#authors-str#author-year-separator#years-joined]
+    }
+  }
+
   let list-formatter(reference-dicts, form, options) = {
     let prefix = options.at("prefix", default: none)
     let suffix = options.at("suffix", default: none)
 
     let individual-form = if form == "p" or form == auto { "n" } else { form }
-    let individual-citations = reference-dicts.map(x => {
-      if type(x) == str {
-        [*?#x?*]
+
+    // Group consecutive citations by author string for merging.
+    let groups = ()
+    for entry in reference-dicts {
+      if type(entry) == str {
+        // Undefined citation — cannot merge
+        groups.push((author: none, authors-str: none, entries: ((label: none, entry: entry),)))
       } else {
-        let lbl = x.at(0)
-        let reference = x.at(1)
-        link(label(lbl), formatter(reference, individual-form))
+        let lbl = entry.at(0)
+        let reference = entry.at(1)
+        let (authors-str, year, extradate) = reference.reference.at("label")
+        let author-key = repr(authors-str)
+
+        if merge-citations and groups.len() > 0 and groups.last().author == author-key {
+          groups.last().entries.push((label: lbl, entry: reference))
+        } else {
+          groups.push((
+            author: author-key,
+            authors-str: authors-str,
+            entries: ((label: lbl, entry: reference),)
+          ))
+        }
+      }
+    }
+
+    // Format each group
+    let formatted-groups = groups.map(group => {
+      if group.author == none {
+        // undefined citation
+        let e = group.entries.first()
+        [*?#e.entry?*]
+      } else if group.entries.len() == 1 {
+        // single citation — use existing formatter
+        let e = group.entries.first()
+        link(label(e.label), formatter(e.entry, individual-form))
+      } else {
+        // merged group — author once, multiple years
+        format-merged-group(group.authors-str, group.entries, individual-form)
       }
     })
 
-    let joined = individual-citations.join(citation-separator)
+    let joined = formatted-groups.join(citation-separator)
     let joined-with-affixes = fjoin(suffix-separator,
       fjoin(prefix-separator, prefix, joined),
       suffix
