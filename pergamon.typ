@@ -1238,6 +1238,7 @@ to parse #bibtex files, and that crate requires the syntax variant.
 - Leading and trailing whitespace in Bibtex fields is now trimmed.
 - In the _alphabetic_ style, author names with non-ASCII first characters are now treated correctly (thanks to prawin12345 for the pull request).
 - In the _authoryear_ style, subsequent citations with the same authors can now be automatically merged (thanks to zouharvi for the suggestion).
+- Bumped citegeist dependency to 0.2.2.
 
 ==== Changes in 0.7.2 (2026-01-26)
 - Added support for refsection-local bibliographies.

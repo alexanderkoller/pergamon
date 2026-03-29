@@ -52,7 +52,7 @@
   #context {
     assert( bibliography.get().keys() == ("kuhlmann2003tiny",) )
 
-    assert( local-bibliography-at-refsection-end().keys() == ("fake-mastersthesis", "multi1", "multi2") )
+    assert( local-bibliography-at-refsection-end().keys().sorted() == ("fake-mastersthesis", "multi1", "multi2") )
   }
 ]
 
