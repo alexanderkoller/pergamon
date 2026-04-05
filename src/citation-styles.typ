@@ -85,6 +85,10 @@
     /// -> str | content
     citation-separator: ", ",
 
+    /// The string that separates the suffix from the citation.
+    /// -> str
+    suffix-separator: ", ",
+
     /// Wraps text in square brackets. The argument needs to be a function
     /// that takes one argument (`str` or `content`) and returns `content`.
     /// 
@@ -117,6 +121,8 @@
 
 
   let list-formatter(reference-dicts, form, options) = {
+    let suffix = options.at("suffix", default: none)
+
     let individual-form = "n"
     let individual-citations = reference-dicts.map(x => {
       if type(x) == str {
@@ -129,10 +135,12 @@
     })
 
     let joined = individual-citations.join(citation-separator)
+    let joined-with-suffix = fjoin(suffix-separator, joined, suffix)
+
     if form != "n" {
-      format-brackets(joined)
+      format-brackets(joined-with-suffix)
     } else {
-      joined
+      joined-with-suffix
     }
   }
 
@@ -528,6 +536,10 @@
     /// -> str | content
     compact-separator: [--],
 
+    /// The string that separates the suffix from the citation.
+    /// -> str
+    suffix-separator: ", ",
+
     /// Wraps text in square brackets. The argument needs to be a function
     /// that takes one argument (`str` or `content`) and returns `content`.
     /// 
@@ -539,6 +551,8 @@
     format-brackets: nn(it => [[#it]]),
   ) = {
   let list-formatter(reference-dicts, form, options) = {
+    let suffix = options.at("suffix", default: none)
+
     let individual-citations = reference-dicts.map(x => {
       if type(x) == str {
         [*?#x?*]
@@ -610,10 +624,12 @@
       individual-citations.map(x => if type(x) == array { x.at(1) } else { x }).join(citation-separator)
     }
 
+    let joined-with-suffix = fjoin(suffix-separator, joined, suffix)
+
     if form != "n" {
-      format-brackets(joined)
+      format-brackets(joined-with-suffix)
     } else {
-      joined
+      joined-with-suffix
     }
   }
 
