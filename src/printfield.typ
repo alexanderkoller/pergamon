@@ -49,13 +49,14 @@
   })
 }
 
+// Typesets the title of the paper. 
 // make title a hyperlink if DOI or URL are defined
 #let link-title(reference, options) = {
   let title = if options.eval-mode == none { 
     reference.fields.title.trim() 
-    } else { 
-      eval(reference.fields.title.trim(), mode: options.eval-mode, scope: options.eval-scope) 
-    }
+  } else { 
+    eval(reference.fields.title.trim(), mode: options.eval-mode, scope: options.eval-scope) 
+  }
 
   if not options.link-titles {
     title 

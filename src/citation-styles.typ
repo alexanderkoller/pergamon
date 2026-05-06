@@ -360,7 +360,7 @@
       // can't concatenate with strfmt because format-parens(year) is not a string
       [#authors-str #format-parens([#year#extradate])]
     } else if form == "g" {
-      [#authors-str\'s #format-parens(year)]
+      [#{authors-str}'s #format-parens(year)]
     } else if form == "n" {
       [#authors-str#author-year-separator#year#extradate]
     } else { // auto or "p"
@@ -394,7 +394,7 @@
     if form == "t" {
       [#authors-str #format-parens(years-joined)]
     } else if form == "g" {
-      [#authors-str\'s #format-parens(years-joined)]
+      [#{authors-str}'s #format-parens(years-joined)]
     } else { // "n" (used for "p"/auto individual-form too)
       [#authors-str#author-year-separator#years-joined]
     }
