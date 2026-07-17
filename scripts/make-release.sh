@@ -53,7 +53,23 @@ cp src/*.typ $RELEASE_DIR/src
 cp README.md $RELEASE_DIR/
 cp LICENSE $RELEASE_DIR/
 
+# Include README-linked documentation assets in the submitted package, but
+# exclude them from package downloads.
+mkdir -p $RELEASE_DIR/docs/materials
+cp $DOCS_DIR/pergamon-$VERSION.pdf $RELEASE_DIR/docs/
+cp $DOCS_DIR/materials/example-output.png $RELEASE_DIR/docs/materials/
+cp example.typ $RELEASE_DIR/
+cp example.pdf $RELEASE_DIR/
+cat >> $RELEASE_DIR/typst.toml <<EOF
+
+exclude = [
+  "/docs/pergamon-$VERSION.pdf",
+  "/docs/materials/example-output.png",
+  "/example.typ",
+  "/example.pdf",
+]
+EOF
+
 
 echo "Package is ready for release in $RELEASE_DIR."
 echo "Before committing, you should git add $DOCS_DIR/*.pdf."
-
