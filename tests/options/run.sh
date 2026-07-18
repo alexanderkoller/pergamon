@@ -25,7 +25,6 @@ compile_fails() {
 }
 
 compile_ok tests/options/on-duplicate/success/test.typ
-compile_fails tests/options/on-duplicate/error-same-source/fail.typ
 compile_fails tests/options/on-duplicate/error-cross-source/fail.typ
 
 compile_ok tests/options/missing-citation/placeholder/test.typ

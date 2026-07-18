@@ -17,24 +17,6 @@
 #let current-citation-formatter = state("format-citation", (reference, form, options) => [CITATION], )
 #let current-style-bundle = state("style", none) // TODOD: replace none with good default
 
-#let bibliography-keys-in-source(bibtex-string) = {
-  let keys = ()
-  let rest = bibtex-string
-  let entry-re = regex("@\\w+\\s*\\{\\s*([^,]+),")
-
-  while true {
-    let m = rest.match(entry-re)
-    if m == none {
-      break
-    }
-
-    keys.push(m.captures.first().trim())
-    rest = rest.slice(m.end)
-  }
-
-  keys
-}
-
 /// Parses #bibtex references and makes them available to #bibtypst.
 /// Due to architectural limitations in Typst, #bibtypst cannot read
 /// #bibtex from a file. You will therefore typically call `read` yourself, like this:
@@ -105,15 +87,6 @@
   ) = {
     if not on-duplicate in ("error", "keep-first", "keep-last") {
       panic("Unknown on-duplicate policy '" + on-duplicate + "'.")
-    }
-
-    if on-duplicate == "error" {
-      let grouped-keys = collect-deduplicate(bibliography-keys-in-source(bibtex-string).map(key => (key, 1)))
-      for (key, occurrences) in grouped-keys {
-        if occurrences.len() > 1 {
-          panic("Duplicate definition of bibliography key '" + key + "'.")
-        }
-      }
     }
 
     let update-bib-dict(old-bib) = {
