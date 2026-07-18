@@ -19,7 +19,7 @@
 
 @InProceedings{bender20:_climb_nlu,
   author = 	 {Emily M. Bender and Alexander Koller},
-  keywords = {highlighted, pi},  
+  keywords = {highlighted, pi},
   title = 	 {Climbing towards {NLU}:
  On Meaning, Form, and Understanding in the Age of Data},
   award = {Best theme paper},
@@ -52,11 +52,11 @@
 
     // Try out different name formats, e.g. "{family}, {given}" and "{g}. {family}":
     // name-format: "{family}, {given}",
-    
+
     // Try rendering additional fields, either as strings or as functions:
     // additional-fields: ("award",)
     // additional-fields: ((reference, options) => ifdef(reference, "award", (:), award => [*#award*]),),
-    
+
     // Try highlighting references, e.g. based on keywords:
     // highlight: (x, reference, index) => {
     //  if "highlight" in reference.fields.at("keywords", default: ()) {
@@ -64,7 +64,11 @@
     //  } else {
     //     x
     //  }
-    // }    
+    // }
+  ),
+
+  citation: (
+    missing-citation: "error",
   )
 )
 
@@ -97,13 +101,13 @@
 
 
 
-// If you don't pass a "style" or "format-citation" argument, the refsection 
+// If you don't pass a "style" or "format-citation" argument, the refsection
 // uses the same citation style as the previous refsection.
 #refsection[
   #v(1em)
   = Second refsection
 
-  Here is another refsection. If you cite different papers than in the first 
+  Here is another refsection. If you cite different papers than in the first
   refsection, the bibliography will contain different papers: #cite("bender20:_climb_nlu").
 
   #print-bibliography()
@@ -135,4 +139,3 @@
 
   Hey look, citations can come after the bibliography: #cite("bender20:_climb_nlu").
 ]
-

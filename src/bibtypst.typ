@@ -1,6 +1,6 @@
 #import "@preview/bullseye:0.1.0": *
 #import "@preview/oxifmt:1.0.0": strfmt
-#import "@preview/citegeist:0.2.2": load-bibliography
+#import "@preview/citegeist:0.3.1": load-bibliography
 #import "bib-util.typ": collect-deduplicate, fd
 #import "names.typ": parse-reference-names
 #import "dates.typ": parse-date, make-date-tuple
@@ -17,8 +17,26 @@
 #let current-citation-formatter = state("format-citation", (reference, form, options) => [CITATION], )
 #let current-style-bundle = state("style", none) // TODOD: replace none with good default
 
+#let bibliography-keys-in-source(bibtex-string) = {
+  let keys = ()
+  let rest = bibtex-string
+  let entry-re = regex("@\\w+\\s*\\{\\s*([^,]+),")
+
+  while true {
+    let m = rest.match(entry-re)
+    if m == none {
+      break
+    }
+
+    keys.push(m.captures.first().trim())
+    rest = rest.slice(m.end)
+  }
+
+  keys
+}
+
 /// Parses #bibtex references and makes them available to #bibtypst.
-/// Due to architectural limitations in Typst, #bibtypst cannot read 
+/// Due to architectural limitations in Typst, #bibtypst cannot read
 /// #bibtex from a file. You will therefore typically call `read` yourself, like this:
 /// #import "@preview/zebraw:0.5.5": *
 /// #zebraw(lang: false,
@@ -26,11 +44,11 @@
 /// #add-bib-resource(read("bibliography.bib"))
 /// ```
 /// )
-/// 
+///
 /// You can call `add-bib-resource` multiple times, and this will add
-/// the contents of multiple bib files. However, all bibliography entries
-/// must have different keys, even if they are in different source files.
-/// 
+/// the contents of multiple bib files. By default, duplicate bibliography
+/// keys are an error, even if they occur in different source files.
+///
 /// -> none
 #let add-bib-resource(
     /// A #bibtex string to be parsed.
@@ -40,45 +58,70 @@
     /// If `source-id` is not `none`, it is added to all references loaded from
     /// this #bibtex source under the `source-id` field. This can e.g. be used
     /// to filter bibliographies by source id.
-    /// 
+    ///
     /// For instance, this value of `filter` for @print-bibliography will only
     /// show the references that were assigned the source id `other.bib`:
-    /// 
+    ///
     /// ```
     /// filter: reference => reference.fields.at("source-id", default: none) == "other.bib"
     /// ```
-    /// 
+    ///
     /// -> str | none
     source-id: none,
 
     /// Marks this bibliography resource as _local_. Local bibliographies are
     /// only available within the `refsection` in which they are defined; papers
     /// in these bibliographies cannot be referenced from outside this refsection.
-    /// 
+    ///
     /// Pergamon allows you to define the same entry key in both the global
     /// and a local bibliography. In case of such collisions, the entry in the
     /// local bibliography wins.
-    /// 
+    ///
     /// Calls to `add-bib-resource` with `local: true` from outside of a
     /// refsection are not allowed and will cause an error message.
-    /// 
+    ///
     /// -> bool
     local: false,
 
     /// Controls whether #pergamon should convert the titles of all
     /// references to #link("https://apastyle.apa.org/style-grammar-guidelines/capitalization/sentence-case")[sentence case].
-    /// 
+    ///
     /// If `true`, titles will be converted to sentence case.
     /// If `false`, titles will be typeset with the verbatim capitalization
     /// specified in the #bibtex entries.
-    /// 
+    ///
     /// -> bool
-    sentence-case-titles: false
+    sentence-case-titles: false,
+
+    /// Controls how duplicate bibliography keys are handled. The value
+    /// `"error"` aborts with an error, `"keep-first"` keeps the first entry
+    /// with a duplicate key, and `"keep-last"` keeps the last entry.
+    ///
+    /// This policy applies both to duplicates within this #bibtex source and
+    /// to duplicates across multiple calls to `add-bib-resource`.
+    ///
+    /// -> str
+    on-duplicate: "error",
   ) = {
-    let update-bib-dict(old-bib) = {
-      for (key, value) in load-bibliography(bibtex-string, sentence-case-titles: sentence-case-titles).pairs() {
-        if key in old-bib {
+    if not on-duplicate in ("error", "keep-first", "keep-last") {
+      panic("Unknown on-duplicate policy '" + on-duplicate + "'.")
+    }
+
+    if on-duplicate == "error" {
+      let grouped-keys = collect-deduplicate(bibliography-keys-in-source(bibtex-string).map(key => (key, 1)))
+      for (key, occurrences) in grouped-keys {
+        if occurrences.len() > 1 {
           panic("Duplicate definition of bibliography key '" + key + "'.")
+        }
+      }
+    }
+
+    let update-bib-dict(old-bib) = {
+      for (key, value) in load-bibliography(bibtex-string, sentence-case-titles: sentence-case-titles, on-duplicate: on-duplicate).pairs() {
+        if key in old-bib and on-duplicate == "error" {
+          panic("Duplicate definition of bibliography key '" + key + "'.")
+        } else if key in old-bib and on-duplicate == "keep-first" {
+          continue
         }
 
         // Trim whitespace from all string field values, since citegeist
@@ -125,7 +168,7 @@
 /// and another one with the other references by adding some
 /// references to a `"highlighted"` category. See the `has-category`
 /// function for looking up categories.
-/// 
+///
 /// Like in #biblatex, a category is defined globally for the
 /// entire document, not per refsection. Calls to `add-category`
 /// should come after the call to `add-bib-resource` that loaded
@@ -133,7 +176,7 @@
 #let add-category(
   /// The category to which the keys should be assigned.
   /// -> str
-  category, 
+  category,
 
   /// The entry keys in the bibliography that should be assigned
   /// to the bibliography.
@@ -153,15 +196,15 @@
 /// Checks whether a bibliography entry has been assigned to the
 /// given category. The primary purpose of this function is to be
 /// used as a `filter` in `print-bibliography`.
-/// 
+///
 /// The `key` argument can be a string; in this case it is interpreted
 /// as the Bibtex key of a bibliography entry, and the function checks
 /// whether this key has been assigned to the given `category`.
-/// 
+///
 /// Alternatively, you can pass a reference dictionary as the `key`
 /// argument. In this case, the function will check whether `key.entry_key`
 /// has been assigned to the given category.
-/// 
+///
 /// -> bool
 #let has-category(
   /// The key that should be looked up.
@@ -182,7 +225,7 @@
 }
 
 // Returns the current refsection identifier.
-// 
+//
 // -> str
 #let current-refsection() = {
   let refsection-count = reference-collection.get().len()
@@ -192,7 +235,7 @@
 // Prepends x with the current refsection identifier.
 // Can be used to generate globally unique labels for references,
 // even when they appear in multiple refsections.
-// 
+//
 // -> str
 #let refsectionize(x) = current-refsection() + "-" + x
 
@@ -204,11 +247,11 @@
 /// the function passes the metadata
 /// of this bib entry to the `citation-content` function and returns the content this
 /// function generated. Otherwise, the `link` is passed to `other-content` for further processing.
-/// 
+///
 /// The primary purpose of `if-citation` is to facilitate the definition of show rules.
 /// A typical example is the following show rule, which colors references to my own publications
 /// green and all others blue.
-/// 
+///
 /// #zebraw(lang: false,
 /// ```typ
 /// #show link: it => if-citation(it, value => {
@@ -220,21 +263,21 @@
 ///      it
 ///  }})
 /// ```)
-/// 
+///
 /// -> content
 #let if-citation(
     /// A Typst `link` element.
     /// -> link
-    it, 
+    it,
 
     /// A function that maps the metadata associated with a Pergamon reference to
     /// a piece of content. The metadata is a dictionary with keys `reference`, `index`, and
     /// `key`. `reference` is a reference dictionary (see @sec:reference),
     /// `key` is the key of the bib entry, and `index`
     /// is the position in the bibliography.
-    /// 
+    ///
     /// -> function
-    citation-content, 
+    citation-content,
 
     /// A function that maps the `link` to a piece of content. The default argument
     /// simply leaves the `link` untouched, permitting other show rules to trigger and
@@ -260,7 +303,7 @@
 /// Defines a section of the document with its own bibliography.
 /// You need to load a bibliography with the @add-bib-resource function
 /// in a place that is earlier than the refsection in rendering order.
-/// 
+///
 /// Each refsection is automatically assigned a unique identifier that distinguishes
 /// it from all other refsections in the document. These refsection identifiers are
 /// used to generate unique Typst labels for all references in the document, even
@@ -268,67 +311,67 @@
 /// the form of these identifiers beyond their uniqueness. Note that unlike in
 /// #pergamon 0.6.0 and earlier, it is no longer possible to specify the refsection
 /// identifier explicitly.
-/// 
+///
 /// -> none
 #let refsection(
   /// The citation formatter that should be used to generate citation strings
   /// within this refsection. It typically comes from a citation style.
-  /// 
+  ///
   /// A citation formatter is a function that
   /// receives an array of _citation specifications_ as its first
   /// argument, a `form` string as its second argument, and an `options` dictionary
   /// as its third argument. It returns
   /// the content that is displayed in place of a @cite call.
-  /// 
+  ///
   /// A citation specification is an array `(lbl, reference)`, where `lbl`
   /// is a citation label and `reference` is a reference dictionary.
   /// The citation formatter is expected to use the information in the reference
-  /// dictionary to generate the citation and then embed it in a #link("https://typst.app/docs/reference/model/link/")[link] 
+  /// dictionary to generate the citation and then embed it in a #link("https://typst.app/docs/reference/model/link/")[link]
   /// to the given label (which is anchored by the reference in the bibliography).
   /// This might look like this:
   /// ```
   /// #link(label(lbl), format(reference))
   /// ```
-  /// 
+  ///
   /// In addition to `(lbl, reference)` pairs, the citation specification array
-  /// can also contain elements that are strings (i.e. Typst objects of type `str`). 
+  /// can also contain elements that are strings (i.e. Typst objects of type `str`).
   /// This happens in cases where the
   /// user cites a paper that does not exist in the bibliography. In this case,
   /// the string is the key of the cited paper, and the citation formatter is
-  /// expected to render an appropriate error message. The builtin styles 
+  /// expected to render an appropriate error message. The builtin styles
   /// render the key as "*?key?*"".
-  /// 
+  ///
   /// The `form` string specifies the exact form in which the citation is rendered;
   /// see @sec:builtin-citation-styles for details. This makes the difference e.g.
   /// between "Smith et al. (2025)" and "(Smith et al. 2025)".
-  /// 
+  ///
   /// The `options` dictionary specifies options that control the rendering of the
-  /// citation in detail. For instance, the _authoryear_ style accepts 
+  /// citation in detail. For instance, the _authoryear_ style accepts
   /// `prefix` and `suffix` arguments. Not every citation style is required to
   /// interpret the same options; see the documentation of the citation style
   /// for details.
-  /// 
+  ///
   /// You can pass `auto` in this argument to indicate that you want to use the
   /// same citation formatter as in the previous `refsection`. If you pass `auto`
   /// to the first refsection in the document, #bibtypst will use the dummy
   /// citation formatter `(references, form) => [CITATION]`.
-  /// 
+  ///
   /// See the documentation of the `style` parameter for an alternative way
   /// to specify citation formatters.
-  /// 
+  ///
   /// -> function | auto
   format-citation: auto,
 
   /// The style bundle that should be used to typeset citations and
   /// bibliographies within this refsection.
-  /// 
+  ///
   /// A style bundle combines citation style and a reference style
   /// in a single dictionary,
   /// as explained in@sec:style-bundles. The citation style will be used
   /// to format citations within the refsection, and the reference style
   /// will be used to typeset the references in all calls to
   /// @print-bibliography within the refsection.
-  /// 
+  ///
   /// You will typically specify how to format citations by passing _either_
   /// a `format-citation` _or_ a `style` argument. The `style` argument is
   /// much more convenient, so there is a good chance that this is how most
@@ -336,10 +379,10 @@
   /// and `style` arguments; in this case, `format-citation` takes precedence.
   /// The `style` will still provide a reference style and label generator
   /// to the `print-bibliography` calls.
-  /// 
+  ///
   /// If you pass `auto` as the `style` argument, the refsection will use the
   /// same style as the previous refsection in the document.
-  /// 
+  ///
   /// -> dictionary | auto
   style: auto,
 
@@ -405,7 +448,7 @@
 // The location() of this element can be used to retrieve the full set
 // of references cited in the refsection, including ones that were only
 // cited after the print-bibliography call.
-// 
+//
 // -> metadata
 #let find-refsection-end() = {
   let upcoming = query(selector(metadata).after(here()))
@@ -413,7 +456,7 @@
     let v = m.value
     type(v) == dictionary and v.at("kind", default: none) == REFSECTION-END-MARKER
   })
-  
+
   if matching.len() > 0 {
     matching.first()
   } else {
@@ -423,7 +466,7 @@
 
 // Returns the set of all reference keys that were cited in the
 // current refsection.
-// 
+//
 // -> array
 #let references-at-refsection-end() = {
   let ref-end = find-refsection-end()
@@ -465,35 +508,35 @@
 /// The `cite` function keeps track of what `refsection` we are in and
 /// uses that refsection's citation formatter to typeset the
 /// citation.
-/// 
+///
 /// You can pass a single key, `cite(key)`, to typeset a citation of a
 /// single reference. Alternatively, you can pass multiple keys,
 /// `cite(key1, key2, key3)`, to generate a sequence of citations. Depending
 /// on the citation style, this may give you a compact and neat citation,
 /// such as "[1, 5]" or "(Author 2020; Other 2021)".
-/// 
+///
 /// Note that bib keys are always given as strings in #bibtypst,
 /// e.g. `cite("paper1")`. This is in contrast to Typst's builtin cite function,
 /// which expects labels.
-/// 
+///
 /// You can pass a `form` for finer control over the citation string,
 /// depending on what your citation style supports (see   @sec:builtin-citation-styles). If you do not specify
 /// the `form`, its default value of `auto` will generate a default form
 /// that depends on the citation style.
-/// 
+///
 /// You can optionally pass a `prefix` or `suffix` argument to the `cite` call.
 /// The authoryear style will place these before or after the main citation,
 /// separated by its `prefix-separator` and `suffix-separator` parameters.
-/// 
+///
 /// -> content
 #let cite(
   /// The keys of the #bibtex entries you want to cite.
-  /// 
+  ///
   /// -> arguments
   ..keys,
 
   /// The citation form.
-  /// 
+  ///
   /// -> str | auto
   form: auto,
 ) = context {
@@ -501,6 +544,9 @@
   let to-format = ()
 
   let xkeys = keys.pos()
+  let local-bibs = local-bibliographies.get()
+  let current-local-bib = if local-bibs.len() == 0 { (:) } else { local-bibs.last() }
+  let current-bib = bibliography.get() + current-local-bib
 
   for key in xkeys {
     if type(key) != str {
@@ -517,8 +563,13 @@
     let lbl = refsectionize(key)
     let targets = query(label(lbl)) // find metadata object generated by print-bibliography
     if targets.len() == 0 {
-      // on first pass, the label does not exist yet
-      to-format.push(key)
+      if key in current-bib {
+        // On early layout passes, the bibliography label does not exist yet.
+        // This is distinct from an actually missing bibliography key.
+        to-format.push((kind: "pending-citation", key: key))
+      } else {
+        to-format.push(key)
+      }
     } else if "value" in targets.first().fields() { // not sure why I need this
       // on second pass, we can generate the real citation
       let value = targets.first().value
@@ -747,34 +798,34 @@
 /// This function cannot be used outside of a refsection.
 ///
 /// -> none
-#let print-bibliography( 
+#let print-bibliography(
     /// The reference style that should be used to render a reference
     /// into Typst content.
-    /// 
+    ///
     /// A reference style is a function that takes two arguments.
     /// It takes the position of the reference in the
     /// bibliography as a zero-based `int` in the first argument.
     /// It takes the #link(<sec:reference>)[reference dictionary]
     /// for the reference
     /// in the second argument.
-    /// 
+    ///
     /// The function returns an
     /// array of contents. The elements of this array will be laid out as the columns
     /// of a grid, in the same row, permitting e.g. bibliography layouts with one
-    /// column for the reference label and one with the reference itself. 
+    /// column for the reference label and one with the reference itself.
     /// If only one column is needed (e.g. in the authoryear citation style),
     /// `format-reference` should return an array of length one.
     /// All calls to `format-reference` should return arrays of the same length.
-    /// 
+    ///
     /// You can pass the value `auto` instead of a function. In this case,
     /// `print-bibliography` will look up the reference formatter from the
     /// style bundle that you passed to the @refsection that surrounds
     /// this call to `print-bibliography`. If you pass `auto` without
     /// specifying a `style` for the refsection, a dummy reference style
     /// will be used.
-    /// 
+    ///
     /// -> auto | function
-    format-reference: auto, 
+    format-reference: auto,
 
     /// The label generator that should be used to generate label information
     /// for a reference. This is a function that takes
@@ -783,18 +834,18 @@
     /// useful for generating the citations and `label-repr` is a string representation
     /// of the label. These string representations are used to detect label collisions,
     /// which cause the generation of extradates.
-    /// 
+    ///
     /// The default implementation simply returns a number that is guaranteed to be
     /// unique to each reference. Styles that want to work with `extradate` will almost
     /// certainly want to pass a different function here.
-    /// 
+    ///
     /// The function passed as `label-generator` does not control whether labels
     /// are printed in the bibliography in their own separate column; it only computes information for internal use.
     /// A style can decide whether it wants to print labels through its `format-reference`
     /// function.
-    /// 
+    ///
     /// Note that `label-repr` _must_ be a `str`.
-    /// 
+    ///
     /// You can pass the value `auto` instead of a function. In this case,
     /// `print-bibliography` will look up the label generator from the
     /// style bundle that you passed to the @refsection that surrounds
@@ -802,15 +853,15 @@
     /// specifying a `style` for the refsection, the default implementation
     /// described above
     /// will be used.
-    /// 
+    ///
     /// -> auto | function
-    label-generator: auto, 
+    label-generator: auto,
 
     /// A function that defines the order in which references are shown in the bibliography.
-    /// This function takes a #link(<sec:reference>)[reference dictionary] as input and returns a value that can be 
+    /// This function takes a #link(<sec:reference>)[reference dictionary] as input and returns a value that can be
     /// #link("https://typst.app/docs/reference/foundations/array/#definitions-sorted")[sorted],
     /// e.g. a number, a string, or an array of sortable values.
-    /// 
+    ///
     /// Alternatively, you can specify a #biblatex\-style sorting string. The following strings are
     /// supported:
     /// - `n`: author name (lastname firstname)
@@ -819,18 +870,18 @@
     /// - `d`: the date on which the paper was published; write `dd` for descending order
     /// - `v`: volume, if defined
     /// - `a`: the contents of the `label` field (if defined); for the `alphabetic` style, this amounts to the alphabetic paper key
-    /// 
+    ///
     /// For instance, `"nydt"` sorts the references first by author name, then by descending year, then by title.
-    /// 
+    ///
     /// See @sec:dates for details on how dates are parsed in the #bibtex entries. If
     /// a field of the date (year, month, day) is missing, it is treated as zero for the purposes
     /// of sorting. Months that are specified as strings (e.g. `"July"` rather than `7` or `jul`)
     /// are also treated as zero.
-    /// 
+    ///
     /// If `none` or the string `"none"` is passed as the `sorting` argument, the references
     /// are sorted in an arbitrary order. There is currently no reliable support for sorting
     /// the references in the order in which they were cited in the document.
-    /// 
+    ///
     /// -> function | str | none
     sorting: none,
 
@@ -845,26 +896,26 @@
     /// and returns a boolean value. The printed bibliography will contain exactly those references
     /// for which the function returned `true`.
     /// -> function
-    /// 
+    ///
     filter: reference => true,
 
     /// A dictionary for styling the #link("https://typst.app/docs/reference/layout/grid/")[grid]
     /// in which the bibliography is laid out. By default, the grid is laid out with `row-gutter: 1.2em` and
     /// `column-gutter: 0.5em`. You can overwrite these values and specify new ones with this argument;
     /// the revised style specification will be passed to the `grid` function.
-    /// 
+    ///
     /// -> dictionary
     grid-style: (:),
 
     /// The title that will be typeset above the bibliography in the document.
     /// The string given here will be rendered as a first-level heading without numbering.
     /// Pass `none` to suppress the bibliography title.
-    /// 
+    ///
     /// -> str | content | none
     title: "References",
 
     /// Whether the title of the bibliography should appear in the document's #link("https://typst.app/docs/reference/model/outline/")[outline].
-    /// 
+    ///
     /// -> bool
     outlined: true,
 
@@ -872,16 +923,16 @@
     /// #bibtypst will enrich the reference dictionary with a field `parsed-X` that contains an array of
     /// name-part dictionaries, such as `("family": "Smith", "given": "John")`. See
     /// @sec:reference for an example.
-    /// 
+    ///
     /// If the field `X` is not defined in the #bibtex entry, #bibtypst will still insert
     /// a field `parsed-X`; in this case, it will have the value `none`.
-    /// 
+    ///
     /// Note that to fully replicate the options `useauthor` / `useeditor` / `usetranslator`
     /// in #biblatex, you will need to both (a) specify the corresponding option in @format-reference
     /// and (b) remove the field from the `name-fields` parameter here. This is because
     /// `name-fields` is used to determine the reference's `labelname`, long before `format-reference`
-    /// gets to typeset the reference itself. 
-    /// 
+    /// gets to typeset the reference itself.
+    ///
     /// -> array
     name-fields: ("afterword",
         "annotator",
@@ -903,18 +954,18 @@
     /// #bibtex fields that will be considered when determining the entry's labelname.
     /// The labelname is the field that will be used when generating the labels for
     /// the _authoryear_ and _alphabetic_ citation styles. Labelnames are computed as follows:
-    /// 
+    ///
     /// - If the #bibtex entry specified a field with the name `labelnamefield`, then the
     ///   #bibtex field specified under `labelnamefield` is used.
     /// - Otherwise, the first field name in `labelname-fields` that is defined in the
     ///   #bibtex entry is used.
     /// - If none of these fields is defined, #pergamon will throw an error.
-    ///   
+    ///
     /// In either of these cases, the name of the #bibtex field from which the labelname
     /// is taken is stored in the #bibtex field `labelnamesource`.
-    /// 
+    ///
     /// #pergamon assumes that the labelname field contains a list of names.
-    /// 
+    ///
     /// -> array
     labelname-fields: (
       "shortauthor",
@@ -926,25 +977,25 @@
 
     /// Starts the numbering of entries in this bibliography after the number
     /// specified in this argument. Let's say you typeset two bibliographies in
-    /// your document, and the first one has 15 entries. You can pass `15` in 
+    /// your document, and the first one has 15 entries. You can pass `15` in
     /// the `resume-after` argument to make the numbering of entries in the second
     /// bibliography start at 16.
-    /// 
+    ///
     /// The `index` parameters of functions like `format-reference` and `format-citation`
     /// will receive the sum of resume-after and the actual position in this particular
     /// bibliography as an argument. In the example above, the first reference in the
     /// second bibliography will be called with index=15 (because the count in the
     /// second bibliography is zero-based). The only default citation style that cares
     /// about indices is _numeric_.
-    /// 
+    ///
     /// If you have
-    /// multiple calls to `print-bibliography` within the same `refsection`, 
+    /// multiple calls to `print-bibliography` within the same `refsection`,
     /// you can pass `auto` to `resume-after` to seamlessly continue the numbering
     /// across bibliographies within the same refsection. Note that this requires
     /// slightly complex state management, and using the `auto` argument will
     /// require Typst to perform four iterations to make the layout converge
     /// (rather than three for other uses of Pergamon).
-    /// 
+    ///
     /// -> int | auto
     resume-after: 0,
 
@@ -953,13 +1004,13 @@
     /// reference in the order of the `sorting` order is still called "[1]".
     /// However, if `reversed` is set to `true`, the reference [1] will be
     /// the final reference in the bibliography.
-    /// 
+    ///
     /// -> bool
     reversed: false
   ) = context {
   // look up format-reference and label-generator
   let style = current-style-bundle.get()
-  
+
   let format-reference = if format-reference == auto {
     if style != none {
       style.at("reference-style")
@@ -1018,13 +1069,13 @@
   let n = sorted.len()
   let formatted-references-original = sorted.enumerate(start: start-index).map(it => format-reference(it.at(0), it.at(1)))
   // -> array(array(content))
-  
+
   let formatted-references = if reversed {
     formatted-references-original.rev()
   } else {
     formatted-references-original
   }
-  
+
   let num-columns = if formatted-references.len() == 0 { 0 } else { formatted-references.at(0).len() }
   let cells = ()
 

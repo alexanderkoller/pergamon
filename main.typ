@@ -12,7 +12,7 @@
 
 #set heading(numbering: "1.1")
 
-#let marker = text(size: 8pt)[#emoji.star] 
+#let marker = text(size: 8pt)[#emoji.star]
 
 
 // Alphabetic:
@@ -35,7 +35,7 @@
 
     // print-identifiers: ("doi", "url"),
     // print-doi: true,
-    // 
+    //
     suppress-fields: (
       "*": ("month", "day",),
       "inproceedings": ("editor", "publisher", "pages", "location")
@@ -71,7 +71,7 @@
 
     //     concatenate-names(formatted-names, maxnames: 999)
     //   },
-    // )    
+    // )
   )
 )
 
@@ -140,7 +140,7 @@
 #add-bib-resource(read("bibs/physics.bib"))
 
 #refsection(style: style)[
-// #refsection(format-citation: fcite.format-citation)[ // id: "hallo", 
+// #refsection(format-citation: fcite.format-citation)[ // id: "hallo",
   // This show rule has to come inside the refsection, otherwise it is
   // overwritten by the show rule that is defined in refsection's source code.
   // It colors the citation links based on whether the reference is to a PI publication.
@@ -149,8 +149,10 @@
     set text(fill: color)
     it
   })
-  
+
   #set par(justify: true)
+
+  x
 
   = Introduction <sec:intro>
   To reproduce \#78:
@@ -226,7 +228,7 @@
 
     // print references in reversed order:
     // reversed: true,
-    
+
     // control the formatting of the bibliography:
     // grid-style: (row-gutter: 2cm),
 
@@ -244,5 +246,3 @@
   to test tracl \#21 / pergamon \#139: #cite("test_entry2")
 
 ]
-
-
