@@ -2,7 +2,7 @@
 #import "@preview/oxifmt:1.0.0": strfmt
 #import "bib-util.typ": fd, ifdef, concatenate-names
 #import "templating.typ": *
-#import "names.typ": format-name
+#import "names.typ": format-name, is-andothers-name
 #import "bib-util.typ": is-integer
 #import "dates.typ": is-year-defined
 
@@ -78,8 +78,13 @@
 // as specified in the options. `name-parts-array` is an array of name-parts dictionaries.
 // "name-type" is the Bibtex field name, e.g. "author" or "editor".
 #let print-name(name-parts-array, name-type, options) = {
+  let andothers = name-parts-array.len() > 0 and is-andothers-name(name-parts-array.last())
+  if andothers {
+    name-parts-array = name-parts-array.slice(0, name-parts-array.len() - 1)
+  }
+
   let names = name-parts-array.map(d => format-name(d, name-type: name-type, format: options.name-format))
-  concatenate-names(names, options: options, minnames: options.minnames, maxnames: options.maxnames)
+  concatenate-names(names, options: options, minnames: options.minnames, maxnames: options.maxnames, andothers: andothers)
 }
 
 #let month-bibstring-keys = (
@@ -338,4 +343,3 @@
     printed
   }
 }
-

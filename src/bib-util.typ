@@ -53,16 +53,24 @@
   /// Minimum number of names that is guaranteed to be displayed. See the `minnames`
   /// parameter in @format-reference for details.
   /// -> int
-  minnames: 1
+  minnames: 1,
+
+  /// Whether the input name list was explicitly abbreviated with `and others`.
+  /// -> bool
+  andothers: false,
   ) = {
   let etal = names.len() > maxnames and names.len() > minnames // print "et al.", at least one name dropped
   let num-names = if etal { calc.min(minnames, names.len()) } else { names.len() } // #names that will be printed
 
   let options-d = (list-end-delim-two: " and ", list-middle-delim: ", ", list-end-delim-many: ", and ", bibstring: default-long-bibstring) + options
 
-  if etal {
+  if etal or andothers {
     let nn = names.slice(0, num-names).join(options-d.list-middle-delim)
-    nn + " " + options-d.bibstring.andothers
+    if nn == "" {
+      options-d.bibstring.andothers
+    } else {
+      nn + " " + options-d.bibstring.andothers
+    }
   } else {
     if names.len() == 1 {
       names.at(0)
@@ -166,6 +174,4 @@
 #let nn(func) = {
   it => if it == none { none } else { func(it) }
 }
-
-
 

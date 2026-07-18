@@ -6,13 +6,56 @@
 // whose keys are the parts of a name (family, given, ...).
 
 
+#let name-part(name-parts-dict, key) = {
+  name-parts-dict.at(key, default: "")
+}
+
+#let name-initial(name-parts-dict, key, initials-key: none) = {
+  let initials = if initials-key == none { "" } else { name-part(name-parts-dict, initials-key) }
+  let value = name-part(name-parts-dict, key)
+
+  if initials != "" {
+    initials
+  } else if value != "" {
+    value.at(0)
+  } else {
+    ""
+  }
+}
+
+#let family-name(name-parts-dict) = {
+  let prefix = name-part(name-parts-dict, "prefix")
+  let family = name-part(name-parts-dict, "family")
+
+  if name-parts-dict.at("use-prefix", default: false) and prefix != "" {
+    prefix + " " + family
+  } else {
+    family
+  }
+}
+
+#let sort-name(name-parts-dict, use-prefix-in-sorting: false) = {
+  let prefix = name-part(name-parts-dict, "prefix")
+  let family = name-part(name-parts-dict, "family")
+  let given = name-part(name-parts-dict, "given")
+  let sort-family = if use-prefix-in-sorting and prefix != "" { prefix + " " + family } else { family }
+
+  (sort-family, given).filter(x => x != "").join(",")
+}
+
+#let is-andothers-name(name-parts-dict) = {
+  name-part(name-parts-dict, "family") == "others" and name-part(name-parts-dict, "given") == "" and name-part(name-parts-dict, "prefix") == "" and name-part(name-parts-dict, "suffix") == ""
+}
+
+#let name-part-placeholder = regex("\\{(given|prefix|family|suffix|given-initials|prefix-initials|g|p|f|s)\\}")
+
 // Parses the name lists for the given name-fields. Returns a reference dictionary
 // that has been enriched with "parsed-X" fields, for all X in name-fields.
-#let parse-reference-names(reference, name-fields) = {
+#let parse-reference-names(reference, name-fields, use-prefix-in-sorting: false) = {
   for field in name-fields {
     if field in reference.parsed_names {
       let parsed-names = reference.parsed_names.at(field)
-      let lastname-first = parsed-names.map(it => it.family + "," + it.given).join(" ")
+      let lastname-first = parsed-names.map(it => sort-name(it, use-prefix-in-sorting: use-prefix-in-sorting)).join(" ")
       reference.fields.insert("parsed-" + field, parsed-names)
       reference.fields.insert("sortstr-" + field, lastname-first)
       // sortstr fields are needed to perform efficient sorting on the "n" key
@@ -35,7 +78,7 @@
   if parsed-names == none {
     none
   } else {
-    parsed-names.map( it => it.at("family", default: none) )
+    parsed-names.map(family-name)
   }
 }
 
@@ -61,24 +104,29 @@
   /// or you can pass a dictionary that maps name types to
   /// strings.
   /// -> str | dictionary
-  format: "{family}, {given}"
+  format: "{given} {prefix} {family} {suffix}"
   ) = {
   let format-str = if type(format) == dictionary {
-    format.at(name-type, default: "{family}, {given}")
+    format.at(name-type, default: "{given} {prefix} {family} {suffix}")
   } else {
     format
   }
 
-  let ret = format-str
-  for (key, value) in name-parts-dict.pairs() {
-    ret = ret.replace("{" + key + "}", value)
+  let replacements = (
+    "given": name-part(name-parts-dict, "given"),
+    "prefix": name-part(name-parts-dict, "prefix"),
+    "family": name-part(name-parts-dict, "family"),
+    "suffix": name-part(name-parts-dict, "suffix"),
+    "given-initials": name-part(name-parts-dict, "given-initials"),
+    "prefix-initials": name-part(name-parts-dict, "prefix-initials"),
+    "g": name-initial(name-parts-dict, "given", initials-key: "given-initials"),
+    "p": name-initial(name-parts-dict, "prefix", initials-key: "prefix-initials"),
+    "f": name-initial(name-parts-dict, "family"),
+    "s": name-initial(name-parts-dict, "suffix"),
+  )
 
-    // Citegeist inserts keys with empty strings as values into the 
-    // name-parts dictionary; skip those.
-    if value.len() > 0 {
-      ret = ret.replace("{" + key.at(0) + "}", value.at(0))
-    }
-  }
-  return ret
+  format-str
+    .replace(name-part-placeholder, m => replacements.at(m.captures.at(0)))
+    .replace(regex("\s+"), " ")
+    .trim()
 }
-

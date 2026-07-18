@@ -710,8 +710,8 @@
 // order in which sortstr fields are used for "n" sorting
 #let namefield-sort-order = ("sortstr-sortname", "sortstr-author", "sortstr-editor", "sortstr-translator")
 
-#let preprocess-reference(reference, name-fields, labelname-fields) = {
-  let ref = parse-reference-names(reference, name-fields)
+#let preprocess-reference(reference, name-fields, labelname-fields, use-prefix-in-sorting: false) = {
+  let ref = parse-reference-names(reference, name-fields, use-prefix-in-sorting: use-prefix-in-sorting)
 
   // determine labelname
   let labelname-field = fd(ref, "labelnamefield", (:))
@@ -857,6 +857,13 @@
     ///
     /// -> function | str | none
     sorting: none,
+
+    /// If `true`, name prefixes such as `van` and `de` are included in the
+    /// built-in name sorting key `n`. If `false`, names are sorted by family
+    /// name without the prefix, e.g. `van Gennep` sorts under `Gennep`.
+    ///
+    /// -> bool
+    use-prefix-in-sorting: false,
 
     /// Determines whether the printed bibliography should contains all references from the loaded bibliographies
     /// (`true`) or only those that were cited in the current refsection (`false`).
@@ -1023,7 +1030,7 @@
 
   if show-all {
     for reference in bib.values() {
-      let ref = preprocess-reference(reference, name-fields, labelname-fields)
+      let ref = preprocess-reference(reference, name-fields, labelname-fields, use-prefix-in-sorting: use-prefix-in-sorting)
       bibl-unsorted.push(ref)
     }
   } else {
@@ -1031,7 +1038,7 @@
     for key in cited-keys {
       if key in bib { // skip references to labels that are not bib keys
         let bib-entry = bib.at(key)
-        bib-entry = preprocess-reference(bib-entry, name-fields, labelname-fields)
+        bib-entry = preprocess-reference(bib-entry, name-fields, labelname-fields, use-prefix-in-sorting: use-prefix-in-sorting)
         bibl-unsorted.push(bib-entry)
       }
     }
