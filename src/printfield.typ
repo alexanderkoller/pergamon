@@ -49,17 +49,19 @@
   })
 }
 
-// Typesets the title of the paper. 
-// make title a hyperlink if DOI or URL are defined
-#let link-title(reference, options) = {
-  let title = if options.eval-mode == none { 
-    reference.fields.title.trim() 
-  } else { 
-    eval(reference.fields.title.trim(), mode: options.eval-mode, scope: options.eval-scope) 
+// Normalizes and optionally links a caller-provided title string.
+// If options.eval-mode is not `none`, the title string is first evaluated.
+// Then, if the reference defines a URL or DOI, the title is wrapped in
+// a `link`.
+#let link-title(reference, options, title) = {
+  if options.eval-mode != none and type(title) == str {
+    title = eval(title.trim(), mode: options.eval-mode, scope: options.eval-scope)
+  } else if type(title) == str {
+    title = title.trim()
   }
 
   if not options.link-titles {
-    title 
+    title
   } else if "doi" in reference.fields {
     link("https://doi.org/" + reference.fields.doi)[#title]
   } else if "url" in reference.fields {
@@ -88,10 +90,10 @@
 }
 
 #let month-bibstring-keys = (
-   "january", "february", "march", "april", "may", "june", 
+   "january", "february", "march", "april", "may", "june",
    "july", "august", "september", "october", "november", "december"
 )
- 
+
 #let print-date(date-dict, options) = {
   let month-entry = date-dict.at("month", default: none)
   let day-entry = date-dict.at("day", default: none)
@@ -206,18 +208,7 @@
     options.bibstring.at(value, default: value)
   },
 
-  "title": (value, reference, field, options, style) => {
-    let bib-type = reference.entry_type
-    let title = link-title(reference, options)
-
-    if bib-type in ("article", "inbook", "incollection", "inproceedings", "patent", "thesis", "unpublished") {
-      options.at("format-quotes")(title)
-    } else if bib-type in ("suppbook", "suppcollection", "suppperiodical", "misc") {
-      title
-    } else {
-      emph(title)
-    }
-  },
+  "title": (value, reference, field, options, style) => value,
 
   "type": (value, reference, field, options, style) => {
     options.bibstring.at(value, default: value)
@@ -252,7 +243,7 @@
   },
 
   "extradate": (value, reference, field, options, style) => {
-    if is-year-defined(reference) {      
+    if is-year-defined(reference) {
       numbering("a", value+1)
     } else {
       (options.format-brackets)(numbering("a", value+1))
@@ -272,7 +263,7 @@
   },
 
   "translator": "parsed-translator",
-  
+
   "parsed-translator": (value, reference, field, options, style) => {
     print-name(value, "translator", options)
   },
@@ -310,12 +301,10 @@
   */
 )
 
-
-
 #let printfield(reference, field, options, style: none) = {
   let field-formats = options.at("field-formatters")
   let value = fd(reference, field, options)
-  
+
   if value == none {
     none
   } else {

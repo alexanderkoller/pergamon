@@ -1,7 +1,7 @@
 #import "bibtypst.typ": *
 #import "templating.typ": *
 #import "bibstrings.typ": default-long-bibstring, default-short-bibstring
-#import "printfield.typ": printfield, default-field-formats
+#import "printfield.typ": printfield, link-title, default-field-formats
 #import "bib-util.typ": fd, ifdef, type-aliases, nn, concatenate-names
 
 
@@ -204,17 +204,41 @@
   }
 })
 
-// biblatex.def periodical
-#let periodical = with-default("periodical", (reference, options) => {
-  (options.commas)(
-    (options.format-issuetitle)(
-      fjoin(options.subtitlepunct,
-        printfield(reference, "title", options, style: "titlecase"),
-        printfield(reference, "subtitle", options, style: "titlecase")
-      )
-    ),
+// Prints the linked main title unit of an entry: title + subtitle, linked to
+// DOI/URL/eprint if `link-titles` is enabled.
+//
+// This deliberately does not apply
+// quote/emphasis/plain formatting; callers such as the `title` macro wrap the
+// returned unit with `format-title`, mirroring Biblatex's `\printtext[title]`.
+//
+// This is the single entry point for the entry's own title; container titles
+// such as maintitle, booktitle, and journaltitle are formatted separately and
+// are not linked to the entry URL by default.
+#let linked-title = with-default("linked-title", (reference, options) => {
+  let main-title = fd(reference, "title", options)
+  let subtitle = fd(reference, "subtitle", options)
+
+  if main-title == none and subtitle == none {
+    none
+  } else {
+    link-title(reference, options, fjoin(options.subtitlepunct, main-title, subtitle))
+  }
+})
+
+// Prints the Biblatex title macro: the linked title unit followed by
+// titleaddon as a separate sentence/unit.
+#let title = with-default("title", (reference, options) => {
+  let title-unit = linked-title(reference, options)
+
+  (options.periods)(
+    if title-unit == none { none } else { (options.format-title)(reference, title-unit, options) },
     printfield(reference, "titleaddon", options)
   )
+})
+
+// biblatex.def periodical
+#let periodical = with-default("periodical", (reference, options) => {
+  title(reference, options)
 })
 
 // standard.bbx title+issuetitle
@@ -374,9 +398,9 @@
 
 #let maintitle = with-default("maintitle", (reference, options) => {
   (options.periods)(
-    fjoin(options.subtitlepunct, 
-      printfield(reference, "maintitle", options, style: "titlecase"), 
-      printfield(reference, "mainsubtitle", options, style: "titlecase"), 
+    fjoin(options.subtitlepunct,
+      printfield(reference, "maintitle", options, style: "titlecase"),
+      printfield(reference, "mainsubtitle", options, style: "titlecase"),
       format: options.format-maintitle),
     printfield(reference, "maintitleaddon", options)
   )
@@ -386,8 +410,8 @@
 
 #let booktitle = with-default("booktitle", (reference, options) => {
   (options.periods)(
-    fjoin(options.subtitlepunct, 
-      printfield(reference, "booktitle", options, style: "titlecase"), 
+    fjoin(options.subtitlepunct,
+      printfield(reference, "booktitle", options, style: "titlecase"),
       printfield(reference, "booksubtitle", options, style: "titlecase"),
       format: options.format-booktitle),
     printfield(reference, "booktitleaddon", options)
@@ -405,7 +429,7 @@
         maintitle,
         ifdef(reference, "volume", options, volume => {
           [#printfield(reference, "volume", options)
-           #printfield(reference, "part", options):]           
+           #printfield(reference, "part", options):]
         })
       )
     }),
@@ -414,6 +438,9 @@
 })
 
 // standard.bbx maintitle+title
+// Prints the unlinked maintitle block, then the entry's own linked title unit.
+// The DOI/URL/eprint identifies the cited entry, so it belongs on linked-title,
+// not on the maintitle/container block.
 #let maintitle-title = with-default("maintitle-title", (reference, options) => {
   let maintitle = fd(reference, "maintitle", options)
   let title = fd(reference, "title", options)
@@ -430,13 +457,14 @@
         format: options.format-maintitle
       ),
       epsilons(
-        printfield(reference, "volume", options), 
+        printfield(reference, "volume", options),
         printfield(reference, "part", options),
       )
     )
   } else { none }
 
-    fjoin(":", maintitle-str, printfield(reference, "title", options)
+    let title-unit = linked-title(reference, options)
+    fjoin(":", maintitle-str, if title-unit == none { none } else { (options.format-title)(reference, title-unit, options) }
   )
 })
 
@@ -484,7 +512,7 @@
 }
 
 // standard.bbx publisher+location+date
-#let publisher-location-date = with-default("publisher-location-date", 
+#let publisher-location-date = with-default("publisher-location-date",
     (reference, options) => xxx-location-date(reference, options, "publisher"))
 
 // standard.bbx organization+location+date
@@ -540,7 +568,7 @@
 
 #let title-with-language = with-default("title-with-language", (reference, options) => {
   (options.periods)(
-    printfield(reference, "title", options),
+    title(reference, options),
     printfield(reference, "language", options)
   )
 })
@@ -605,7 +633,7 @@
     if options.print-isbn { printfield(reference, "isbn", options) } else { none },
     doi-eprint-url(reference, options),
     addendum-pubstate(reference, options)
-    
+
     // TODO see [1] above
   )
 })
@@ -634,7 +662,7 @@
     if options.print-isbn { printfield(reference, "isbn", options) } else { none },
     doi-eprint-url(reference, options),
     addendum-pubstate(reference, options)
-    
+
     // TODO see [1] above
   )
 })
@@ -665,7 +693,7 @@
     if options.print-isbn { printfield(reference, "isbn", options) } else { none },
     doi-eprint-url(reference, options),
     addendum-pubstate(reference, options)
-    
+
     // TODO see [1] above
   )
 })
@@ -689,7 +717,7 @@
     organization-location-date(reference, options),
     doi-eprint-url(reference, options),
     addendum-pubstate(reference, options)
-    
+
     // TODO see [1] above
   )
 })
@@ -716,7 +744,7 @@
     if options.print-isbn { printfield(reference, "isbn", options) } else { none },
     doi-eprint-url(reference, options),
     addendum-pubstate(reference, options)
-    
+
     // TODO see [1] above
   )
 })
@@ -726,7 +754,7 @@
 // @booklet - A work that is printed and bound, but without a named publisher or sponsoring institution
 #let driver-booklet = with-default("driver-booklet", (reference, options) => {
     require-fields(reference, options, ("author", "editor"), "title")
-    
+
     (options.periods)(
       maybe-with-date(reference, options)(
         author-editor-others-translator-others(reference, options),
@@ -776,7 +804,7 @@
 // @inbook - A part of a book which forms a self-contained unit with its own title
 #let driver-inbook = with-default("driver-inbook", (reference, options) => {
     require-fields(reference, options, "author", "title", "booktitle")
-    
+
     (options.periods)(
       maybe-with-date(reference, options)(
         author-translator-others(reference, options)
@@ -794,7 +822,7 @@
         printfield(reference, "volumes", options),
       ),
       series-number(reference, options),
-      note-pages(reference, options),
+      printfield(reference, "note", options),
       publisher-location-date(reference, options),
       chapter-pages(reference, options),
       if options.print-isbn { printfield(reference, "isbn", options) } else { none },
@@ -806,7 +834,7 @@
 // @manual - Technical documentation
 #let driver-manual = with-default("driver-manual", (reference, options) => {
     require-fields(reference, options, ("author", "editor"), "title")
-    
+
     (options.periods)(
       maybe-with-date(reference, options)(
         author-editor(reference, options)
@@ -836,7 +864,7 @@
 // @online - An online resource
 #let driver-online = with-default("driver-online", (reference, options) => {
     require-fields(reference, options, ("author", "editor", "translator"), "title", ("url", "doi", "eprint"))
-    
+
     (options.periods)(
       maybe-with-date(reference, options)(
         author-editor-others-translator-others(reference, options)
@@ -858,7 +886,7 @@
 // @patent - A patent or patent request
 #let driver-patent = with-default("driver-patent", (reference, options) => {
     require-fields(reference, options, "author", "title", "number")
-    
+
     (options.periods)(
       maybe-with-date(reference, options)(
         author(reference, options)
@@ -877,7 +905,7 @@
 // @periodical - A complete issue of a periodical
 #let driver-periodical = with-default("driver-periodical", (reference, options) => {
     require-fields(reference, options, "editor")
-    
+
     (options.periods)(
       maybe-with-date(reference, options)(
         editor(reference, options)
@@ -898,7 +926,7 @@
 #let driver-proceedings = with-default("driver-proceedings", (reference, options) => {
     require-fields(reference, options, "title")
     // editor can be optional - proceedings without editors exist
-    
+
     (options.periods)(
       maybe-with-date(reference, options)(
         editor-others(reference, options)
@@ -913,7 +941,7 @@
       series-number(reference, options),
       printfield(reference, "note", options),
       (options.commas)(
-        printlist(reference, "organization", options),
+        printfield(reference, "organization", options),
         publisher-location-date(reference, options)
       ),
       (options.commas)(
@@ -928,7 +956,7 @@
 
 #let driver-report = with-default("driver-report", (reference, options) => {
     require-fields(reference, options, "author", "title", "type", "institution")
-    
+
     (options.periods)(
       maybe-with-date(reference, options)(
         author(reference, options)
@@ -956,7 +984,7 @@
 
 #let driver-unpublished = with-default("driver-unpublished", (reference, options) => {
     require-fields(reference, options, "author", "title")
-    
+
     (options.periods)(
       maybe-with-date(reference, options)(
         author(reference, options)
@@ -975,7 +1003,7 @@
 
 #let driver-dataset = with-default("driver-dataset", (reference, options) => {
     require-fields(reference, options, ("author", "editor", "translator"), "title")
-    
+
     (options.periods)(
       maybe-with-date(reference, options)(
         author-editor-others-translator-others(reference, options)
@@ -1052,22 +1080,22 @@
 /// of `print-bibliography`, and will control how the references in this
 /// bibliography are rendered. See the documentation of `print-bibliography`
 /// for a more detailed specification of the `format-reference` function in general.
-/// 
+///
 /// Most of the options of `format-reference` have sensible default values.
 /// The one exception is the mandatory named argument `reference-label`,
 /// which you obtain from your citation style.
 #let format-reference(
     /// The reference labeler that should be used for this bibliography;
     /// see @sec:custom-styles for a detailed explanation.
-    /// 
+    ///
     /// The reference labeler typically comes from a citation style (e.g.
     /// _authoryear_, _numeric_, _alphabetic_).
-    /// 
+    ///
     /// Unlike the other parameters of `format-reference`, you _must_ pass
     /// a meaningful argument for this parameter. If you leave it at the default
     /// value of `none`, Typst will not even show you a proper error message;
     /// it will just say "warning: layout did not converge within 5 attempts".
-    /// 
+    ///
     /// -> function
     reference-label: none,
 
@@ -1077,14 +1105,14 @@
     /// an opportunity to e.g. mark certain entries in the bibliography by
     /// boldfacing them or prepending them with a marker symbol. See
     /// @sec:highlighting for an example.
-    /// 
+    ///
     /// The highlighting function accepts arguments `rendered-reference`
     /// (`str` or `content` representing the reference as it is printed),
     /// `index` (position of the reference in the bibliography), and
     /// `reference` (the reference dictionary). It returns `content`.
     /// The default implementation simply returns the `rendered-reference`
     /// unmodified.
-    /// 
+    ///
     /// -> function
     highlight: (rendered-reference, index, reference) => rendered-reference,
 
@@ -1093,12 +1121,12 @@
     /// -> bool
     link-titles: true,
 
-    /// Array of reference identifiers that should be printed at the end of 
+    /// Array of reference identifiers that should be printed at the end of
     /// the bibliography entry. The array contains a list of strings; possible
     /// values are `"doi"`, `"url"`, and `"eprint"`. For each bib entry, these
     /// values are considered in the order in which they appear in the array,
     /// and the first value that is defined as a key in the bib entry is printed.
-    /// 
+    ///
     /// `print-identifiers` acts as a flexible version of the `print-url`,
     /// `print-doi`, and `print-eprint` parameters. For the first `X` in the array
     /// that is defined in the bib entry, it effectively sets `print-X` to `true`.
@@ -1106,7 +1134,7 @@
     /// thus, you could e.g. still force the rendering of `eprint` by
     /// setting `print-eprint` to `true`, even if `print-identifiers`
     /// matches on the DOI instead.
-    /// 
+    ///
     /// -> array
     print-identifiers: (),
 
@@ -1129,13 +1157,13 @@
 
     /// If `true`, prints the reference's translator if it is defined.
     /// See also `name-fields` in @print-bibliography.
-    /// 
+    ///
     /// -> bool
     use-translator: true,
 
     /// If `true`, prints the reference's editor if it is defined.
     /// See also `name-fields` in @print-bibliography.
-    /// 
+    ///
     /// -> bool
     use-editor: true,
 
@@ -1149,19 +1177,19 @@
     /// When #bibtypst renders a reference, the title is processed by Typst's
     /// #link("https://typst.app/docs/reference/foundations/eval/")[eval] function.
     /// The `eval-mode` argument you specify here is passed as the `mode` argument
-    /// to `eval`. 
-    /// 
+    /// to `eval`.
+    ///
     /// The default value of `"markup"` renders the title as if it were ordinary
     /// Typst content, typesetting e.g. mathematical expressions correctly.
-    /// 
+    ///
     /// You can pass `none` to typeset the title literally, without calling `eval.`
-    /// 
+    ///
     /// -> str | none
     eval-mode: "markup",
 
     /// The `scope` argument that is passed to the `eval` call (see `eval-mode`).
     /// This allows you to call Typst functions from within the #bibtex entries.
-    /// 
+    ///
     /// -> dictionary
     eval-scope: (:),
 
@@ -1192,39 +1220,60 @@
 
     /// Renders the title and subtitle of a journal as content.
     /// The default argument typesets it in italics.
-    /// 
-    /// Certain titles (journaltitle, issuetitle, maintitle, booktitle)
+    ///
+    /// Certain titles (title, journaltitle, issuetitle, maintitle, booktitle)
     /// can be combined with subtitles (e.g. journalsubtitle). The title and
     /// subtitle are joined by `subtitlepunct` to obtain e.g. "Journal title: subtitle".
     /// The subtitlepunct needs to be formatted the same as the title and
     /// subtitle, but its formatting cannot be controlled by `format-fields`. This is
     /// why #pergamon offers parameters such as `format-journaltitle` to format
     /// the entire concatenated title and subtitle.
-    ///     
+    ///
     /// -> function
     format-journaltitle: it => emph(it),
 
+    /// Formats the entry's title as content. The `title` argument is the already-composed
+    /// and possible hyperlinked title and subtitle. The purpose of the `format-title`
+    /// function is to decorate the title as appropriate for the entry type, e.g. by
+    /// adding quotes or italics. The BibLaTeX equivalent is `printtext[title]`.
+    ///
+    /// The default implementation quotes titles in article-like entries, adds italics
+    /// in book-like entries, and leaves other titles plain.
+    ///
+    /// -> function
+    format-title: (reference, title, options) => {
+      let bib-type = reference.entry_type
+
+      if bib-type in ("article", "inbook", "incollection", "inproceedings", "patent", "thesis", "unpublished") {
+        options.at("format-quotes")(title)
+      } else if bib-type in ("suppbook", "suppcollection", "suppperiodical", "misc") {
+        title
+      } else {
+        emph(title)
+      }
+    },
+
     /// Renders the title of a special issue as content. The default argument
     /// typesets it in italics.
-    /// 
+    ///
     /// See `format-journaltitle` for further explanation.
-    /// 
+    ///
     /// -> function
     format-issuetitle: it => emph(it),
 
     /// Renders the main title of a multi-volume work as content. The default argument
     /// typesets it in italics.
-    /// 
+    ///
     /// See `format-journaltitle` for further explanation.
-    /// 
+    ///
     /// -> function
     format-maintitle: it => emph(it),
 
     /// Renders the title of a book as content. The default argument
     /// typesets it in italics.
-    /// 
+    ///
     /// See `format-journaltitle` for further explanation.
-    /// 
+    ///
     /// -> function
     format-booktitle: it => emph(it),
 
@@ -1232,7 +1281,7 @@
     /// The argument is a dictionary that maps the names of fields in a #bibtex
     /// entry to _extended field formatters_, i.e. functions that compute
     /// Typst content and take the following positional parameters:
-    /// - `dffmt`: the _default_ field formatter, which is applied if no 
+    /// - `dffmt`: the _default_ field formatter, which is applied if no
     ///   more specific field formatter is specified through `format-fields`.
     /// - `value`: the value of the field in the #bibtex entry.
     /// - `reference`: the reference dictionary, cf. @sec:reference.
@@ -1240,73 +1289,73 @@
     /// - `options`: a dictionary containing all the options that were passed
     ///   to `format-reference` as arguments.
     /// - `style`: an optional style specification for the field.
-    /// 
+    ///
     /// If you do not override the rendering of a field, #pergamon
     /// uses a default field formatter, i.e. a function that computes content
     /// from the `value`, `reference`, `field`, `options`, and `style`
     /// parameters explained above. This default field formatter is passed
     /// as the first argument (`dffmt`) to the extended field formatter
     /// explained above.
-    /// 
-    /// Some examples of how `format-fields` can be used are shown in 
+    ///
+    /// Some examples of how `format-fields` can be used are shown in
     /// @sec:styling-individual-references.
-    /// 
+    ///
     /// -> dictionary
     format-fields: (:),
 
     /// Overrides the way that the complex formatting in the reference style
-    /// is handled. 
-    /// 
+    /// is handled.
+    ///
     /// The default #pergamon reference style relies on a variety
     /// of functions with signature `(reference, options) → content` to render
     /// pieces of the reference in the bibliography. For instance, the function
     /// `driver-article` typesets a #bibtex entry of type `article`.
-    /// 
+    ///
     /// By passing a dictionary
     /// with an entry `function-name: function` in this parameter, you can
     /// override the default implementations of these formatting functions.
     /// To find the function names that can be overriden, look for functions
     /// that start with `with-default` in #link("https://github.com/alexanderkoller/pergamon/blob/main/src/reference-styles.typ")[reference-styles.typ].
-    /// 
+    ///
     /// The `format-functions` parameter allows you to deeply customize the
     /// way #pergamon displays references, without having to implement your
     /// own reference style from scratch. It applies to larger spans of
     /// content in the references -- in contrast to `format-fields`, which
-    /// affects the formatting of individual #bibtex fields. 
+    /// affects the formatting of individual #bibtex fields.
     /// See @sec:customizing-style for examples.
-    /// 
+    ///
     /// -> dictionary
-    /// 
+    ///
     format-functions: (:),
-  
+
     /// Wraps text in round brackets. The argument needs to be a function
     /// that takes one argument (`str` or `content`) and returns `content`.
-    /// 
+    ///
     /// It is essential that if the argument is `none`, the function must
     /// also return `none`. This can be achieved conveniently with the `nn`
     /// function wrapper, see @sec:package:utility.
-    /// 
+    ///
     /// -> function
     format-parens: nn(it => [(#it)]),
 
     /// Wraps text in square brackets. The argument needs to be a function
     /// that takes one argument (`str` or `content`) and returns `content`.
-    /// 
+    ///
     /// It is essential that if the argument is `none`, the function must
     /// also return `none`. This can be achieved conveniently with the `nn`
     /// function wrapper, see @sec:package:utility.
-    /// 
+    ///
     /// -> function
     format-brackets: nn(it => [[#it]]),
 
     /// Wraps text in double quotes. The argument needs to be a function
     /// that takes one argument (`str` or `content`) and returns `content`.
-    /// 
+    ///
     /// It is essential that if the argument is `none`, the function must
     /// also return `none`. This can be achieved conveniently with the `nn`
     /// function wrapper, see @sec:package:utility.
-    /// 
-    /// -> function    
+    ///
+    /// -> function
     format-quotes: nn(it => ["#it"]),
 
     /// The format in which names (of authors, editors, etc.) are printed.
@@ -1314,13 +1363,13 @@
     /// `{given}`, `{prefix}`, `{family}`, `{suffix}`, `{given-initials}`, and
     /// `{prefix-initials}`; these will be replaced by the person's actual name
     /// parts. You can use `{g}`, `{p}`, `{f}`, and `{s}` for initials.
-    /// 
+    ///
     /// Instead of a string, you can also pass a dictionary in this argument.
     /// The keys are name types ("author", "editor", etc.), and the values are
     /// name format strings as explained above. The style will use a default
     /// format of `"{given} {prefix} {family} {suffix}"` for name types that you
     /// did not specify.
-    /// 
+    ///
     /// -> str | dictionary
     name-format: "{given} {prefix} {family} {suffix}",
 
@@ -1344,17 +1393,17 @@
     /// Selects whether the long or short versions of the bibstrings should be used
     /// by default. Acceptable values are "long" and "short". See the documentation
     /// of @default-long-bibstring for details.
-    /// 
+    ///
     /// -> str
     bibstring-style: "long",
 
     /// Overrides entries in the bibstring table. The bibstring table is a dictionary
     /// that maps language-independent
-    /// IDs of bibliographic constants (e.g. "in") to  
+    /// IDs of bibliographic constants (e.g. "in") to
     /// their language-dependent surface forms (such as "In: " or "edited by").
     /// The ID-form pairs you specify in the `bibstring` argument will overwrite
     /// the default entries.
-    /// 
+    ///
     /// See the documentation for @default-long-bibstring in @sec:package:utility for
     /// more information on the bibstring table.
     /// -> dictionary
@@ -1367,87 +1416,87 @@
     /// specified as a function `(reference, options) -> content`, in which case the
     /// returned content will be printed directly. Instead of an array, you can also
     /// pass `none` to indicate that no additional fields need to be printed.
-    /// 
+    ///
     /// For example, both of these will work:
     /// ```
     /// additional-fields: ("award",)
-    /// 
-    /// additional-fields: ((reference, options) => 
+    ///
+    /// additional-fields: ((reference, options) =>
     ///    ifdef(reference, "award", (:), award => [*#award*]),)
     /// ```
-    /// 
+    ///
     /// -> array | none
     additional-fields: none,
 
     /// A specification of field names that should not be printed. References are treated
     /// as if they do not contain values for these fields, even if the #bibtex file
     /// defines them.
-    /// 
+    ///
     /// You can pass a dictionary that maps entry types to arrays of strings.
     /// `("inproceedings": ("editor", "location"))` means that the editor and location fields
     /// will not be printed in `inproceedings` references, but may be printed in other
-    /// entry types. 
-    /// 
+    /// entry types.
+    ///
     /// You can use the special key `"*"` to suppress fields in _all_ entry types.
     /// A typical usecase is to hide the months and days of the `date` field
     /// and typeset only the year: pass `("*": ("month", "day"))` to `suppress-fields`.
     ///
     /// If you don't need fine-grained control over the entry types, you can simply
-    /// pass an array of strings instead of a dictionary. 
+    /// pass an array of strings instead of a dictionary.
     /// These field names will be suppressed in
     /// all references.
-    /// 
+    ///
     /// Finally, you can also pass  `none` to indicate that
     /// no fields should be suppressed.
-    /// 
+    ///
     /// -> array | dictionary | none
     suppress-fields: none,
 
     /// Specifies how string or content elements are joined using period symbols.
     /// This corresponds roughly (but not precisely) to blocks in #biblatex.
-    /// 
+    ///
     /// If you specify a string here, this string will be used to join
     /// the elements. #bibtypst will avoid duplicating connector symbols, i.e.
     /// it will not print a period if the preceding symbol was already a period.
-    /// 
+    ///
     /// Alternatively, you can specify an array `(connector, skip-chars)`, where
     /// `connector` is the period symbol. The connector is skipped if the
     /// preceding character occurs in the string `skip-chars`.
-    /// 
+    ///
     /// -> str | array
     period: (".", ".,?!;:"),
 
-    /// Function that joins an arbitrary number of strings or contents with a 
-    /// comma symbol. 
+    /// Function that joins an arbitrary number of strings or contents with a
+    /// comma symbol.
     /// This corresponds roughly (but not precisely) to units in #biblatex.
-    /// 
+    ///
     /// See the documentation for `period` for details.
-    /// 
+    ///
     /// -> str | array
     comma: ",",
 
     /// Maximum number of names that are displayed in name lists (author, editor, etc.).
     /// If the actual number of names exceeds `maxnames`, only the first `maxnames`
     /// names are shown and `bibstring.andothers` ("et al.") is appended.
-    /// 
+    ///
     /// This parameter is modeled after the `maxnames`/`maxbibnames` option
     /// in #biblatex.
-    /// 
+    ///
     /// -> int
     maxnames: 9999,
 
     /// Minimum number of names that are displayed in name lists (author, editor, etc.).
     /// This can be used in conjunction with `maxnames` to create name lists like
-    /// "Jones, Smith et al." (minnames = 2, maxnames = 2). 
-    /// 
+    /// "Jones, Smith et al." (minnames = 2, maxnames = 2).
+    ///
     /// `minnames` trumps `maxnames`: That is, if the name list is at least as long
     /// as `minnames`, the reference will show `minnames` names, even if this exceeds
     /// `maxnames`. In typical use cases, `minnames` will be less or equal than `maxnames`,
     /// so this situation will usually not occur.
-    /// 
+    ///
     /// This parameter is modeled after the `minnames`/`minbibnames` option
     /// in #biblatex.
-    /// 
+    ///
     /// -> int
     minnames: 9999,
 
@@ -1471,7 +1520,7 @@
 
     let commas = make-fjoin-function(comma)
     let periods = make-fjoin-function(period)
-    
+
     let formatter(index, reference) = {
       // Unfortunately, this still causes "layout did not converge" errors, rather
       // than just printing the error message.
@@ -1531,6 +1580,7 @@
         list-end-delim-two: list-end-delim-two,
         list-end-delim-many: list-end-delim-many,
         subtitlepunct: subtitlepunct,
+        format-title: format-title,
         format-journaltitle: format-journaltitle,
         format-issuetitle: format-issuetitle,
         format-booktitle: format-booktitle,
