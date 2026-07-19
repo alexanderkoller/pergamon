@@ -1233,7 +1233,7 @@ to parse #bibtex files, and that crate requires the syntax variant.
 = Changelog
 
 ==== Changes in 0.8.1 (2026-07-20)
-- Bumped to Citegeist 0.3.1 and Typst Biblatex 0.12. Bibliography reading should now be much faster.
+- Bumped to Citegeist 0.3.1 and Typst Biblatex 0.12. Bibliography reading should now be much faster, and error reporting is much improved.
 - Name printing is now at #biblatex parity: prefixes, suffixes, initials all handled correctly.
 - More flexible handling of undefined and duplicated reference keys (thanks to navdeeprana, augustebaum, and Nasenbaer39 for suggestions).
 - Multiple small improvements and bugfixes (thanks to mo-mit, cuzbog, and maxnoe for the issues).
