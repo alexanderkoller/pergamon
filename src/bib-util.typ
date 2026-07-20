@@ -139,6 +139,65 @@
   }
 }
 
+#let parse-key-list(value) = {
+  if value == none {
+    return ()
+  } else if type(value) == array {
+    return value.map(key => key.trim()).filter(key => key != "")
+  }
+
+  value.split(",").map(key => key.trim()).filter(key => key != "")
+}
+
+#let increment-parent-count(counts, parent) = {
+  counts.insert(parent, counts.at(parent, default: 0) + 1)
+}
+
+#let expand-parent-references(selected-keys, bib, mincrossrefs: 2, minxrefs: 2) = {
+  let selected = (:)
+  let ret = ()
+  let crossref-counts = (:)
+  let xref-counts = (:)
+
+  for key in selected-keys {
+    if not key in selected {
+      selected.insert(key, true)
+      ret.push(key)
+    }
+
+    if key in bib {
+      let reference = bib.at(key)
+      let crossref = fd(reference, "crossref", (:))
+      if crossref != none {
+        crossref = crossref.trim()
+        if crossref != "" {
+          increment-parent-count(crossref-counts, crossref)
+        }
+      }
+
+      for xref in parse-key-list(fd(reference, "xref", (:))) {
+        increment-parent-count(xref-counts, xref)
+      }
+    }
+  }
+
+  for (parent, count) in crossref-counts.pairs() {
+    if count >= mincrossrefs and not parent in selected {
+      selected.insert(parent, true)
+      ret.push(parent)
+    }
+  }
+
+  for (parent, count) in xref-counts.pairs() {
+    if count >= minxrefs and not parent in selected {
+      selected.insert(parent, true)
+      ret.push(parent)
+    }
+  }
+
+  ret
+}
+
 #let ifdef(reference, field, options, fn) = {
   let value = fd(reference, field, options)
 
@@ -174,4 +233,3 @@
 #let nn(func) = {
   it => if it == none { none } else { func(it) }
 }
-

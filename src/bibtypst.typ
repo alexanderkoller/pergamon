@@ -1,7 +1,7 @@
 #import "@preview/bullseye:0.1.0": *
 #import "@preview/oxifmt:1.0.0": strfmt
 #import "@preview/citegeist:0.3.1": load-bibliography
-#import "bib-util.typ": collect-deduplicate, fd
+#import "bib-util.typ": collect-deduplicate, fd, expand-parent-references
 #import "names.typ": parse-reference-names
 #import "dates.typ": parse-date, make-date-tuple
 
@@ -870,6 +870,20 @@
     /// -> bool
     show-all: false,
 
+    /// Minimum number of selected child entries with a `crossref` to the same
+    /// parent before that parent is automatically included in the bibliography.
+    /// This matches Biblatex's `mincrossrefs` default.
+    ///
+    /// -> int
+    mincrossrefs: 2,
+
+    /// Minimum number of selected child entries with an `xref` to the same
+    /// parent before that parent is automatically included in the bibliography.
+    /// This matches Biblatex's `minxrefs` default.
+    ///
+    /// -> int
+    minxrefs: 2,
+
     /// Filters which references should be included in the printed bibliography. This makes sense only if
     /// `show-all` is `true`, otherwise not all your citations will be resolved to bibliography entries.
     /// The parameter should be a function that takes a #link(<sec:reference>)[reference dictionary] as argument
@@ -1030,16 +1044,21 @@
 
   if show-all {
     for reference in bib.values() {
-      let ref = preprocess-reference(reference, name-fields, labelname-fields, use-prefix-in-sorting: use-prefix-in-sorting)
-      bibl-unsorted.push(ref)
+      if lower(reference.entry_type) != "xdata" {
+        let ref = preprocess-reference(reference, name-fields, labelname-fields, use-prefix-in-sorting: use-prefix-in-sorting)
+        bibl-unsorted.push(ref)
+      }
     }
   } else {
     let cited-keys = references-at-refsection-end()
-    for key in cited-keys {
+    let selected-keys = expand-parent-references(cited-keys, bib, mincrossrefs: mincrossrefs, minxrefs: minxrefs)
+    for key in selected-keys {
       if key in bib { // skip references to labels that are not bib keys
         let bib-entry = bib.at(key)
-        bib-entry = preprocess-reference(bib-entry, name-fields, labelname-fields, use-prefix-in-sorting: use-prefix-in-sorting)
-        bibl-unsorted.push(bib-entry)
+        if lower(bib-entry.entry_type) != "xdata" {
+          bib-entry = preprocess-reference(bib-entry, name-fields, labelname-fields, use-prefix-in-sorting: use-prefix-in-sorting)
+          bibl-unsorted.push(bib-entry)
+        }
       }
     }
   }
