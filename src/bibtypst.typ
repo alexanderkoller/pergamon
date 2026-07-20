@@ -1,9 +1,9 @@
 #import "@preview/bullseye:0.1.0": *
 #import "@preview/oxifmt:1.0.0": strfmt
-#import "@preview/citegeist:0.3.1": load-bibliography
+#import "@local/citegeist:0.4.0": load-bibliography
 #import "bib-util.typ": collect-deduplicate, fd, expand-parent-references
 #import "names.typ": parse-reference-names
-#import "dates.typ": parse-date, make-date-tuple
+#import "dates.typ": get-date, date-year, date-sort-key
 
 #let REFSECTION-END-MARKER = "refsection-end"
 
@@ -618,8 +618,10 @@
     let sorting-function = if sort-key == "y" {
       // year
       let extract-date(reference) = {
-        if reference.fields.parsed-date != none and "year" in reference.fields.parsed-date {
-            reference.fields.parsed-date.year
+        let date = get-date(reference, "date")
+        let year = if date != none { date-year(date) } else { none }
+        if year != none {
+          year
         } else {
           0
         }
@@ -634,11 +636,7 @@
     } else if sort-key == "d" {
       // date
       let extract-date(reference, negate-year) = {
-        if reference.fields.parsed-date != none {
-          make-date-tuple(reference.fields.parsed-date, reversed: negate-year)
-        } else {
-          (0,0,0)
-        }
+        date-sort-key(reference, reversed: negate-year)
       }
 
       if i+1 < sorting-string.len() and sorting-string.at(i+1) == "d" {
@@ -751,18 +749,6 @@
     }
   }
 
-  // definitely parse "date" field with fallback "year"
-  let parsed-date = parse-date(reference, "date", fallback-year-field: "year", fallback-month-field: "month")
-  ref.fields.insert("parsed-date", parsed-date)
-
-  // if other "Xdate" fields are defined, parse them too
-  for field-name in reference.fields.keys() {
-    if field-name.ends-with("date") and field-name != "date" {
-      let parsed-date = parse-date(reference, field-name)
-      ref.fields.insert("parsed-" + field-name, parsed-date)
-    }
-  }
-
   ref
 }
 
@@ -846,10 +832,9 @@
     ///
     /// For instance, `"nydt"` sorts the references first by author name, then by descending year, then by title.
     ///
-    /// See @sec:dates for details on how dates are parsed in the #bibtex entries. If
-    /// a field of the date (year, month, day) is missing, it is treated as zero for the purposes
-    /// of sorting. Months that are specified as strings (e.g. `"July"` rather than `7` or `jul`)
-    /// are also treated as zero.
+    /// See @sec:dates for details on how parsed dates are exposed by Citegeist. If
+    /// a field of the publication date (year, month, day) is missing, it is treated
+    /// as zero for the purposes of sorting.
     ///
     /// If `none` or the string `"none"` is passed as the `sorting` argument, the references
     /// are sorted in an arbitrary order. There is currently no reliable support for sorting
@@ -870,16 +855,20 @@
     /// -> bool
     show-all: false,
 
-    /// Minimum number of selected child entries with a `crossref` to the same
-    /// parent before that parent is automatically included in the bibliography.
-    /// This matches Biblatex's `mincrossrefs` default.
+    /// If a bib entry is specified as the parent of another entry through
+    /// `crossref` links, it will be included in the bibliography when enough
+    /// of its children have been cited -- even if it wasn't cited itself.
+    /// This option specifies how many children must be cited. It
+    /// corresponds to `mincrossrefs` in #biblatex.
     ///
     /// -> int
     mincrossrefs: 2,
 
-    /// Minimum number of selected child entries with an `xref` to the same
-    /// parent before that parent is automatically included in the bibliography.
-    /// This matches Biblatex's `minxrefs` default.
+    /// If a bib entry is specified as the parent of another entry through
+    /// `xref` links, it will be included in the bibliography when enough
+    /// of its children have been cited -- even if it wasn't cited itself.
+    /// This option specifies how many children must be cited. It
+    /// corresponds to `minxrefs` in #biblatex.
     ///
     /// -> int
     minxrefs: 2,

@@ -3,7 +3,7 @@
 #import "bibstrings.typ": default-long-bibstring, default-short-bibstring
 #import "bib-util.typ": fd, ifdef, type-aliases, nn, concatenate-names
 #import "names.typ": family-names
-#import "dates.typ": is-year-defined
+#import "dates.typ": is-year-defined, get-date, date-year
 #import "templating.typ": fjoin
 
 // #let pending-citation-placeholder(key) = [*?#key?*]
@@ -182,8 +182,9 @@
       }
     }
 
-    let year = if is-year-defined(reference) {
-      str(reference.fields.parsed-date.year).slice(-2)
+    let date = get-date(reference, "date")
+    let year = if date != none and date-year(date) != none {
+      str(date-year(date)).slice(-2)
     } else {
       ""
     }
@@ -509,8 +510,9 @@
   let label-generator(index, reference) = {
     let labelname = family-names(reference.fields.labelname)
     let year-defined = is-year-defined(reference)
-    let year = if reference.fields.parsed-date != none and "year" in reference.fields.parsed-date {
-      str(reference.fields.parsed-date.year)
+    let date = get-date(reference, "date")
+    let year = if date != none and date-year(date) != none {
+      str(date-year(date))
     } else {
       options.bibstring.nodate
     }

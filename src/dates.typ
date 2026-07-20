@@ -1,157 +1,239 @@
-#import "bib-util.typ": fd, is-integer
+#let month-bibstring-keys = (
+  "january", "february", "march", "april", "may", "june",
+  "july", "august", "september", "october", "november", "december"
+)
 
-#let month-names = (
-    "january": 1,
-    "february": 2,
-    "march": 3,
-    "april": 4,
-    "may": 5,
-    "june": 6,
-    "july": 7,
-    "august": 8,
-    "september": 9,
-    "october": 10,
-    "november": 11,
-    "december": 12,
-    "jan": 1,
-    "feb": 2,
-    "mar": 3,
-    "apr": 4,
-    "jun": 6,
-    "jul": 7,
-    "aug": 8,
-    "sep": 9,
-    "oct": 10,
-    "nov": 11,
-    "dec": 12
-  )
-
-// Returns an empty dictionary if the date field is unparseable.
-// (Returning "none" would cause trouble in printfield, which returns none
-// if the field value is none.)
-#let parse-date(reference, date-field, fallback-year-field: none, fallback-month-field: none) = {
-  let options = (:) // these are print-reference options, and we are outside of print-reference
-  let date-str = fd(reference, date-field, options)
-  
-  // I would like to return dates as Typst datetime objects, but they require
-  // valid dates in which year, month, day are all specified; and Biblatex doesn't require this.
-
-  // TODO: permit date ranges
-  // TODO: permit approximate dates
-  // TODO: permit negative years
-
-  if date-str != none {
-    date-str = date-str.trim()
-
-    if date-str.contains("-") {
-      // parse as ISO8601-2 Extended Format, see Biblatex manual, §2.3.8
-      let parts = date-str.split("-")
-
-      if parts.len() >= 3 {
-        // Format: year-month-date
-        if is-integer(parts.at(0)) and is-integer(parts.at(1)) and is-integer(parts.at(2)) {
-          ("year": int(parts.at(0)), "month": int(parts.at(1)), "day": int(parts.at(2)))
-        } else {
-          // unparseable date
-          (:)
-        }
-      } else if parts.len() == 2 {
-        // Format: year-month
-         if is-integer(parts.at(0)) and is-integer(parts.at(1)) {          
-          ("year": int(parts.at(0)), "month": int(parts.at(1)))
-         } else {
-          (:)
-         }
-      }
-    } else if is-integer(date-str) {
-      // Format: year
-      ("year": int(date-str))
-    } else {
-      // unparsable date -> print as "n.d."
-      (:)
-    }
-  } else if fallback-year-field != none {
-    // no date field, fall back to year field
-    let year-str = fd(reference, fallback-year-field, options)
-    if year-str != none and is-integer(year-str) {
-      let date-dict = ("year": int(year-str.trim()))      
-
-      if fallback-month-field != none {
-        let month-str = fd(reference, fallback-month-field, options)
-
-        if month-str != none {
-          month-str = month-str.trim()
-
-          if is-integer(month-str) {
-            // integer months: insert directly
-            date-dict.insert("month", int(month-str.trim()))
-          } else {
-            // months that are defined in the month-names dict: resolve to int
-            // all other months: retain verbatim (thus "month" field can be type str)
-            let lower-month-str = lower(month-str)
-            let month-num = month-names.at(lower-month-str, default: month-str)
-            date-dict.insert("month", month-num)
-          }
-        }
-      }
-
-      date-dict
-    } else {
-      // unparseable year -> print as "n.d."
-      (:)
-    }
+#let date-field-name(field) = {
+  let field = lower(field)
+  if field in ("date", "eventdate", "origdate", "urldate") {
+    field
   } else {
-    // no date or year field specified -> print as "n.d."
-    (:)
+    none
   }
 }
 
-// Checks whether the year is defined in this reference dict.
-#let is-year-defined(reference) = {
-  reference.fields.parsed-date != none and "year" in reference.fields.parsed-date
+#let get-date(reference, field, options: (:)) = {
+  if field in options.at("suppressed-fields", default: ()) {
+    none
+  } else {
+    reference.at("parsed_dates", default: (:)).at(field, default: none)
+  }
 }
 
-// Converts a date dictionary into a tuple of (year, month, day).
-// These tuples are suitable for comparing dates. 
-// Missing fields are treated as zero.
-// If the "reversed" parameter is true, all numbers are negated
-// (for sorting in descending order).
-#let make-date-tuple(date-dict, reversed: false) = {
-  let ret = ("year", "month", "day").map(x => {
-    let v = date-dict.at(x, default: 0)
-    if v == none or type(v) != int {
-      v = 0
+#let date-start(date) = {
+  date.at("start", default: none)
+}
+
+#let date-end(date) = {
+  date.at("end", default: none)
+}
+
+#let date-year(date) = {
+  let start = date-start(date)
+  if start != none {
+    start.year
+  } else {
+    let end = date-end(date)
+    if end != none {
+      end.year
+    } else {
+      none
+    }
+  }
+}
+
+// Checks whether the publication date is defined in this reference dict.
+#let is-year-defined(reference) = {
+  let date = get-date(reference, "date")
+  date != none and date-year(date) != none
+}
+
+#let date-sort-key(reference, reversed: false) = {
+  let date = get-date(reference, "date")
+  let start = if date != none { date-start(date) } else { none }
+
+  let parts = ("year", "month", "day").map(field => {
+    let value = if start != none { start.at(field, default: 0) } else { 0 }
+    if value == none {
+      value = 0
     }
     if reversed {
-      v = -v
+      -value
+    } else {
+      value
     }
-    v
   })
 
-  return ret
+  parts
 }
 
-// #{make-date-tuple(("year": 2025, "month": "sep"))}
+#let pad2(value) = {
+  if value < 10 {
+    "0" + str(value)
+  } else {
+    str(value)
+  }
+}
 
-// #{(1,2) < (1, 3)}
+#let format-signed-year(year) = {
+  let sign = if year < 0 { "-" } else { "" }
+  let abs-year = calc.abs(year)
+  sign + str(abs-year).pad(4, fill: "0")
+}
 
-// #{
-//   let a = (1,)
-//   let b = (1,)
-//   a.push(2)
-//   b.push(3)
-//   a < b
-// }
+#let default-format-date-era(year, field-name, options) = {
+  if year < 1 {
+    str(1 - year) + " BCE"
+  } else {
+    str(year)
+  }
+}
 
-// #{ (1,2) < (1,2,3) } -> true
+#let format-year(year, field-name, options, style) = {
+  if style == "iso" {
+    format-signed-year(year)
+  } else {
+    options.at("format-date-era")(year, field-name, options)
+  }
+}
 
-// #{
-//   let x = (1,2,3)
-//   let y = array(x)
-//   [#x]
-//   [#y]
-//   x.at(0) = 5
-//     [#x]
-//   [#y]
+#let default-format-datetime(datetime, field-name, options, style) = {
+  let year = format-year(datetime.year, field-name, options, style)
+  let month = datetime.at("month", default: none)
+  let day = datetime.at("day", default: none)
+  if "month" in options.suppressed-fields {
+    month = none
+    day = none
+  } else if "day" in options.suppressed-fields {
+    day = none
+  }
 
-// }
+  if style == "iso" {
+    if month != none and day != none {
+      format-signed-year(datetime.year) + "-" + pad2(month) + "-" + pad2(day)
+    } else if month != none {
+      format-signed-year(datetime.year) + "-" + pad2(month)
+    } else {
+      format-signed-year(datetime.year)
+    }
+  } else if style == "short" {
+    if month != none and day != none {
+      str(datetime.year) + "-" + pad2(month) + "-" + pad2(day)
+    } else if month != none {
+      str(datetime.year) + "-" + pad2(month)
+    } else {
+      year
+    }
+  } else {
+    let month-str = if month != none {
+      options.bibstring.at(month-bibstring-keys.at(month - 1))
+    } else {
+      none
+    }
+
+    if day != none and month-str != none {
+      str(day) + " " + month-str + " " + year
+    } else if month-str != none {
+      month-str + " " + year
+    } else {
+      year
+    }
+  }
+}
+
+#let default-format-time(time, options) = {
+  let ret = pad2(time.hour) + ":" + pad2(time.minute)
+
+  if options.at("show-date-seconds", default: false) {
+    ret += ":" + pad2(time.second)
+  }
+
+  if options.at("show-date-timezones", default: false) {
+    let offset = time.at("offset", default: none)
+    if offset != none and offset.kind == "utc" {
+      ret += "Z"
+    } else if offset != none and offset.kind == "offset" {
+      let sign = if offset.positive { "+" } else { "-" }
+      ret += sign + pad2(offset.hours) + ":" + pad2(offset.minutes)
+    }
+  }
+
+  ret
+}
+
+#let default-format-date-time(datetime, field-name, options) = {
+  let style = if field-name == "urldate" { "short" } else { "long" }
+  let ret = default-format-datetime(datetime, field-name, options, style)
+  let time = datetime.at("time", default: none)
+
+  if time != none and options.at("show-date-times", default: false) {
+    ret + " " + default-format-time(time, options)
+  } else {
+    ret
+  }
+}
+
+#let default-format-date-range(start, end, field-name, options) = {
+  let sep = "–"
+  let fmt = datetime => options.at("format-date-time")(datetime, field-name, options)
+
+  if start != none and end != none {
+    fmt(start) + sep + fmt(end)
+  } else if start != none {
+    fmt(start) + sep
+  } else if end != none {
+    sep + fmt(end)
+  } else {
+    options.bibstring.nodate
+  }
+}
+
+#let default-format-date-uncertain(rendered, field-name, options) = {
+  rendered + "?"
+}
+
+#let default-format-date-approximate(rendered, field-name, options) = {
+  "ca. " + rendered
+}
+
+#let default-format-date(date, reference, field-name, options) = {
+  let kind = date.kind
+  let start = date-start(date)
+  let end = date-end(date)
+  let rendered = if kind == "at" {
+    if start == none {
+      options.bibstring.nodate
+    } else {
+      options.at("format-date-time")(start, field-name, options)
+    }
+  } else if kind == "after" {
+    if start == none {
+      options.bibstring.nodate
+    } else {
+      "after " + options.at("format-date-time")(start, field-name, options)
+    }
+  } else if kind == "before" {
+    if end == none {
+      options.bibstring.nodate
+    } else {
+      "before " + options.at("format-date-time")(end, field-name, options)
+    }
+  } else if kind == "between" {
+    options.at("format-date-range")(start, end, field-name, options)
+  } else {
+    options.bibstring.nodate
+  }
+
+  if date.approximate {
+    rendered = options.at("format-date-approximate")(rendered, field-name, options)
+  }
+  if date.uncertain {
+    rendered = options.at("format-date-uncertain")(rendered, field-name, options)
+  }
+
+  rendered
+}
+
+#let format-date-field(date, reference, field, options) = {
+  options.at("format-date")(date, reference, field, options)
+}

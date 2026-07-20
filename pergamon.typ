@@ -501,7 +501,8 @@ the default one.
 
 The formatting functions that can be overridden are exactly those that start with `with-default` in #link("https://github.com/alexanderkoller/pergamon/blob/main/src/reference-styles.typ")[reference-styles.typ]. That file will also give you hints on which formatting function you have to override for the effect you want.
 You can access the other formatting functions through the dictionary `pergamon-dev`, which you can access after importing #pergamon
-(see the code above).
+(see the code above). The default date formatter hooks, such as `default-format-date`
+and `default-format-date-range`, are also exported directly from #pergamon.
 
 
 == Implementing your own styles from scratch
@@ -647,7 +648,7 @@ a unique identifier automatically. In this case, the first refsection in the doc
 For the frequent use case where the document has only one refsection, this will make error messages
 easier to read.
 
-You may use `print-bibliography` only in the context of a `refsection`. If your document has only a single
+You may use `print-bibliography` only inside a `refsection`. If your document has only a single
 refsection, you can configure it through a document show rule, like this:
 
 #zebraw(lang: false,
@@ -1004,31 +1005,81 @@ in the #biblatex documentation), but some of them are worth discussing.
 <sec:dates>
 
 Dates can occur in a number of places in the #bibtex entry. The most important one
-is the publication date of the reference. It can be specified in one of two ways:
+is the publication date of the reference. #pergamon uses the parsed date information
+that #link("https://typst.app/universe/package/citegeist/")[citegeist] exposes from
+the Typst `biblatex` crate, which parses #biblatex date fields almost perfectly.
 
-- In the `date` field, using the ISO 8601-2 format: "YYYY-MM-DD" or "YYYY-MM" or "YYYY".
-  In this format, years, months, and days must all be positive integers.
-- In the `year` and `month` fields. In this format, the value of `year` should be a positive integer.
-  The `month` field should contain a positive integer (1--12), full English month names like
-  `january`, or three-letter abbreviations of English month names like `feb`.
-  Dates specified in this way will be potentially localized using `bibstring`
-  (see @sec:package:utility). As a fallback option, you can also specify some other string
-  for the month, which will be printed in the reference verbatim.
+Parsed dates are available in the #link(<sec:reference>)[reference dictionary] under
+`reference.parsed_dates`. The standard keys are `date`, `eventdate`, `origdate`, and
+`urldate`, when these fields are defined by the bibliography data. The original raw
+fields remain available under `reference.fields`, but reference and citation styles
+should use `reference.parsed_dates` for date-sensitive behavior.
 
-All other #bibtex fields whose name ends in `date` (e.g. `urldate`) will also be parsed
-as in the `date` option described above.
+A parsed date contains a `kind` field (`"at"`, `"before"`, `"after"`, or `"between"`),
+boolean `uncertain` and `approximate` markers, and `start` and/or `end` datetime
+dictionaries. A datetime always has a `year` and may also contain `month`, `day`,
+and `time`; years may be negative.
 
-The parsed dates will be stored in the #link(<sec:reference>)[reference dictionary] `reference`
-under `reference.fields.parsed-X`, where `X` is the name of the `date` field. (If the publication
-date is specified with a `year` field, its value will still be stored in `reference.fields.parsed-date`.)
-This makes them available for other functions and styles. A parsed date is represented as a dictionary
-with keys `year`, `month`, and `day`, all of which may be missing. The values under these fields are
-all positive integers. If a date specification in the #bibtex entry cannot be parsed, it will be
-represented as an empty dictionary.
+Date formatting can be customized through the `format-reference` arguments
+`format-date`, `format-date-range`, `format-date-time`, `format-date-uncertain`,
+`format-date-approximate`, and `format-date-era`. These functions receive the
+date value they format as an explicit argument, followed by the field name and
+the current `format-reference` options. The top-level `format-date` hook also
+receives the full reference dictionary.
+The corresponding default implementations are exported as `default-format-date`,
+`default-format-date-range`, `default-format-date-time`, `default-format-date-uncertain`,
+`default-format-date-approximate`, and `default-format-date-era`, so custom hooks
+can delegate back to the default behavior.
 
-In addition to these basic date specifications, #biblatex allows for date ranges (#issue(55),
-approximate dates (#issue(56)), and years before the Common Era (#issue(57)). These features
-are not yet supported in #bibtypst.
+The main hook is `format-date`. It is used for all parsed date fields, including
+`date`, `eventdate`, `origdate`, and `urldate`; the field being formatted is
+available as the `field-name` argument:
+
+```
+format-date: (date, reference, field-name, options) => ...
+```
+
+The lower-level hooks receive only the values they format, the field name, and
+the options:
+
+- `format-date-range: (start, end, field-name, options) => ...`;
+- `format-date-time: (datetime, field-name, options) => ...`;
+- `format-date-uncertain: (rendered, field-name, options) => ...`;
+- `format-date-approximate: (rendered, field-name, options) => ...`;
+- `format-date-era: (year, field-name, options) => ...`.
+
+The default `format-date-time` uses `field-name` to choose between two built-in
+calendar-date styles. For `date`, `eventdate`, and `origdate`, it uses a long
+human-readable style with localized month names: `2024-03-14` becomes
+`14 March 2024`, `2024-03` becomes `March 2024`, and `2024` remains `2024`.
+For `urldate`, it uses a short numeric style: the same values become
+`2024-03-14`, `2024-03`, and `2024`. These are defaults of the formatter, not
+separate option names; override `format-date-time` to use a different style.
+
+For example, this changes only the range separator while keeping all other default
+date behavior:
+
+```
+#let fref = format-reference(
+  reference-label: fcite.reference-label,
+  format-date-range: (start, end, field-name, options) => {
+    let fmt = datetime => options.at("format-date-time")(
+      datetime,
+      field-name,
+      options,
+    )
+    fmt(start) + " / " + fmt(end)
+  },
+)
+```
+
+To format different date fields differently, override `format-date` and branch on
+`field-name`. Some BibLaTeX dates may include a time-of-day component, such as
+`2024-03-14T12:30:45+02:00`. By default, Pergamon prints only the calendar date.
+Set `show-date-times: true` to include the parsed time of day. When times of day
+are shown, `show-date-seconds` controls whether seconds are printed, and
+`show-date-timezones` controls whether UTC markers or numeric timezone offsets
+are printed.
 
 
 = Detailed documentation
@@ -1064,6 +1115,8 @@ dictionary and adds some fields of its own.
 - The `sortstr-author` field concatenates the author names, family-name first. It is used when sorting references
   in a bibliography using the `n` identifier.
 
+- The `parsed_dates` dictionary comes from Citegeist and contains canonical parsed date information.
+
 The preprocessing happens relatively early, so the code in a reference or citation style can rely on the presence
 of these fields in the reference dictionary.
 
@@ -1074,6 +1127,14 @@ zebraw(lang: false,
 (
   entry_type: "inproceedings",
   entry_key: "bender20:_climb_nlu",
+  parsed_dates: (
+    date: (
+      kind: "at",
+      uncertain: false,
+      approximate: false,
+      start: (year: 2020),
+    ),
+  ),
   fields: (
     author: "Emily M. Bender and Alexander Koller",
     award: "Best theme paper",
@@ -1091,7 +1152,6 @@ zebraw(lang: false,
     sortstr-author: "Bender,Emily M. Koller,Alexander",
     parsed-editor: none,
     parsed-translator: none,
-    parsed-date: (year: 2020)
   ),
   label: ("Bender and Koller", "2020"),
   label-repr: "Bender and Koller 2020",
@@ -1219,9 +1279,8 @@ to parse #bibtex files, and that crate requires the syntax variant.
 
 == Known limitations
 
-- #pergamon supports `year` and `date` declarations. However, it currently does not support
-  approximate dates (#issue(56)), negative years (#issue(57)), date ranges (#issue(55)),
-  or non-numeric years (#issue(111)).
+- #pergamon's date handling follows the parsed date information provided by Citegeist.
+  Non-numeric years are not supported (#issue(111)).
 - #pergamon supports the `author`, `editor`, and `translator` fields, but there is currently
   no support for `editora` and similar fields (#issue(104)). Furthermore, when the same
   person has multiple roles, these are printed separately and not aggregated (#issue(103)).

@@ -1,10 +1,9 @@
 #import "@preview/nth:1.0.1": *
-#import "@preview/oxifmt:1.0.0": strfmt
 #import "bib-util.typ": fd, ifdef, concatenate-names
 #import "templating.typ": *
 #import "names.typ": format-name, is-andothers-name
 #import "bib-util.typ": is-integer
-#import "dates.typ": is-year-defined
+#import "dates.typ": date-field-name, get-date, format-date-field, is-year-defined
 
 #let make-eprint-url(eprint, eprint-type) = {
   if eprint-type == none {
@@ -87,46 +86,6 @@
 
   let names = name-parts-array.map(d => format-name(d, name-type: name-type, format: options.name-format))
   concatenate-names(names, options: options, minnames: options.minnames, maxnames: options.maxnames, andothers: andothers)
-}
-
-#let month-bibstring-keys = (
-   "january", "february", "march", "april", "may", "june",
-   "july", "august", "september", "october", "november", "december"
-)
-
-#let print-date(date-dict, options) = {
-  let month-entry = date-dict.at("month", default: none)
-  let day-entry = date-dict.at("day", default: none)
-
-  // Special treatment for "month" and "day": It could not be suppressed in parse-date
-  // (that was too early, we didn't have the format-reference options yet),
-  // so we have to do it here. :/
-  if "month" in options.suppressed-fields {
-    month-entry = none
-    day-entry = none // don't show day without month
-  } else if "day" in options.suppressed-fields {
-    day-entry = none
-  }
-
-  let month-str = if month-entry != none {
-    if type(month-entry) == int {
-      options.bibstring.at(month-bibstring-keys.at(month-entry - 1))
-    } else {
-      month-entry
-    }
-  } else {
-    none
-  }
-
-  if day-entry != none {
-    strfmt("{} {} {}", day-entry, month-str, date-dict.year)
-  } else if month-str != none {
-    strfmt("{} {}", month-str, date-dict.year)
-  } else if "year" in date-dict {
-    str(date-dict.year)
-  } else {
-    options.bibstring.nodate
-  }
 }
 
 #let default-field-formats = (
@@ -219,7 +178,7 @@
   },
 
   "urldate": (value, reference, field, options, style) => {
-    spaces(options.bibstring.urlseen, value)
+    spaces(options.bibstring.urlseen, format-date-field(value, reference, field, options))
   },
 
   "version": (value, reference, field, options, style) => {
@@ -230,16 +189,16 @@
     spaces(value, options.bibstring.volumes)
   },
 
-  "date": "parsed-date",
-
-  "parsed-date": (value, reference, field, options, style) => {
-    print-date(value, options)
+  "date": (value, reference, field, options, style) => {
+    format-date-field(value, reference, field, options)
   },
 
-  "eventdate": "parsed-eventdate",
+  "eventdate": (value, reference, field, options, style) => {
+    format-date-field(value, reference, field, options)
+  },
 
-  "parsed-eventdate": (value, reference, field, options, style) => {
-    print-date(value, options)
+  "origdate": (value, reference, field, options, style) => {
+    format-date-field(value, reference, field, options)
   },
 
   "extradate": (value, reference, field, options, style) => {
@@ -303,12 +262,17 @@
 
 #let printfield(reference, field, options, style: none) = {
   let field-formats = options.at("field-formatters")
-  let value = fd(reference, field, options)
+  let date-field = date-field-name(field)
+  let value = if date-field == none {
+    fd(reference, field, options)
+  } else {
+    get-date(reference, date-field, options: options)
+  }
 
   if value == none {
     none
   } else {
-    field = lower(field)
+    field = if date-field == none { lower(field) } else { date-field }
 
     let printed = if field in field-formats {
       let format = field-formats.at(field)

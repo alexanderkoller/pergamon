@@ -4,6 +4,7 @@
 #import "src/citation-styles.typ": format-citation-authoryear, format-citation-alphabetic, format-citation-numeric
 #import "src/style-bundles.typ": alphabetic-style, authoryear-style, numeric-style
 #import "src/names.typ": family-names, format-name
+#import "src/dates.typ": default-format-date, default-format-date-range, default-format-date-time, default-format-date-uncertain, default-format-date-approximate, default-format-date-era
 #import "src/bib-util.typ": fd, ifdef, nn, concatenate-names
 #import "src/content-to-string.typ": content-to-string
 #import "src/templating.typ": commas, periods, spaces, epsilons
@@ -11,11 +12,18 @@
 #let pergamon-dev = {
   import "src/reference-styles.typ": *
   import "src/printfield.typ": *
+  import "src/dates.typ": *
 
   (
     printfield: printfield,
     print-name: print-name,
     link-title: link-title,
+    default-format-date: default-format-date,
+    default-format-date-range: default-format-date-range,
+    default-format-date-time: default-format-date-time,
+    default-format-date-uncertain: default-format-date-uncertain,
+    default-format-date-approximate: default-format-date-approximate,
+    default-format-date-era: default-format-date-era,
     authorstrg: authorstrg,
     language: language,
     date-with-extradate: date-with-extradate, 
