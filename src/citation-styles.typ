@@ -576,9 +576,9 @@
 /// references are different; there is no support for extradates like in the authoryear style.
 /// Thus you should probably make sure that `{}` occurs in the format string somewhere.
 #let format-citation-numeric(
-    /// Determines whether sequences of subsequent citation indices
+    /// Determines whether sequences of three or more subsequent citation indices
     /// should be compacted into a range. If `true`, a citation [1, 2, 3, 5, 6]
-    /// is instead rendered as [1--3, 5--6].
+    /// is instead rendered as [1--3, 5, 6].
     ///
     /// Note that the citation style does not do anything particular to sort
     /// the citation indices within the same citation. The citation [3, 2, 1]
@@ -641,10 +641,11 @@
     })
 
     let joined = if compact {
-      // If "compact" is requested, we suppress subsequent numbers and
-      // replace them with hyphens: 1, 2, 3, 5, 6 becomes [1-3, 5-6].
+      // If "compact" is requested, we suppress subsequent numbers in runs
+      // of at least three: 1, 2, 3, 5, 6 becomes [1-3, 5, 6].
       // This requires a bit of indexing gymnastics.
       let pieces = ()
+      let last-emitted-ix = none
 
       for (i, cit) in individual-citations.enumerate() {
         if type(cit) == array {
@@ -667,19 +668,26 @@
           if i == 0 {
             // first element in citation doesn't get a separator
             pieces.push(cit.at(1))
+            last-emitted-ix = this-ix
           } else if prev-ix == this-ix - 1 {
             // continue range
             if next-ix == this-ix + 1 {
               // ignore this citation, it is inside a compact range
             } else {
               // last citation of compact range
-              pieces.push(compact-separator)
+              if last-emitted-ix == this-ix - 1 {
+                pieces.push(citation-separator)
+              } else {
+                pieces.push(compact-separator)
+              }
               pieces.push(cit.at(1))
+              last-emitted-ix = this-ix
             }
           } else {
             // start new range
             pieces.push(citation-separator)
             pieces.push(cit.at(1))
+            last-emitted-ix = this-ix
           }
         } else {
           // undefined citation - not an array
@@ -687,6 +695,7 @@
             pieces.push(citation-separator)
           }
           pieces.push(cit)
+          last-emitted-ix = none
         }
       }
 
