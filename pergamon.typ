@@ -28,6 +28,14 @@
   #x
 ]
 
+// #let llm-content(x) = box(inset: 6pt, fill: rgb("#eaf4ff"), stroke: 1pt, width: 100%)[#x]
+
+#let llm-content(x) = [
+  #text(fill: red)[*LLM GENERATED SECTION FOLLOWS*]
+
+  #x
+]
+
 #let scope = (
   "bibtypst": bibtypst,
   "bibtex": bibtex,
@@ -938,6 +946,44 @@ all other references unchanged.
   placement: top,
   caption: [Highlighting a reference.]
 ) <fig:highlighting>
+
+
+
+== Customizing date formatting
+
+#pergamon understands all date types that are exposed by the #link("https://github.com/typst/biblatex")[biblatex] crate, including date ranges, BCE dates, and approximate and uncertain dates.
+Formatting of these dates is controlled by the functions `format-date`, `format-date-range`, `format-date-time`, `format-date-uncertain`, `format-date-approximate`, and `format-date-era`,
+all of which are parameters of the `format-reference` function. You can pass alternative functions
+to change the way that dates are rendered in the bibliography.
+
+In addition, #pergamon parses all date fields that #biblatex supports: `date`, `eventdate`, `origdate`, and `urldate`. These are represented as part of the reference dictionary as described in @sec:dates. Just like #biblatex, #pergamon renders only `date` in its default reference and citation styles. You can modify this behavior through arguments to the reference and citation style.
+For example, the code below includes the `origdate` if it is defined and renders it as "origdate/date".
+
+
+#zebraw(lang: false,
+```typ
+#let year(reference, field) =
+  str(reference.parsed_dates.at(field).start.year)
+
+#let orig-and-pub-year(reference) =
+  year(reference, "origdate") + "/" + year(reference, "date")
+
+#let style = authoryear-style(
+  citation: (
+    format-date: (reference, options) => {
+      orig-and-pub-year(reference)
+    },
+  ),
+  reference: (
+    format-functions: (
+      "date-with-extradate": (reference, options) => {
+        let extradate = (dev.printfield)(reference, "extradate", options)
+        epsilons(orig-and-pub-year(reference), extradate)
+      },
+    ),
+  ),
+)
+```)
 
 
 

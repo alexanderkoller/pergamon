@@ -3,7 +3,7 @@
 #import "bibstrings.typ": default-long-bibstring, default-short-bibstring
 #import "bib-util.typ": fd, ifdef, type-aliases, nn, concatenate-names
 #import "names.typ": family-names
-#import "dates.typ": is-year-defined, get-date, date-year
+#import "dates.typ": get-date, date-year
 #import "templating.typ": fjoin
 
 // #let pending-citation-placeholder(key) = [*?#key?*]
@@ -267,6 +267,26 @@
   /// -> str | content
   merge-separator: ", ",
 
+  /// Formats the date component of authoryear citation labels.
+  /// The function receives `(reference, options)` and should return a string
+  /// or `none`. The returned string is used both for the displayed citation
+  /// date and for extradate collision detection. If the function returns
+  /// `none`, the citation label uses `options.bibstring.nodate`.
+  ///
+  /// The default returns the publication year from `reference.parsed_dates.date`.
+  /// A style can override this to include more date precision or to combine
+  /// `origdate` and `date`, e.g. `"1920/2020"`.
+  ///
+  /// -> function
+  format-date: (reference, options) => {
+    let date = get-date(reference, "date")
+    if date != none and date-year(date) != none {
+      str(date-year(date))
+    } else {
+      none
+    }
+  },
+
   /// The string that separates the prefix from the citation.
   /// -> str
   prefix-separator: " ",
@@ -377,18 +397,19 @@
     list-end-delim-many: list-end-delim-many,
     bibstring: default-bibstring + bibstring,
     minnames: minnames,
-    maxnames: maxnames
+    maxnames: maxnames,
+    format-date: format-date,
   )
 
   let formatter(reference-dict, form) = {
     // access precomputed information that was stored in the label field
-    let (authors-str, year, extradate) = reference-dict.reference.at("label")
-    let year-defined = is-year-defined(reference-dict.reference)
+    let (authors-str, label-date, extradate) = reference-dict.reference.at("label")
+    let label-date-defined = label-date != options.bibstring.nodate
     let extradate = if extradate == none {
       // no extradate, so use empty string
       ""
-    } else if year-defined {
-      // year is defined - no need to wrap extradate in brackets
+    } else if label-date-defined {
+      // label date is defined - no need to wrap extradate in brackets
       extradate
     } else if form in ("t", "g", "p", auto) {
       // extradate is inside parentheses
@@ -400,48 +421,48 @@
     if form == "name" {
       authors-str
     } else if form == "year" {
-      [#year#extradate]
+      [#label-date#extradate]
     } else if form == "t" {
-      // can't concatenate with strfmt because format-parens(year) is not a string
-      [#authors-str #format-parens([#year#extradate])]
+      // can't concatenate with strfmt because format-parens(label-date) is not a string
+      [#authors-str #format-parens([#label-date#extradate])]
     } else if form == "g" {
-      [#{authors-str}'s #format-parens(year)]
+      [#{authors-str}'s #format-parens([#label-date#extradate])]
     } else if form == "n" {
-      [#authors-str#author-year-separator#year#extradate]
+      [#authors-str#author-year-separator#label-date#extradate]
     } else { // auto or "p"
-      format-parens([#authors-str#author-year-separator#year#extradate])
+      format-parens([#authors-str#author-year-separator#label-date#extradate])
     }
   }
 
-  // Formats the year+extradate part of a single citation entry.
+  // Formats the label-date+extradate part of a single citation entry.
   // Returns linked content like "2024a".
-  let format-year-part(lbl, reference, form) = {
-    let (authors-str, year, extradate) = reference.reference.at("label")
-    let year-defined = is-year-defined(reference.reference)
+  let format-date-part(lbl, reference, form) = {
+    let (authors-str, label-date, extradate) = reference.reference.at("label")
+    let label-date-defined = label-date != options.bibstring.nodate
     let extradate = if extradate == none {
       ""
-    } else if year-defined {
+    } else if label-date-defined {
       extradate
     } else if form in ("t", "g", "p", auto) {
       format-brackets(extradate)
     } else {
       format-parens(extradate)
     }
-    link(label(lbl), [#year#extradate])
+    link(label(lbl), [#label-date#extradate])
   }
 
   // Formats a merged group of citations that share the same author string.
   // The years are joined with merge-separator; the author appears once.
   let format-merged-group(authors-str, entries, form) = {
-    let year-parts = entries.map(e => format-year-part(e.label, e.entry, form))
-    let years-joined = year-parts.join(merge-separator)
+    let date-parts = entries.map(e => format-date-part(e.label, e.entry, form))
+    let dates-joined = date-parts.join(merge-separator)
 
     if form == "t" {
-      [#authors-str #format-parens(years-joined)]
+      [#authors-str #format-parens(dates-joined)]
     } else if form == "g" {
-      [#{authors-str}'s #format-parens(years-joined)]
+      [#{authors-str}'s #format-parens(dates-joined)]
     } else { // "n" (used for "p"/auto individual-form too)
-      [#authors-str#author-year-separator#years-joined]
+      [#authors-str#author-year-separator#dates-joined]
     }
   }
 
@@ -462,7 +483,7 @@
       } else {
         let lbl = entry.at(0)
         let reference = entry.at(1)
-        let (authors-str, year, extradate) = reference.reference.at("label")
+        let (authors-str, label-date, extradate) = reference.reference.at("label")
         let author-key = repr(authors-str)
 
         if merge-citations and groups.len() > 0 and groups.last().author == author-key {
@@ -509,12 +530,13 @@
 
   let label-generator(index, reference) = {
     let labelname = family-names(reference.fields.labelname)
-    let year-defined = is-year-defined(reference)
-    let date = get-date(reference, "date")
-    let year = if date != none and date-year(date) != none {
-      str(date-year(date))
-    } else {
-      options.bibstring.nodate
+    let label-date = (options.format-date)(reference, options)
+    if label-date == none {
+      label-date = options.bibstring.nodate
+    }
+
+    if type(label-date) != str {
+      panic("format-date in format-citation-authoryear must return a string or none.")
     }
 
     let extradate = if "extradate" in reference.fields {
@@ -525,8 +547,8 @@
 
     let authors-str = concatenate-names(labelname, options: options, minnames: options.minnames, maxnames: options.maxnames)
 
-    let lbl = (authors-str, year, extradate)
-    let lbl-repr = strfmt("{} {}{}", authors-str, year, extradate)
+    let lbl = (authors-str, label-date, extradate)
+    let lbl-repr = strfmt("{} {}{}", authors-str, label-date, extradate)
 
     (lbl, lbl-repr)
   }
