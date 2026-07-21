@@ -1005,6 +1005,8 @@ as "Lynch and Frost (1991/2018)".
 
 Note that this is not actually how the default `format-date` function is implemented.
 The version in the example does not render date ranges, approximate dates, etc. correctly.
+Furthermore, this implementation of `format-date` does not distinguish which `field-name`
+we are rendering; it assumes it is `date` (and folds the contents of `origdate` into it).
 Of course that's fine for this example, and may be fine for your #bibtex.
 
 
@@ -1075,10 +1077,10 @@ in the #biblatex documentation), but some of them are worth discussing.
 Dates can occur in a number of places in the #bibtex entry. The most important one
 is the publication date of the reference. #pergamon uses the parsed date information
 that #link("https://typst.app/universe/package/citegeist/")[citegeist] exposes from
-the Typst `biblatex` crate, which parses #biblatex date fields almost perfectly.
+the Typst #link("https://github.com/typst/biblatex")[biblatex] crate, which parses #biblatex date fields almost perfectly.
 
 Parsed dates are available in the #link(<sec:reference>)[reference dictionary] under
-`reference.parsed_dates`. The standard keys are `date`, `eventdate`, `origdate`, and
+`reference.parsed_dates` (see @fig:reference-dict). The standard keys are `date`, `eventdate`, `origdate`, and
 `urldate`, when these fields are defined by the bibliography data. The original raw
 fields remain available under `reference.fields`, but reference and citation styles
 should use `reference.parsed_dates` for date-sensitive behavior.
@@ -1089,22 +1091,11 @@ dictionaries. A datetime always has a `year` and may also contain `month`, `day`
 and `time`; years may be negative.
 
 Date formatting in references is customized through the `format-date` argument
-of `format-reference`. It is used for all parsed date fields, including `date`,
-`eventdate`, `origdate`, and `urldate`; the field being formatted is available
-as the `field-name` argument:
+of `format-reference`. The _authoryear_ citation style also offers a `format-date`
+argument; these should usually receive the same date formatting function for consistency.
 
-```
-format-date: (date, reference, field-name, options) => ...
-```
-
-The default implementation is exported as `default-format-date`. The helper
-functions it uses are exported as well: `default-format-date-range`,
-`default-format-datetime`, `default-format-calendar-date`, `default-format-date-uncertain`,
-`default-format-date-approximate`, and `default-format-date-era`. These are
-utility functions for custom `format-date` implementations, not separate
-parameters of `format-reference`.
-
-The default `default-format-datetime` utility formats a parsed datetime, including
+The default `default-format-datetime` utility (in `dates.typ`) formats a parsed datetime,
+including
 the time of day when `show-date-times` is true. It delegates the date-only part
 to `default-format-calendar-date`, which uses `field-name` to choose between two
 built-in calendar-date styles. For `date`, `eventdate`, and `origdate`, it
@@ -1112,35 +1103,6 @@ uses a long human-readable style with localized month names: `2024-03-14` become
 `14 March 2024`, `2024-03` becomes `March 2024`, and `2024` remains `2024`.
 For `urldate`, it uses a short numeric style: the same values become
 `2024-03-14`, `2024-03`, and `2024`.
-
-For example, this changes only the range separator while keeping all other default
-date behavior:
-
-```
-#let fref = format-reference(
-  reference-label: fcite.reference-label,
-  format-date: (date, reference, field-name, options) => {
-    if date.kind == "between" {
-      let fmt = datetime => default-format-datetime(
-        datetime,
-        field-name,
-        options,
-      )
-      fmt(date.start) + " / " + fmt(date.end)
-    } else {
-      default-format-date(date, reference, field-name, options)
-    }
-  },
-)
-```
-
-To format different date fields differently, override `format-date` and branch on
-`field-name`. Some BibLaTeX dates may include a time-of-day component, such as
-`2024-03-14T12:30:45+02:00`. By default, Pergamon prints only the calendar date.
-Set `show-date-times: true` to include the parsed time of day. When times of day
-are shown, `show-date-seconds` controls whether seconds are printed, and
-`show-date-timezones` controls whether UTC markers or numeric timezone offsets
-are printed.
 
 
 = Detailed documentation
@@ -1352,9 +1314,10 @@ to parse #bibtex files, and that crate requires the syntax variant.
 
 = Changelog
 
-==== Changes in 0.8.1 (2026-07-20)
+==== Changes in 0.9.0 (2026-07-22)
 - Bumped to Citegeist 0.3.1 and Typst Biblatex 0.12. Bibliography reading should now be much faster, and error reporting is much improved.
 - Name printing is now at #biblatex parity: prefixes, suffixes, initials all handled correctly.
+- Full support for #biblatex dates: ranges, uncertain, approximate, BCE. Date formatting can be configured by the user, e.g. to print `origdate` (thanks to ironupiwada for the suggestion).
 - More flexible handling of undefined and duplicated reference keys (thanks to navdeeprana, augustebaum, and Nasenbaer39 for suggestions).
 - Multiple small improvements and bugfixes (thanks to mo-mit, cuzbog, and maxnoe for the issues).
 
