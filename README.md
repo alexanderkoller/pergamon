@@ -21,7 +21,14 @@ Pergamon has a number of advantages over the builtin Typst bibliographies:
 - Bibliographies can be automatically split by entry type (one for journals, one for conference papers, etc.) or by the Bibtex file they came from. Each of these filtered bibliographies can have its own prefix (e.g. journal papers are labeled J01, J02, ...; conference papers are C01, C02, ...).
 - References retain nonstandard Bibtex fields ([unlike in Hayagriva](https://github.com/typst/hayagriva/issues/240)),  making it e.g. possible to split bibliographies based on keywords.
 
-I have used Pergamon in a variety of contexts, from scientific publications to research proposals, and it works well for my needs. There seems to be some uptake from other users in the Typst community too. Nonetheless, Pergamon is not feature-complete with respect to BibLaTeX, and it is not as fast or mature as the builtin Typst bibliographies. If you find bugs, feel free to [report them](https://github.com/alexanderkoller/pergamon/issues); if you have questions or feature requests, let's [discuss them](https://github.com/alexanderkoller/pergamon/discussions).
+Pergamon covers many key features of BibLaTeX, such as refsections, name and date handling, and categories.
+It supports the three standard citation styles of BibLaTeX (alphabetic, authoryear, and numeric), and
+permits fine-grained customization of these styles from Typst code. I have used Pergamon in a variety of 
+contexts, from scientific publications to 400-page research proposals with twenty refsections, and it works well for my needs. 
+There seems to be some uptake from other users in the Typst community too. Nonetheless, Pergamon is
+not feature-complete with respect to BibLaTeX, and it is slower than the builtin Typst bibliographies. 
+
+If you find bugs, feel free to [report them](https://github.com/alexanderkoller/pergamon/issues); if you have questions or feature requests, let's [discuss them](https://github.com/alexanderkoller/pergamon/discussions).
 
 [Pergamon](https://en.wikipedia.org/wiki/Pergamon) was an ancient Greek city state in Asia Minor.
 Its library was second only to the Library of Alexandria around 200 BC.
