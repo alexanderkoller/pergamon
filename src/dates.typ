@@ -93,7 +93,7 @@
   if style == "iso" {
     format-signed-year(year)
   } else {
-    options.at("format-date-era")(year, field-name, options)
+    default-format-date-era(year, field-name, options)
   }
 }
 
@@ -175,7 +175,7 @@
 
 #let default-format-date-range(start, end, field-name, options) = {
   let sep = "–"
-  let fmt = datetime => options.at("format-date-time")(datetime, field-name, options)
+  let fmt = datetime => default-format-date-time(datetime, field-name, options)
 
   if start != none and end != none {
     fmt(start) + sep + fmt(end)
@@ -197,6 +197,10 @@
 }
 
 #let default-format-date(date, reference, field-name, options) = {
+  if date == none {
+    return none
+  }
+
   let kind = date.kind
   let start = date-start(date)
   let end = date-end(date)
@@ -204,31 +208,31 @@
     if start == none {
       options.bibstring.nodate
     } else {
-      options.at("format-date-time")(start, field-name, options)
+      default-format-date-time(start, field-name, options)
     }
   } else if kind == "after" {
     if start == none {
       options.bibstring.nodate
     } else {
-      "after " + options.at("format-date-time")(start, field-name, options)
+      "after " + default-format-date-time(start, field-name, options)
     }
   } else if kind == "before" {
     if end == none {
       options.bibstring.nodate
     } else {
-      "before " + options.at("format-date-time")(end, field-name, options)
+      "before " + default-format-date-time(end, field-name, options)
     }
   } else if kind == "between" {
-    options.at("format-date-range")(start, end, field-name, options)
+    default-format-date-range(start, end, field-name, options)
   } else {
     options.bibstring.nodate
   }
 
   if date.approximate {
-    rendered = options.at("format-date-approximate")(rendered, field-name, options)
+    rendered = default-format-date-approximate(rendered, field-name, options)
   }
   if date.uncertain {
-    rendered = options.at("format-date-uncertain")(rendered, field-name, options)
+    rendered = default-format-date-uncertain(rendered, field-name, options)
   }
 
   rendered

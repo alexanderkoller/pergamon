@@ -3,7 +3,7 @@
 #import "bibstrings.typ": default-long-bibstring, default-short-bibstring
 #import "printfield.typ": printfield, link-title, default-field-formats
 #import "bib-util.typ": fd, ifdef, type-aliases, nn, concatenate-names
-#import "dates.typ": default-format-date, default-format-date-range, default-format-date-time, default-format-date-uncertain, default-format-date-approximate, default-format-date-era
+#import "dates.typ": default-format-date
 
 
 
@@ -1366,18 +1366,13 @@
     /// `"eventdate"`, `"origdate"`, or `"urldate"`.
     ///
     /// The default handles single dates, before/after dates, closed ranges,
-    /// approximate/uncertain markers, and delegates datetime/range/era details
-    /// to the lower-level date formatters below.
+    /// approximate/uncertain markers, BCE years, and optional times of day.
     ///
     /// Example:
     /// ```
     /// format-date: (date, reference, field-name, options) => {
     ///   if field-name == "urldate" {
-    ///     "accessed " + options.at("format-date-time")(
-    ///       date.start,
-    ///       field-name,
-    ///       options,
-    ///     )
+    ///     "accessed " + str(date.start.year)
     ///   } else {
     ///     default-format-date(date, reference, field-name, options)
     ///   }
@@ -1386,104 +1381,6 @@
     ///
     /// -> function
     format-date: default-format-date,
-
-    /// Formats a parsed date range. The function receives `(start, end, field-name,
-    /// options)`, where `start` and/or `end` may be `none` for open ranges.
-    ///
-    /// The default joins closed ranges with an en dash, and uses leading or
-    /// trailing en dashes for open ranges when this lower-level formatter is
-    /// called directly with only one endpoint.
-    ///
-    /// Example:
-    /// ```
-    /// format-date-range: (start, end, field-name, options) => {
-    ///   let fmt = datetime => options.at("format-date-time")(
-    ///     datetime,
-    ///     field-name,
-    ///     options,
-    ///   )
-    ///   fmt(start) + " / " + fmt(end)
-    /// }
-    /// ```
-    ///
-    /// -> function
-    format-date-range: default-format-date-range,
-
-    /// Formats one parsed datetime, consisting of a date and a time of day.
-    /// The function receives `(datetime, field-name, options)`.
-    ///
-    /// The default chooses its date style from `field-name`. For most field names
-    /// (such as `date`), date fields are printed in long form: `14 March 2024`,
-    /// `March 2024`, or `2024`, depending on whether the month and day were
-    /// specified in the bib entry. By contrast, `urldate` is printed
-    /// in short numeric form by default: `2024-03-14`,
-    /// `2024-03`, or `2024`.
-    ///
-    /// The default respects suppression of `month` and `day`
-    /// fields; that is, if they are specified in the `suppress-fields` option,
-    /// they won't be printed. The time of day is printed only if when
-    /// `show-date-times` is true.
-    ///
-    /// Example:
-    /// ```
-    /// format-date-time: (datetime, field-name, options) => {
-    ///   str(datetime.year)
-    /// }
-    /// ```
-    ///
-    /// -> function
-    format-date-time: default-format-date-time,
-
-    /// Formats an uncertain date after the base date has been rendered. The function
-    /// receives `(rendered, field-name, options)`, where `rendered` is the base rendering.
-    ///
-    /// The default appends "`?`".
-    ///
-    /// Example:
-    /// ```
-    /// format-date-uncertain: (rendered, field-name, options) => {
-    ///   rendered + " (uncertain)"
-    /// }
-    /// ```
-    ///
-    /// -> function
-    format-date-uncertain: default-format-date-uncertain,
-
-    /// Formats an approximate date after the base date has been rendered. The function
-    /// receives `(rendered, field-name, options)`, where `rendered` is the base rendering.
-    ///
-    /// The default prepends "`ca. `".
-    ///
-    /// Example:
-    /// ```
-    /// format-date-approximate: (rendered, field-name, options) => {
-    ///   "about " + rendered
-    /// }
-    /// ```
-    ///
-    /// -> function
-    format-date-approximate: default-format-date-approximate,
-
-    /// Formats the year text used by the default human-readable date formatter.
-    /// The function receives `(year, field-name, options)`, where `year` is the
-    /// parsed numeric year. This hook is mainly useful for changing how years
-    /// before 1 CE are displayed.
-    ///
-    /// The default renders BCE years as "`N BCE`".
-    ///
-    /// Example:
-    /// ```
-    /// format-date-era: (year, field-name, options) => {
-    ///   if year < 1 {
-    ///     str(1 - year) + " BC"
-    ///   } else {
-    ///     str(year)
-    ///   }
-    /// }
-    /// ```
-    ///
-    /// -> function
-    format-date-era: default-format-date-era,
 
     /// Specifies whether the time of day should be included in rendered
     /// datetimes. This affects dates such as `2024-03-14T12:30+02:00`;
@@ -1736,11 +1633,6 @@
         format-brackets: format-brackets,
         format-quotes: format-quotes,
         format-date: format-date,
-        format-date-range: format-date-range,
-        format-date-time: format-date-time,
-        format-date-uncertain: format-date-uncertain,
-        format-date-approximate: format-date-approximate,
-        format-date-era: format-date-era,
         show-date-times: show-date-times,
         show-date-seconds: show-date-seconds,
         show-date-timezones: show-date-timezones,

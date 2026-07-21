@@ -25,8 +25,8 @@
   }
 }
 
-#let citation-date(reference, options) = {
-  let date = year-of(reference, "date")
+#let citation-date(date-value, reference, field-name, options) = {
+  let date = if date-value != none { str(date-value.start.year) } else { none }
   let origdate = year-of(reference, "origdate")
 
   if origdate != none and date != none {

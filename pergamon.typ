@@ -970,7 +970,7 @@ For example, the code below includes the `origdate` if it is defined and renders
 
 #let style = authoryear-style(
   citation: (
-    format-date: (reference, options) => {
+    format-date: (date, reference, field-name, options) => {
       orig-and-pub-year(reference)
     },
   ),
@@ -1066,41 +1066,28 @@ boolean `uncertain` and `approximate` markers, and `start` and/or `end` datetime
 dictionaries. A datetime always has a `year` and may also contain `month`, `day`,
 and `time`; years may be negative.
 
-Date formatting can be customized through the `format-reference` arguments
-`format-date`, `format-date-range`, `format-date-time`, `format-date-uncertain`,
-`format-date-approximate`, and `format-date-era`. These functions receive the
-date value they format as an explicit argument, followed by the field name and
-the current `format-reference` options. The top-level `format-date` hook also
-receives the full reference dictionary.
-The corresponding default implementations are exported as `default-format-date`,
-`default-format-date-range`, `default-format-date-time`, `default-format-date-uncertain`,
-`default-format-date-approximate`, and `default-format-date-era`, so custom hooks
-can delegate back to the default behavior.
-
-The main hook is `format-date`. It is used for all parsed date fields, including
-`date`, `eventdate`, `origdate`, and `urldate`; the field being formatted is
-available as the `field-name` argument:
+Date formatting in references is customized through the `format-date` argument
+of `format-reference`. It is used for all parsed date fields, including `date`,
+`eventdate`, `origdate`, and `urldate`; the field being formatted is available
+as the `field-name` argument:
 
 ```
 format-date: (date, reference, field-name, options) => ...
 ```
 
-The lower-level hooks receive only the values they format, the field name, and
-the options:
+The default implementation is exported as `default-format-date`. The helper
+functions it uses are exported as well: `default-format-date-range`,
+`default-format-date-time`, `default-format-date-uncertain`,
+`default-format-date-approximate`, and `default-format-date-era`. These are
+utility functions for custom `format-date` implementations, not separate
+parameters of `format-reference`.
 
-- `format-date-range: (start, end, field-name, options) => ...`;
-- `format-date-time: (datetime, field-name, options) => ...`;
-- `format-date-uncertain: (rendered, field-name, options) => ...`;
-- `format-date-approximate: (rendered, field-name, options) => ...`;
-- `format-date-era: (year, field-name, options) => ...`.
-
-The default `format-date-time` uses `field-name` to choose between two built-in
-calendar-date styles. For `date`, `eventdate`, and `origdate`, it uses a long
-human-readable style with localized month names: `2024-03-14` becomes
+The default `default-format-date-time` utility uses `field-name` to choose between
+two built-in calendar-date styles. For `date`, `eventdate`, and `origdate`, it
+uses a long human-readable style with localized month names: `2024-03-14` becomes
 `14 March 2024`, `2024-03` becomes `March 2024`, and `2024` remains `2024`.
 For `urldate`, it uses a short numeric style: the same values become
-`2024-03-14`, `2024-03`, and `2024`. These are defaults of the formatter, not
-separate option names; override `format-date-time` to use a different style.
+`2024-03-14`, `2024-03`, and `2024`.
 
 For example, this changes only the range separator while keeping all other default
 date behavior:
@@ -1108,13 +1095,17 @@ date behavior:
 ```
 #let fref = format-reference(
   reference-label: fcite.reference-label,
-  format-date-range: (start, end, field-name, options) => {
-    let fmt = datetime => options.at("format-date-time")(
-      datetime,
-      field-name,
-      options,
-    )
-    fmt(start) + " / " + fmt(end)
+  format-date: (date, reference, field-name, options) => {
+    if date.kind == "between" {
+      let fmt = datetime => default-format-date-time(
+        datetime,
+        field-name,
+        options,
+      )
+      fmt(date.start) + " / " + fmt(date.end)
+    } else {
+      default-format-date(date, reference, field-name, options)
+    }
   },
 )
 ```

@@ -3,7 +3,7 @@
 #import "bibstrings.typ": default-long-bibstring, default-short-bibstring
 #import "bib-util.typ": fd, ifdef, type-aliases, nn, concatenate-names
 #import "names.typ": family-names
-#import "dates.typ": get-date, date-year
+#import "dates.typ": get-date, date-year, default-format-date
 #import "templating.typ": fjoin
 
 // #let pending-citation-placeholder(key) = [*?#key?*]
@@ -267,25 +267,18 @@
   /// -> str | content
   merge-separator: ", ",
 
-  /// Formats the date component of authoryear citation labels.
-  /// The function receives `(reference, options)` and should return a string
-  /// or `none`. The returned string is used both for the displayed citation
-  /// date and for extradate collision detection. If the function returns
+  /// Formats the date component of authoryear citation labels from a parsed
+  /// date representation. The function receives `(date, reference, field-name,
+  /// options)` and should return a string or `none`. The returned string is used
+  /// both for the displayed citation date and for extradate collision detection.
+  /// If the reference has no parsed publication date, or if the function returns
   /// `none`, the citation label uses `options.bibstring.nodate`.
   ///
-  /// The default returns the publication year from `reference.parsed_dates.date`.
-  /// A style can override this to include more date precision or to combine
-  /// `origdate` and `date`, e.g. `"1920/2020"`.
+  /// The default is the same `default-format-date` implementation used by
+  /// `format-reference`.
   ///
   /// -> function
-  format-date: (reference, options) => {
-    let date = get-date(reference, "date")
-    if date != none and date-year(date) != none {
-      str(date-year(date))
-    } else {
-      none
-    }
-  },
+  format-date: default-format-date,
 
   /// The string that separates the prefix from the citation.
   /// -> str
@@ -399,6 +392,10 @@
     minnames: minnames,
     maxnames: maxnames,
     format-date: format-date,
+    suppressed-fields: (:),
+    show-date-times: false,
+    show-date-seconds: false,
+    show-date-timezones: false,
   )
 
   let formatter(reference-dict, form) = {
@@ -530,7 +527,8 @@
 
   let label-generator(index, reference) = {
     let labelname = family-names(reference.fields.labelname)
-    let label-date = (options.format-date)(reference, options)
+    let date = get-date(reference, "date")
+    let label-date = (options.format-date)(date, reference, "date", options)
     if label-date == none {
       label-date = options.bibstring.nodate
     }
