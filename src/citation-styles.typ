@@ -41,9 +41,7 @@
 }
 
 /// The _alphabetic_ citation style renders citations in a form like "[BK20]". The citation string
-/// consists of abbreviations derived from the authors' label names. Name prefixes
-/// such as `van` or `de` contribute to the abbreviation when `use-prefix` is set,
-/// following #biblatex's default label-alpha behavior.
+/// consists of abbreviations derived from the authors' label names.
 /// See @fig:example-alphabetic for an example.
 ///
 /// If there are
@@ -57,6 +55,12 @@
 /// the style appends an "extradate" character. For example, if two papers would receive
 /// the label "[BDF+20]", then the first one (in the sorting order of the bibliography)
 /// will be replaced by "[BDF+20a]" and the second one by "[BDF+20b]".
+///
+/// Name prefixes
+/// such as `van` or `de` contribute to the abbreviation when the `useprefix` field in
+/// the bib entry is true. In this case, they are abbreviated preferentially by their
+/// prefix initials, then by the first character of the prefix. Prefix characters do not
+/// count towards the characters considered by `maxalphanames` and `minalphanames`.
 ///
 /// The function `format-citation-alphabetic` returns a dictionary with keys
 /// `format-citation`, `label-generator`, and `reference-label`. You can use the values
@@ -217,6 +221,10 @@
 /// the style appends an "extradate" character. For example, if two papers would receive
 /// the label "(Yao et al. 2025)", then the first one (in the sorting order of the bibliography)
 /// will be replaced by "(Yao et al. 2025a)" and the second one by "(Yao et al. 2025b)".
+///
+/// Name prefixes
+/// such as `van` or `de` contribute to the abbreviation when the `useprefix` field in
+/// the bib entry is true "(van Gennep, 1909)" vs. "(Gennep, 1909)".
 ///
 /// The _authoryear_ citation style supports a particularly rich selection of citation forms
 /// (see @fig:citation-forms).

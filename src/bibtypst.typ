@@ -837,8 +837,7 @@
     /// as zero for the purposes of sorting.
     ///
     /// If `none` or the string `"none"` is passed as the `sorting` argument, the references
-    /// are sorted in an arbitrary order. There is currently no reliable support for sorting
-    /// the references in the order in which they were cited in the document.
+    /// are sorted in the order in which they are cited in the document.
     ///
     /// -> function | str | none
     sorting: none,
