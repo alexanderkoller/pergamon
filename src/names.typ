@@ -34,6 +34,30 @@
   }
 }
 
+#let prefix-labelalpha(name-parts-dict) = {
+  let prefix = name-part(name-parts-dict, "prefix")
+  let initials = name-part(name-parts-dict, "prefix-initials")
+
+  if not name-parts-dict.at("use-prefix", default: false) or prefix == "" {
+    ""
+  } else if initials != "" {
+    initials
+  } else {
+    prefix.split(regex("\s+")).map(part => part.at(0)).join("")
+  }
+}
+
+#let labelalpha-name(name-parts-dict, family-width: none) = {
+  let family = name-part(name-parts-dict, "family")
+  let family-part = if family-width == none {
+    family
+  } else {
+    family.codepoints().slice(0, family-width).join()
+  }
+
+  prefix-labelalpha(name-parts-dict) + family-part
+}
+
 #let sort-name(name-parts-dict, use-prefix-in-sorting: false) = {
   let prefix = name-part(name-parts-dict, "prefix")
   let family = name-part(name-parts-dict, "family")
@@ -70,6 +94,10 @@
 /// Extracts the list of family names from the list of name-part dictionaries.
 /// For instance, the `parsed-author` entry of the example in @fig:reference-dict
 /// will be mapped to the array `("Bender", "Koller")`.
+///
+/// Warning: this is a convenience helper for simple family-name extraction and
+/// custom show rules. It flattens parsed name dictionaries, so it is not suitable
+/// for BibLaTeX-style label construction such as alphabetic citation labels.
 /// 
 /// If `parsed-names` is `none`, the function returns `none`.
 /// 

@@ -2,7 +2,7 @@
 
 #import "bibstrings.typ": default-long-bibstring, default-short-bibstring
 #import "bib-util.typ": fd, ifdef, type-aliases, nn, concatenate-names
-#import "names.typ": family-names
+#import "names.typ": labelalpha-name
 #import "dates.typ": get-date, date-year, default-format-date
 #import "templating.typ": fjoin
 
@@ -41,7 +41,9 @@
 }
 
 /// The _alphabetic_ citation style renders citations in a form like "[BK20]". The citation string
-/// consists of a sequence of the first letters of the authors' family names.
+/// consists of abbreviations derived from the authors' label names. Name prefixes
+/// such as `van` or `de` contribute to the abbreviation when `use-prefix` is set,
+/// following #biblatex's default label-alpha behavior.
 /// See @fig:example-alphabetic for an example.
 ///
 /// If there are
@@ -169,16 +171,16 @@
   }
 
   let label-generator(index, reference) = {
-    let lastnames = family-names(reference.fields.labelname)
+    let labelnames = reference.fields.labelname
 
-    let abbreviation = if lastnames.len() == 1 {
-      lastnames.at(0).codepoints().slice(0, labelalpha).join()
+    let abbreviation = if labelnames.len() == 1 {
+      labelalpha-name(labelnames.at(0), family-width: labelalpha)
     } else {
-      let first-letters = lastnames.map(s => s.at(0)).join("")
-      if lastnames.len() > maxalphanames {
-        first-letters.slice(0, minalphanames) + labelalphaothers
+      let labelalpha-names = labelnames.map(name => labelalpha-name(name, family-width: 1))
+      if labelalpha-names.len() > maxalphanames {
+        labelalpha-names.slice(0, minalphanames).join("") + labelalphaothers
       } else {
-        first-letters
+        labelalpha-names.join("")
       }
     }
 
@@ -401,6 +403,17 @@
     show-date-timezones: false,
   )
 
+  let label-name(name) = {
+    let prefix = name.at("prefix", default: "")
+    let family = name.at("family", default: "")
+
+    if name.at("use-prefix", default: false) and prefix != "" {
+      prefix + " " + family
+    } else {
+      family
+    }
+  }
+
   let formatter(reference-dict, form) = {
     // access precomputed information that was stored in the label field
     let (authors-str, label-date, extradate) = reference-dict.reference.at("label")
@@ -529,7 +542,7 @@
 
 
   let label-generator(index, reference) = {
-    let labelname = family-names(reference.fields.labelname)
+    let labelname = reference.fields.labelname.map(label-name)
     let date = get-date(reference, "date")
     let label-date = (options.format-date)(date, reference, "date", options)
     if label-date == none {

@@ -1105,6 +1105,23 @@ For `urldate`, it uses a short numeric style: the same values become
 `2024-03-14`, `2024-03`, and `2024`.
 
 
+== Names
+<sec:names>
+
+Names (for `author`, `editor`, `translator`, etc.) are parsed by Citegeist and represented as dictionaries in #pergamon (cf. @fig:reference-dict). A name dictionary always contains the keys `given`, `family`, `prefix` (e.g. "von"), and `suffix` (e.g. "Jr."); some of these may be the empty string. If defined in the Bibtex entry, the dictionary may also contain the keys `given-initials` and `prefix-initials`, which abbreviate the given names ("Jean Pierre Simon" to "JPS") and the prefix ("de la" to "d"), respectively.
+
+You can control how names are typeset in the bibliography using the `name-format` parameter in `format-reference`. For instance, the name format "`{given} {prefix} {family}`" typesets Arnold van Gennep as "Arnold van Gennep"; with "`{prefix} {family}, {given}`", he will be printed as "van Gennep, Arnold". This means that `format-reference` ignores the #biblatex `useprefix` field in the bib entry -- if a prefix exists and it occurs in the `name-format`, it will be printed in the bibliography.
+
+By contrast, _citation_ styles are sensitive to the `useprefix` field. In the _authoryear_ style, the citation will be to "(van Gennep, 1909)" if `useprefix` is true in the Bibtex entry, and to "(Gennep, 1909)" if it isn't. Similarly, in the _alphabetic_ citation style, `useprefix` controls whether the prefix abbreviation is included in the label string ("dSau" vs. "Sau" for de Saussure).
+The alphabetic style also prefers to show the `prefix-initials` if they are defined, falling back to the first character of the prefix if they are not. Note that `useprefix` is a part of the #biblatex name specification in the bib entry, not a Pergamon option.
+
+
+Bibliography sorting is controlled by the `sorting` argument of `print-bibliography`, using a compact string inspired by #biblatex sorting templates. The sorting key `n` sorts by name.
+By default, `n` ignores prefixes, so `van Gennep` sorts under `Gennep`. Pass `use-prefix-in-sorting: true` to `print-bibliography` to sort him under `van Gennep` instead.
+
+
+
+
 = Detailed documentation
 <sec:package-doc>
 
@@ -1146,7 +1163,7 @@ of these fields in the reference dictionary.
 
 #figure(
 zebraw(lang: false,
-```
+```json
 (
   entry_type: "inproceedings",
   entry_key: "bender20:_climb_nlu",
@@ -1169,8 +1186,8 @@ zebraw(lang: false,
             in the Age of Data",
     year: "2020",
     parsed-author: (
-      (given: "Emily M.", family: "Bender"),
-      (given: "Alexander", family: "Koller"),
+      (given: "Emily M.", family: "Bender", prefix: "", suffix: ""),
+      (given: "Alexander", family: "Koller", prefix: "", suffix: ""),
     ),
     sortstr-author: "Bender,Emily M. Koller,Alexander",
     parsed-editor: none,

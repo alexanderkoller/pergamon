@@ -1,7 +1,7 @@
 #import "/src/bibtypst.typ": add-bib-resource, bibliography, cite, preprocess-reference, print-bibliography, refsection
 #import "/src/bibstrings.typ": default-long-bibstring
-#import "/src/citation-styles.typ": format-citation-authoryear
-#import "/src/names.typ": family-names, format-name
+#import "/src/citation-styles.typ": format-citation-alphabetic, format-citation-authoryear
+#import "/src/names.typ": family-names, format-name, labelalpha-name
 #import "/src/printfield.typ": print-name
 #import "/src/reference-styles.typ": format-reference
 
@@ -53,6 +53,16 @@
   )),
 )
 
+#assert.eq(
+  "Sau",
+  labelalpha-name((given: "Ferdinand", prefix: "de", family: "Saussure", suffix: ""), family-width: 3),
+)
+
+#assert.eq(
+  "dSau",
+  labelalpha-name((given: "Ferdinand", prefix: "de", family: "Saussure", suffix: "", use-prefix: true), family-width: 3),
+)
+
 #let print-options = (
   name-format: "{given} {prefix} {family} {suffix}",
   bibstring: default-long-bibstring,
@@ -83,6 +93,24 @@
   title = {B},
   year = {2020},
 }
+
+@book{saussure-no-prefix,
+  author = {given=Ferdinand, prefix=de, family=Saussure},
+  title = {Course},
+  year = {1916},
+}
+
+@book{saussure-prefix,
+  author = {given=Ferdinand, prefix=de, family=Saussure, useprefix=true},
+  title = {Course With Prefix},
+  year = {1917},
+}
+
+@book{multi-prefix,
+  author = {given=Ferdinand, prefix=de, family=Saussure, useprefix=true and given=Noam, family=Chomsky},
+  title = {Multi},
+  year = {2026},
+}
 ```.text
 
 #add-bib-resource(bib)
@@ -98,6 +126,18 @@
   assert.eq("van Gennep,Arnold", ref-a-prefix-sort.fields.sortstr-author)
   assert.eq(("Gennep",), family-names(ref-a-default.fields.labelname))
   assert.eq(("van Gennep",), family-names(ref-b-default.fields.labelname))
+
+  let authoryear = format-citation-authoryear()
+  assert.eq(("Gennep", "2020", none), (authoryear.label-generator)(0, ref-a-default).first())
+  assert.eq(("van Gennep", "2020", none), (authoryear.label-generator)(0, ref-b-default).first())
+
+  let alphabetic = format-citation-alphabetic()
+  let ref-saussure-no-prefix = preprocess-reference(bib.at("saussure-no-prefix"), ("author",), ("author",))
+  let ref-saussure-prefix = preprocess-reference(bib.at("saussure-prefix"), ("author",), ("author",))
+  let ref-multi-prefix = preprocess-reference(bib.at("multi-prefix"), ("author",), ("author",))
+  assert.eq("Sau16", (alphabetic.label-generator)(0, ref-saussure-no-prefix).first())
+  assert.eq("dSau17", (alphabetic.label-generator)(0, ref-saussure-prefix).first())
+  assert.eq("dSC26", (alphabetic.label-generator)(0, ref-multi-prefix).first())
 }
 
 #let fcite = format-citation-authoryear()
