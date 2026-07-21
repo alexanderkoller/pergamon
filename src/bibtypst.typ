@@ -1058,21 +1058,21 @@
   let formatted-references-original = sorted.enumerate(start: start-index).map(it => format-reference(it.at(0), it.at(1)))
   // -> array(array(content))
 
-  let formatted-references = if reversed {
-    formatted-references-original.rev()
+  let displayed-indices = if reversed {
+    range(sorted.len()).rev()
   } else {
-    formatted-references-original
+    range(sorted.len())
   }
 
-  let num-columns = if formatted-references.len() == 0 { 0 } else { formatted-references.at(0).len() }
+  let num-columns = if formatted-references-original.len() == 0 { 0 } else { formatted-references-original.at(0).len() }
   let cells = ()
 
   rendered-citation-count.update(x => x + n)
 
   // collect cells
-  for index in range(sorted.len()) {
+  for index in displayed-indices {
     let reference = sorted.at(index)
-    let formatted-reference = formatted-references.at(index)
+    let formatted-reference = formatted-references-original.at(index)
 
     // construct first cell of the row, it has to contain the metadata and label
     let meta = (

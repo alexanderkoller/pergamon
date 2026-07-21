@@ -2,7 +2,7 @@
 #import "/src/bibstrings.typ": default-long-bibstring
 #import "/src/content-to-string.typ": content-to-string
 #import "/src/printfield.typ": printfield, default-field-formats
-#import "/lib.typ": default-format-date, default-format-date-time
+#import "/lib.typ": default-format-date, default-format-datetime
 
 #let options = (
   field-formatters: default-field-formats,
@@ -84,7 +84,7 @@
   let field-options = options + (
     format-date: (date, reference, field-name, options) => {
       if field-name == "urldate" {
-        "url:" + default-format-date-time(date.start, field-name, options)
+        "url:" + default-format-datetime(date.start, field-name, options)
       } else {
         default-format-date(date, reference, field-name, options)
       }
@@ -97,7 +97,7 @@
   let slash-range-options = options + (
     format-date: (date, reference, field-name, options) => {
       if date.kind == "between" {
-        let fmt = datetime => default-format-date-time(datetime, field-name, options)
+        let fmt = datetime => default-format-datetime(datetime, field-name, options)
         fmt(date.start) + " / " + fmt(date.end)
       } else {
         default-format-date(date, reference, field-name, options)

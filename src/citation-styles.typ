@@ -268,14 +268,17 @@
   merge-separator: ", ",
 
   /// Formats the date component of authoryear citation labels from a parsed
-  /// date representation. The function receives `(date, reference, field-name,
+  /// date representation.
+  ///
+  /// The function receives `(date, reference, field-name,
   /// options)` and should return a string or `none`. The returned string is used
   /// both for the displayed citation date and for extradate collision detection.
   /// If the reference has no parsed publication date, or if the function returns
   /// `none`, the citation label uses `options.bibstring.nodate`.
   ///
-  /// The default is the same `default-format-date` implementation used by
-  /// `format-reference`.
+  /// The `format-date` function used here should be consistent with the
+  /// `format-date` function that was passed to `format-reference`.
+  /// By default, the function `default-format-date` is used in both places.
   ///
   /// -> function
   format-date: default-format-date,

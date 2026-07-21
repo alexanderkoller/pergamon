@@ -952,38 +952,60 @@ all other references unchanged.
 == Customizing date formatting
 
 #pergamon understands all date types that are exposed by the #link("https://github.com/typst/biblatex")[biblatex] crate, including date ranges, BCE dates, and approximate and uncertain dates.
-Formatting of these dates is controlled by the functions `format-date`, `format-date-range`, `format-date-time`, `format-date-uncertain`, `format-date-approximate`, and `format-date-era`,
-all of which are parameters of the `format-reference` function. You can pass alternative functions
-to change the way that dates are rendered in the bibliography.
+Formatting of these dates is controlled by the `format-date` parameter of `format-reference`.
+The same default implementation is used by the _authoryear_ citation style when it computes date labels, so nonstandard dates such as `2024~` or `-0031%` are rendered consistently in citations and references.
+The helper functions `default-format-date-range`, `default-format-datetime`, `default-format-calendar-date`, `default-format-date-uncertain`, `default-format-date-approximate`, and `default-format-date-era` are exported as utilities for style authors, but are not separate `format-reference` parameters.
 
-In addition, #pergamon parses all date fields that #biblatex supports: `date`, `eventdate`, `origdate`, and `urldate`. These are represented as part of the reference dictionary as described in @sec:dates. Just like #biblatex, #pergamon renders only `date` in its default reference and citation styles. You can modify this behavior through arguments to the reference and citation style.
+In addition, #pergamon parses all date fields that #biblatex supports: `date`, `eventdate`, `origdate`, and `urldate`. These are represented as part of the reference dictionary as described in @sec:dates. Just like #biblatex, #pergamon renders only `date` in its default reference and citation styles. You can modify this behavior through arguments to the reference and citation style bundle.
 For example, the code below includes the `origdate` if it is defined and renders it as "origdate/date".
 
 
 #zebraw(lang: false,
 ```typ
-#let year(reference, field) =
+#let year(reference, field) = {
   str(reference.parsed_dates.at(field).start.year)
+}
 
-#let orig-and-pub-year(reference) =
-  year(reference, "origdate") + "/" + year(reference, "date")
+#let orig-and-pub-date(date, reference, field-name, options) = {
+  if field-name == "date" and "origdate" in reference.parsed_dates {
+    year(reference, "origdate") + "/" + year(reference, "date")
+  } else {
+    default-format-date(date, reference, field-name, options)
+  }
+}
 
 #let style = authoryear-style(
   citation: (
-    format-date: (date, reference, field-name, options) => {
-      orig-and-pub-year(reference)
-    },
+    format-date: orig-and-pub-date,
   ),
   reference: (
-    format-functions: (
-      "date-with-extradate": (reference, options) => {
-        let extradate = (dev.printfield)(reference, "extradate", options)
-        epsilons(orig-and-pub-year(reference), extradate)
-      },
-    ),
+    format-date: orig-and-pub-date,
   ),
 )
 ```)
+
+For example, for the #bibtex entry below, both references and citations will be rendered
+as "Lynch and Frost (1991/2018)".
+
+#zebraw(lang: false,
+```bibtex
+@Misc{LynchTwinPeaks1990,
+  author       = {Lynch, David and Frost, Mark},
+  date         = {2018},
+  title        = {Twin Peaks},
+  howpublished = {DVD},
+  location     = {Warszawa},
+  organization = {Imperial CinePix},
+  origdate     = {1991},
+}
+```
+)
+
+
+
+Note that this is not actually how the default `format-date` function is implemented.
+The version in the example does not render date ranges, approximate dates, etc. correctly.
+Of course that's fine for this example, and may be fine for your #bibtex.
 
 
 
@@ -1077,13 +1099,15 @@ format-date: (date, reference, field-name, options) => ...
 
 The default implementation is exported as `default-format-date`. The helper
 functions it uses are exported as well: `default-format-date-range`,
-`default-format-date-time`, `default-format-date-uncertain`,
+`default-format-datetime`, `default-format-calendar-date`, `default-format-date-uncertain`,
 `default-format-date-approximate`, and `default-format-date-era`. These are
 utility functions for custom `format-date` implementations, not separate
 parameters of `format-reference`.
 
-The default `default-format-date-time` utility uses `field-name` to choose between
-two built-in calendar-date styles. For `date`, `eventdate`, and `origdate`, it
+The default `default-format-datetime` utility formats a parsed datetime, including
+the time of day when `show-date-times` is true. It delegates the date-only part
+to `default-format-calendar-date`, which uses `field-name` to choose between two
+built-in calendar-date styles. For `date`, `eventdate`, and `origdate`, it
 uses a long human-readable style with localized month names: `2024-03-14` becomes
 `14 March 2024`, `2024-03` becomes `March 2024`, and `2024` remains `2024`.
 For `urldate`, it uses a short numeric style: the same values become
@@ -1097,7 +1121,7 @@ date behavior:
   reference-label: fcite.reference-label,
   format-date: (date, reference, field-name, options) => {
     if date.kind == "between" {
-      let fmt = datetime => default-format-date-time(
+      let fmt = datetime => default-format-datetime(
         datetime,
         field-name,
         options,
