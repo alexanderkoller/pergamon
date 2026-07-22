@@ -675,28 +675,19 @@
   it => ret.map(f => f(it))
 }
 
-// Shorthand labels stand in for numeric labels in Biblatex; they do not consume
-// an ordinary numeric label slot.
-#let label-index(entries, index, start-index) = {
-  let shorthand-count = 0
-  for prior in entries.slice(0, index) {
-    if fd(prior, "shorthand", (:)) != none {
-      shorthand-count += 1
-    }
-  }
-
-  start-index + index - shorthand-count
-}
-
 // Generate labels for the references, add extradates to distinguish them where
 // necessary, and return the sorted bibliography.
 #let label-sort-deduplicate(bibl-unsorted, label-generator, sorting-function, start-index) = {
   // Generate preliminary labels; note that the indices we pass to label-generator
   // are meaningless at this point, but they are guaranteed to be all different.
+  let preliminary-index = start-index
   for (index, reference) in bibl-unsorted.enumerate() {
-    let (lbl, lbl-repr) = label-generator(label-index(bibl-unsorted, index, start-index), reference)
+    let (lbl, lbl-repr) = label-generator(preliminary-index, reference)
     bibl-unsorted.at(index).insert("label", lbl)
     bibl-unsorted.at(index).insert("label-repr", lbl-repr)
+    if fd(reference, "shorthand", (:)) == none {
+      preliminary-index += 1
+    }
   }
 
   // Sort and collect label collisions
@@ -716,10 +707,14 @@
   }
 
   // Generate final labels
+  let final-index = start-index
   for (index, reference) in sorted.enumerate() {
-    let (lbl, lbl-repr) = label-generator(label-index(sorted, index, start-index), reference)
+    let (lbl, lbl-repr) = label-generator(final-index, reference)
     sorted.at(index).insert("label", lbl)
     sorted.at(index).insert("label-repr", lbl-repr)
+    if fd(reference, "shorthand", (:)) == none {
+      final-index += 1
+    }
   }
 
   return sorted
