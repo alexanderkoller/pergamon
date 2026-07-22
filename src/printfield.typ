@@ -1,7 +1,7 @@
 #import "@preview/nth:1.0.1": *
 #import "bib-util.typ": fd, ifdef, concatenate-names
 #import "templating.typ": *
-#import "names.typ": format-name, is-andothers-name
+#import "names.typ": format-name-parsed, is-andothers-name, parse-name-format-option
 #import "bib-util.typ": is-integer
 #import "dates.typ": date-field-name, get-date, format-date-field, is-year-defined
 
@@ -84,7 +84,12 @@
     name-parts-array = name-parts-array.slice(0, name-parts-array.len() - 1)
   }
 
-  let names = name-parts-array.map(d => format-name(d, name-type: name-type, format: options.name-format))
+  let name-format = if type(options.name-format) == dictionary and "*" in options.name-format {
+    options.name-format
+  } else {
+    parse-name-format-option(options.name-format)
+  }
+  let names = name-parts-array.map(d => format-name-parsed(d, name-type, name-format))
   concatenate-names(names, options: options, minnames: options.minnames, maxnames: options.maxnames, andothers: andothers)
 }
 

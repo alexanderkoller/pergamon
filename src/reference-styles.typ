@@ -4,6 +4,7 @@
 #import "printfield.typ": printfield, link-title, default-field-formats
 #import "bib-util.typ": fd, ifdef, type-aliases, nn, concatenate-names
 #import "dates.typ": default-format-date
+#import "names.typ": parse-name-format-option
 
 
 
@@ -1638,7 +1639,7 @@
         show-date-timezones: show-date-timezones,
         field-formatters: field-formatters,
         format-functions: format-functions,
-        name-format: name-format,
+        name-format: parse-name-format-option(name-format),
         bibeidpunct: bibeidpunct,
         bibpagespunct: bibpagespunct,
         print-isbn: print-isbn,

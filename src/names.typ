@@ -5,7 +5,6 @@
 // The central data structure of this file is a "name-parts dictionary",
 // whose keys are the parts of a name (family, given, ...).
 
-
 #let name-part(name-parts-dict, key) = {
   name-parts-dict.at(key, default: "")
 }
@@ -71,7 +70,106 @@
   name-part(name-parts-dict, "family") == "others" and name-part(name-parts-dict, "given") == "" and name-part(name-parts-dict, "prefix") == "" and name-part(name-parts-dict, "suffix") == ""
 }
 
-#let name-part-placeholder = regex("\\{(given|prefix|family|suffix|given-initials|prefix-initials|g|p|f|s)\\}")
+#let name-format-default = "{given} {prefix} {family} {suffix}"
+#let name-format-fields = (
+  "given": 1,
+  "prefix": 1,
+  "family": 1,
+  "suffix": 1,
+  "given-initials": 1,
+  "prefix-initials": 1,
+  "g": 1,
+  "p": 1,
+  "f": 1,
+  "s": 1,
+)
+
+#let parse-name-format(format-str) = {
+  let tokens = ()
+  let chars = format-str.codepoints()
+  let literal = ()
+  let i = 0
+
+  while i < chars.len() {
+    if chars.at(i) == "{" {
+      let j = i + 1
+      while j < chars.len() and chars.at(j) != "}" {
+        j += 1
+      }
+
+      if j < chars.len() {
+        let field = chars.slice(i + 1, j).join("")
+        if field in name-format-fields {
+          tokens.push((field: field, prefix: literal.join("")))
+          literal = ()
+          i = j + 1
+          continue
+        }
+      }
+    }
+
+    literal.push(chars.at(i))
+    i += 1
+  }
+
+  if literal.len() > 0 {
+    tokens.push(literal.join(""))
+  }
+
+  tokens
+}
+
+#let parse-name-format-option(format) = {
+  let parsed = ("*": parse-name-format(name-format-default))
+  if type(format) == dictionary {
+    for (name-type, format-str) in format {
+      parsed.insert(name-type, parse-name-format(format-str))
+    }
+  } else {
+    parsed.insert("*", parse-name-format(format))
+  }
+  parsed
+}
+
+#let parsed-name-format-for(format, name-type) = {
+  format.at(name-type, default: format.at("*"))
+}
+
+#let render-name-format(format, name-parts-dict) = {
+  let buffer = ()
+  let emitted = false
+  for token in format {
+    if type(token) == str {
+      if token != "" {
+        buffer.push(token)
+        emitted = true
+      }
+    } else {
+      let value = if token.field == "g" {
+        name-initial(name-parts-dict, "given", initials-key: "given-initials")
+      } else if token.field == "p" {
+        name-initial(name-parts-dict, "prefix", initials-key: "prefix-initials")
+      } else if token.field == "f" {
+        name-initial(name-parts-dict, "family")
+      } else if token.field == "s" {
+        name-initial(name-parts-dict, "suffix")
+      } else {
+        name-parts-dict.at(token.field, default: "")
+      }
+
+      if value != "" {
+        if emitted {
+          buffer.push(token.prefix)
+        } else {
+          emitted = true
+        }
+        buffer.push(value)
+      }
+    }
+  }
+
+  buffer.join("")
+}
 
 // Parses the name lists for the given name-fields. Returns a reference dictionary
 // that has been enriched with "parsed-X" fields, for all X in name-fields.
@@ -134,27 +232,10 @@
   /// -> str | dictionary
   format: "{given} {prefix} {family} {suffix}"
   ) = {
-  let format-str = if type(format) == dictionary {
-    format.at(name-type, default: "{given} {prefix} {family} {suffix}")
-  } else {
-    format
-  }
+  let parsed-format = parse-name-format-option(format)
+  render-name-format(parsed-name-format-for(parsed-format, name-type), name-parts-dict)
+}
 
-  let replacements = (
-    "given": name-part(name-parts-dict, "given"),
-    "prefix": name-part(name-parts-dict, "prefix"),
-    "family": name-part(name-parts-dict, "family"),
-    "suffix": name-part(name-parts-dict, "suffix"),
-    "given-initials": name-part(name-parts-dict, "given-initials"),
-    "prefix-initials": name-part(name-parts-dict, "prefix-initials"),
-    "g": name-initial(name-parts-dict, "given", initials-key: "given-initials"),
-    "p": name-initial(name-parts-dict, "prefix", initials-key: "prefix-initials"),
-    "f": name-initial(name-parts-dict, "family"),
-    "s": name-initial(name-parts-dict, "suffix"),
-  )
-
-  format-str
-    .replace(name-part-placeholder, m => replacements.at(m.captures.at(0)))
-    .replace(regex("\s+"), " ")
-    .trim()
+#let format-name-parsed(name-parts-dict, name-type, format) = {
+  render-name-format(parsed-name-format-for(format, name-type), name-parts-dict)
 }
