@@ -175,21 +175,41 @@
   }
 
   let label-generator(index, reference) = {
-    let labelnames = reference.fields.labelname
+    let title-abbreviation(title) = {
+      let trimmed = title.trim()
+      let words = trimmed.split(regex("[^A-Za-z0-9]+")).filter(word => word != "")
+      let base = if words.len() > 0 { words.first() } else { trimmed }
+      base.codepoints().slice(0, labelalpha).join()
+    }
 
-    let abbreviation = if labelnames.len() == 1 {
+    let shorthand = fd(reference, "shorthand", (:))
+    let label = fd(reference, "label", (:))
+    let labelnames = fd(reference, "labelname", (:))
+    let labeltitle = fd(reference, "labeltitle", (:))
+
+    let abbreviation = if shorthand != none {
+      shorthand
+    } else if label != none {
+      label
+    } else if labelnames != none and labelnames.len() == 1 {
       labelalpha-name(labelnames.at(0), family-width: labelalpha)
-    } else {
+    } else if labelnames != none {
       let labelalpha-names = labelnames.map(name => labelalpha-name(name, family-width: 1))
       if labelalpha-names.len() > maxalphanames {
         labelalpha-names.slice(0, minalphanames).join("") + labelalphaothers
       } else {
         labelalpha-names.join("")
       }
+    } else if labeltitle != none {
+      title-abbreviation(labeltitle)
+    } else {
+      title-abbreviation(reference.entry_key)
     }
 
     let date = get-date(reference, "date")
-    let year = if date != none and date-year(date) != none {
+    let year = if shorthand != none {
+      ""
+    } else if date != none and date-year(date) != none {
       str(date-year(date)).slice(-2)
     } else {
       ""
@@ -422,7 +442,52 @@
     }
   }
 
+  let formatted-labelname(reference) = {
+    let labelname = fd(reference, "labelname", (:))
+    if labelname == none {
+      none
+    } else {
+      let names = labelname.map(label-name)
+      concatenate-names(names, options: options, minnames: options.minnames, maxnames: options.maxnames)
+    }
+  }
+
+  let authoryear-left-label(reference) = {
+    let name = formatted-labelname(reference)
+    if name != none {
+      name
+    } else {
+      let fallback = fd(reference, "label", (:))
+      if fallback != none {
+        fallback
+      } else {
+        let title = fd(reference, "labeltitle", (:))
+        if title != none { title } else { reference.entry_key }
+      }
+    }
+  }
+
+  let authoryear-collision-context(reference) = {
+    let name = formatted-labelname(reference)
+    if name != none {
+      name
+    } else {
+      let fallback = fd(reference, "label", (:))
+      if fallback != none {
+        fallback
+      } else {
+        let title = fd(reference, "labeltitle", (:))
+        if title != none { title } else { reference.entry_key }
+      }
+    }
+  }
+
   let formatter(reference-dict, form) = {
+    let shorthand = fd(reference-dict.reference, "shorthand", (:))
+    if shorthand != none {
+      return shorthand
+    }
+
     // access precomputed information that was stored in the label field
     let (authors-str, label-date, extradate) = reference-dict.reference.at("label")
     let label-date-defined = label-date != options.bibstring.nodate
@@ -458,6 +523,11 @@
   // Formats the label-date+extradate part of a single citation entry.
   // Returns linked content like "2024a".
   let format-date-part(lbl, reference, form) = {
+    let shorthand = fd(reference.reference, "shorthand", (:))
+    if shorthand != none {
+      return link(label(lbl), shorthand)
+    }
+
     let (authors-str, label-date, extradate) = reference.reference.at("label")
     let label-date-defined = label-date != options.bibstring.nodate
     let extradate = if extradate == none {
@@ -550,7 +620,7 @@
 
 
   let label-generator(index, reference) = {
-    let labelname = reference.fields.labelname.map(label-name)
+    let shorthand = fd(reference, "shorthand", (:))
     let date = get-date(reference, "date")
     let label-date = (options.format-date)(date, reference, "date", options)
     if label-date == none {
@@ -567,10 +637,11 @@
       none
     }
 
-    let authors-str = concatenate-names(labelname, options: options, minnames: options.minnames, maxnames: options.maxnames)
+    let authors-str = if shorthand != none { shorthand } else { authoryear-left-label(reference) }
 
     let lbl = (authors-str, label-date, extradate)
-    let lbl-repr = strfmt("{} {}{}", authors-str, label-date, extradate)
+    let collision-context = if shorthand != none { shorthand } else { authoryear-collision-context(reference) }
+    let lbl-repr = strfmt("{} {}{}", collision-context, label-date, extradate)
 
     (lbl, lbl-repr)
   }
@@ -655,9 +726,15 @@
         // reference.reference.label: any = first value from label-generator
         // reference.reference.label-repr: str = second value from label-generator
 
-        let (index, format-string) = reference.reference.label
-        let formatted = strfmt(format-string, index)
-        (index, link(label(lbl), formatted))
+        let label-data = reference.reference.label
+        if type(label-data) == dictionary and label-data.at("kind", default: none) == "shorthand" {
+          link(label(lbl), label-data.value)
+        } else {
+          let index = if type(label-data) == dictionary { label-data.index } else { label-data.at(0) }
+          let format-string = if type(label-data) == dictionary { label-data.format-string } else { label-data.at(1) }
+          let formatted = strfmt(format-string, index)
+          (index, link(label(lbl), formatted))
+        }
       }
     })
 
@@ -734,13 +811,24 @@
   }
 
   let label-generator(index, reference, format-string: "{}") = {
-    ((index + 1, format-string), str(index + 1))
+    let shorthand = fd(reference, "shorthand", (:))
+    if shorthand != none {
+      ((kind: "shorthand", value: shorthand), shorthand)
+    } else {
+      ((kind: "number", index: index + 1, format-string: format-string), str(index + 1))
+    }
   }
 
   let reference-label(index, reference) = {
-    let (index, format-string) = reference.label
-    let formatted = strfmt(format-string, index)
-    [[#formatted]]
+    let label-data = reference.label
+    if type(label-data) == dictionary and label-data.at("kind", default: none) == "shorthand" {
+      [[#label-data.value]]
+    } else {
+      let index = if type(label-data) == dictionary { label-data.index } else { label-data.at(0) }
+      let format-string = if type(label-data) == dictionary { label-data.format-string } else { label-data.at(1) }
+      let formatted = strfmt(format-string, index)
+      [[#formatted]]
+    }
   }
 
   ("format-citation": list-formatter, "label-generator": label-generator, "reference-label": reference-label)

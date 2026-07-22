@@ -1322,8 +1322,11 @@ to parse #bibtex files, and that crate requires the syntax variant.
 - #pergamon supports the `author`, `editor`, and `translator` fields, but there is currently
   no support for `editora` and similar fields (#issue(104)). Furthermore, when the same
   person has multiple roles, these are printed separately and not aggregated (#issue(103)).
-- #pergamon currently requires all #bibtex entries to specify an author, editor, or
-  translator; there is no support for the `label` or `shorthand` fields (#issue(115)).
+#llm-content[
+- Anonymous entries without an author, editor, or translator can be cited when they provide
+  title-like data, `label`, or `shorthand`. `label` is used as a fallback by styles that need
+  one; `shorthand` overrides the ordinary citation label.
+]
 - `set`, `related`, and `pageref` are not yet supported.
 
 
@@ -1333,6 +1336,10 @@ to parse #bibtex files, and that crate requires the syntax variant.
 - Bumped to Citegeist 0.3.1 and Typst Biblatex 0.12. Bibliography reading should now be much faster, and error reporting is much improved.
 - Name printing is now at #biblatex parity: prefixes, suffixes, initials all handled correctly.
 - Full support for #biblatex dates: ranges, uncertain, approximate, BCE. Date formatting can be configured by the user, e.g. to print `origdate` (thanks to ironupiwada for the suggestion).
+#llm-content[
+- Added BibLaTeX-style fallback labels for anonymous entries: `label`, `shorthand`, and
+  title-derived labels now work in the built-in citation styles.
+]
 - Support for `crossref`, `xref`, and `xdata`: crossref picks up parent data, and crossref/xref parents are included in the bibliography if enough children are.
 - More flexible handling of undefined and duplicated reference keys (thanks to navdeeprana, augustebaum, and Nasenbaer39 for suggestions).
 - Multiple small improvements and bugfixes (thanks to mo-mit, cuzbog, and maxnoe for the issues).

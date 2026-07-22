@@ -76,15 +76,6 @@
 
 
 
-// biblatex.def author/editor
-#let author-editor = with-default("author-editor", (reference, options) => {
-  if fd(reference, "author", options) != none and options.use-author {
-    author(reference, options)
-  } else {
-    editor(reference, options)
-  }
-})
-
 // biblatex.def editor+others
 #let editor-others = with-default("editor-others", (reference, options) => {
   let editor = fd(reference, "parsed-editor", options)
@@ -102,6 +93,15 @@
   // TODO - I am pointing this back to editor+others for now, but we should
   // probably disentangle the two once support for "+others" improves.
   editor-others(reference, options)
+})
+
+// biblatex.def author/editor
+#let author-editor = with-default("author-editor", (reference, options) => {
+  if fd(reference, "author", options) != none and options.use-author {
+    author(reference, options)
+  } else {
+    editor(reference, options)
+  }
 })
 
 
@@ -834,7 +834,7 @@
 
 // @manual - Technical documentation
 #let driver-manual = with-default("driver-manual", (reference, options) => {
-    require-fields(reference, options, ("author", "editor"), "title")
+    require-fields(reference, options, "title")
 
     (options.periods)(
       maybe-with-date(reference, options)(
@@ -864,7 +864,7 @@
 
 // @online - An online resource
 #let driver-online = with-default("driver-online", (reference, options) => {
-    require-fields(reference, options, ("author", "editor", "translator"), "title", ("url", "doi", "eprint"))
+    require-fields(reference, options, "title", ("url", "doi", "eprint"))
 
     (options.periods)(
       maybe-with-date(reference, options)(
@@ -905,7 +905,7 @@
 
 // @periodical - A complete issue of a periodical
 #let driver-periodical = with-default("driver-periodical", (reference, options) => {
-    require-fields(reference, options, "editor")
+    require-fields(reference, options, "title")
 
     (options.periods)(
       maybe-with-date(reference, options)(

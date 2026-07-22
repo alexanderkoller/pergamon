@@ -647,15 +647,23 @@
       }
     } else if sort-key == "n" {
       // author name
-      reference => reference.fields.sortstr // TEST ME
+      reference => reference.fields.at("sortstr", default: reference.entry_key)
     } else if sort-key == "t" {
       // paper title
-      reference => reference.fields.title.trim()
+      reference => {
+        for fieldname in ("sorttitle", "labeltitle", "title") {
+          let value = fd(reference, fieldname, (:))
+          if value != none {
+            return value.trim()
+          }
+        }
+        reference.entry_key
+      }
     } else if sort-key == "v" {
       // volume
       reference => if "volume" in reference.fields { reference.fields.volume } else { "ZZZZZZZZZZ" }
     } else if sort-key == "a" {
-      reference => if "label" in reference { reference.label } else { "ZZZZZZZZZ" }
+      reference => if "label-repr" in reference { reference.label-repr } else if "label" in reference { str(reference.label) } else { "ZZZZZZZZZ" }
     } else {
       panic(strfmt("Sorting key {} is not implemented yet.", sort-key))
     }
@@ -667,13 +675,26 @@
   it => ret.map(f => f(it))
 }
 
+// Shorthand labels stand in for numeric labels in Biblatex; they do not consume
+// an ordinary numeric label slot.
+#let label-index(entries, index, start-index) = {
+  let shorthand-count = 0
+  for prior in entries.slice(0, index) {
+    if fd(prior, "shorthand", (:)) != none {
+      shorthand-count += 1
+    }
+  }
+
+  start-index + index - shorthand-count
+}
+
 // Generate labels for the references, add extradates to distinguish them where
 // necessary, and return the sorted bibliography.
 #let label-sort-deduplicate(bibl-unsorted, label-generator, sorting-function, start-index) = {
   // Generate preliminary labels; note that the indices we pass to label-generator
   // are meaningless at this point, but they are guaranteed to be all different.
   for (index, reference) in bibl-unsorted.enumerate() {
-    let (lbl, lbl-repr) = label-generator(start-index + index, reference)
+    let (lbl, lbl-repr) = label-generator(label-index(bibl-unsorted, index, start-index), reference)
     bibl-unsorted.at(index).insert("label", lbl)
     bibl-unsorted.at(index).insert("label-repr", lbl-repr)
   }
@@ -696,8 +717,7 @@
 
   // Generate final labels
   for (index, reference) in sorted.enumerate() {
-    // call label-generator with meaningless indices, just in case it is needed
-    let (lbl, lbl-repr) = label-generator(start-index + index, reference)
+    let (lbl, lbl-repr) = label-generator(label-index(sorted, index, start-index), reference)
     sorted.at(index).insert("label", lbl)
     sorted.at(index).insert("label-repr", lbl-repr)
   }
@@ -708,10 +728,7 @@
 // order in which sortstr fields are used for "n" sorting
 #let namefield-sort-order = ("sortstr-sortname", "sortstr-author", "sortstr-editor", "sortstr-translator")
 
-#let preprocess-reference(reference, name-fields, labelname-fields, use-prefix-in-sorting: false) = {
-  let ref = parse-reference-names(reference, name-fields, use-prefix-in-sorting: use-prefix-in-sorting)
-
-  // determine labelname
+#let populate-labelname(ref, labelname-fields) = {
   let labelname-field = fd(ref, "labelnamefield", (:))
   if labelname-field != none {
     // if labelnamefield specified, try to populate labelname from it
@@ -736,11 +753,34 @@
     }
   }
 
-  if fd(ref, "labelname", (:)) == none {
-    panic("Could not determine labelname for bibliography key '" + reference.entry_key + "'")
+  ref
+}
+
+#let populate-labeltitle(ref, labeltitle-fields) = {
+  let labeltitle-field = fd(ref, "labeltitlefield", (:))
+  if labeltitle-field != none {
+    let value = fd(ref, labeltitle-field, (:))
+    if value != none {
+      ref.fields.insert("labeltitle", value)
+      ref.fields.insert("labeltitlesource", labeltitle-field)
+    }
   }
 
-  // populate sortstr field (to be used in "n" sorting key)
+  if fd(ref, "labeltitle", (:)) == none {
+    for fieldname in labeltitle-fields {
+      let value = fd(ref, fieldname, (:))
+      if value != none {
+        ref.fields.insert("labeltitle", value)
+        ref.fields.insert("labeltitlesource", fieldname)
+        break
+      }
+    }
+  }
+
+  ref
+}
+
+#let populate-sortstr(ref) = {
   for fieldname in namefield-sort-order {
     let value = fd(ref, fieldname, (:))
     if value != none {
@@ -748,6 +788,30 @@
       break
     }
   }
+
+  if fd(ref, "sortstr", (:)) == none {
+    for fieldname in ("sorttitle", "labeltitle", "title", "label", "shorthand") {
+      let value = fd(ref, fieldname, (:))
+      if value != none {
+        ref.fields.insert("sortstr", value)
+        break
+      }
+    }
+  }
+
+  if fd(ref, "sortstr", (:)) == none {
+    ref.fields.insert("sortstr", ref.entry_key)
+  }
+
+  ref
+}
+
+#let preprocess-reference(reference, name-fields, labelname-fields, labeltitle-fields: ("shorttitle", "title", "maintitle"), use-prefix-in-sorting: false) = {
+  let ref = parse-reference-names(reference, name-fields, use-prefix-in-sorting: use-prefix-in-sorting)
+
+  ref = populate-labelname(ref, labelname-fields)
+  ref = populate-labeltitle(ref, labeltitle-fields)
+  ref = populate-sortstr(ref)
 
   ref
 }
@@ -957,6 +1021,20 @@
       "translator"
     ),
 
+    /// #bibtex fields that will be considered when determining the entry's
+    /// labeltitle. The labeltitle is the title-like fallback used by citation
+    /// styles when no labelname is available.
+    ///
+    /// If the #bibtex entry specified a field with the name `labeltitlefield`,
+    /// that field is tried before the fields listed here.
+    ///
+    /// -> array
+    labeltitle-fields: (
+      "shorttitle",
+      "title",
+      "maintitle"
+    ),
+
     /// Starts the numbering of entries in this bibliography after the number
     /// specified in this argument. Let's say you typeset two bibliographies in
     /// your document, and the first one has 15 entries. You can pass `15` in
@@ -1033,7 +1111,7 @@
   if show-all {
     for reference in bib.values() {
       if lower(reference.entry_type) != "xdata" {
-        let ref = preprocess-reference(reference, name-fields, labelname-fields, use-prefix-in-sorting: use-prefix-in-sorting)
+        let ref = preprocess-reference(reference, name-fields, labelname-fields, labeltitle-fields: labeltitle-fields, use-prefix-in-sorting: use-prefix-in-sorting)
         bibl-unsorted.push(ref)
       }
     }
@@ -1044,7 +1122,7 @@
       if key in bib { // skip references to labels that are not bib keys
         let bib-entry = bib.at(key)
         if lower(bib-entry.entry_type) != "xdata" {
-          bib-entry = preprocess-reference(bib-entry, name-fields, labelname-fields, use-prefix-in-sorting: use-prefix-in-sorting)
+          bib-entry = preprocess-reference(bib-entry, name-fields, labelname-fields, labeltitle-fields: labeltitle-fields, use-prefix-in-sorting: use-prefix-in-sorting)
           bibl-unsorted.push(bib-entry)
         }
       }
