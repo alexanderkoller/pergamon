@@ -3,7 +3,7 @@
 #import "templating.typ": *
 #import "names.typ": format-name-parsed, is-andothers-name, parse-name-format-option
 #import "bib-util.typ": is-integer
-#import "dates.typ": date-field-name, get-date, format-date-field, is-year-defined
+#import "dates.typ": format-date-field, is-year-defined
 
 #let make-eprint-url(eprint, eprint-type) = {
   if eprint-type == none {
@@ -92,6 +92,17 @@
   let names = name-parts-array.map(d => format-name-parsed(d, name-type, name-format))
   concatenate-names(names, options: options, minnames: options.minnames, maxnames: options.maxnames, andothers: andothers)
 }
+
+#let parsed-date-value(reference, field) = {
+  reference.parsed_dates.at(field, default: none)
+}
+
+#let date-fields = (
+  "date": true,
+  "eventdate": true,
+  "origdate": true,
+  "urldate": true,
+)
 
 #let default-field-formats = (
   // Used in the bibliography and bibliography lists
@@ -183,7 +194,12 @@
   },
 
   "urldate": (value, reference, field, options, style) => {
-    spaces(options.bibstring.urlseen, format-date-field(value, reference, field, options))
+    let date = parsed-date-value(reference, "urldate")
+    if date == none {
+      none
+    } else {
+      spaces(options.bibstring.urlseen, format-date-field(date, reference, "urldate", options))
+    }
   },
 
   "version": (value, reference, field, options, style) => {
@@ -195,15 +211,18 @@
   },
 
   "date": (value, reference, field, options, style) => {
-    format-date-field(value, reference, field, options)
+    let date = parsed-date-value(reference, "date")
+    if date == none { none } else { format-date-field(date, reference, "date", options) }
   },
 
   "eventdate": (value, reference, field, options, style) => {
-    format-date-field(value, reference, field, options)
+    let date = parsed-date-value(reference, "eventdate")
+    if date == none { none } else { format-date-field(date, reference, "eventdate", options) }
   },
 
   "origdate": (value, reference, field, options, style) => {
-    format-date-field(value, reference, field, options)
+    let date = parsed-date-value(reference, "origdate")
+    if date == none { none } else { format-date-field(date, reference, "origdate", options) }
   },
 
   "extradate": (value, reference, field, options, style) => {
@@ -267,37 +286,40 @@
 
 #let printfield(reference, field, options, style: none) = {
   let field-formats = options.at("field-formatters")
-  let date-field = date-field-name(field)
-  let value = if date-field == none {
-    fd(reference, field, options)
-  } else {
-    get-date(reference, date-field, options: options)
+  field = lower(field)
+  let value = fd(reference, field, options)
+
+  // short-circuit on suppressed fields
+  if field in options.at("suppressed-fields", default: ()) {
+    return none
   }
 
-  if value == none {
-    none
-  } else {
-    field = if date-field == none { lower(field) } else { date-field }
+  // none values count as none, except for date fields, which have
+  // a separate lookup path
+  else if value == none and not field in date-fields {
+    return none
+  }
 
-    let printed = if field in field-formats {
-      let format = field-formats.at(field)
+  else {
+    let format = field-formats.at(field, default: none)
 
-      // resolve format aliases, e.g. "editor" to "parsed-editor"
-      while type(format) == str {
-        field = format
-        format = field-formats.at(field)
-        value = fd(reference, field, options)
-      }
+    // resolve format aliases, e.g. "editor" to "parsed-editor"
+    while type(format) == str {
+      field = format
+      format = field-formats.at(field)
+      value = fd(reference, field, options)
+    }
 
-      format(value, reference, field, options, style)
+    // format != none means we actually found a formatting function
+    if format != none {
+      value = format(value, reference, field, options, style)
+    }
+
+    // run through eval if requested
+    if options.eval-mode != none and type(value) == str {
+      eval(value, mode: options.eval-mode, scope: options.eval-scope)
     } else {
       value
     }
-
-    if options.eval-mode != none and type(printed) == str {
-      printed = eval(printed, mode: options.eval-mode, scope: options.eval-scope)
-    }
-
-    printed
   }
 }
