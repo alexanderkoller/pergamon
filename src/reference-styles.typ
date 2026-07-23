@@ -196,11 +196,13 @@
       printfield(reference, "journaltitleaddon", options)
     )
 
-    spaces(
-      journaltitle,
-      printfield(reference, "series", options),
-      volume-number-eid(reference, options),
-      issue-date(reference, options),
+    epsilons(
+      spaces(
+        journaltitle,
+        printfield(reference, "series", options),
+        volume-number-eid(reference, options),
+        issue-date(reference, options),
+      ),
       issue(reference, options)
     )
   }
@@ -245,13 +247,15 @@
 
 // standard.bbx title+issuetitle
 #let title-issuetitle = with-default("title-issuetitle", (reference, options) => {
-  spaces(
-    (options.commas)(
-      periodical(reference, options),
-      printfield(reference, "series", options)
+  epsilons(
+    spaces(
+      (options.commas)(
+        periodical(reference, options),
+        printfield(reference, "series", options)
+      ),
+      volume-number-eid(reference, options),
+      issue-date(reference, options),
     ),
-    volume-number-eid(reference, options),
-    issue-date(reference, options),
     issue(reference, options)
   )
 })
